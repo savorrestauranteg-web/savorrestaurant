@@ -1146,13 +1146,36 @@ body.dark-mode .item-card.sold-out::after {
 <div class="bottom-bar">
       <span>© 2026 SAVOR. جميع الحقوق محفوظة.</span>
       
-      <!-- حقوق المطور -->
-      <span dir="ltr" style="opacity: 0.9;">
-        Developed by <a href="https://joeadvertiseeg.vercel.app/" target="_blank" rel="noopener" style="font-weight: bold; text-decoration: underline;">Joe Advertise</a>
+      <!-- حقوق المطور مع تأثير التوهج -->
+      <style>
+        @keyframes devGlow {
+          0% { text-shadow: 0 0 4px rgba(226, 165, 48, 0.4); }
+          50% { text-shadow: 0 0 12px rgba(226, 165, 48, 0.9), 0 0 22px rgba(226, 165, 48, 0.6); }
+          100% { text-shadow: 0 0 4px rgba(226, 165, 48, 0.4); }
+        }
+        .dev-badge a {
+          color: #e2a530 !important; /* لون دهبي فخم */
+          font-weight: 900;
+          font-family: 'Oswald', sans-serif; /* خط إنجليزي مميز وسميك */
+          letter-spacing: 0.5px;
+          text-decoration: none;
+          display: inline-block;
+          animation: devGlow 2s infinite alternate; /* حركة التوهج */
+          transition: all 0.3s ease;
+        }
+        .dev-badge a:hover {
+          color: #ffffff !important; /* بيقلب أبيض لما تقف عليه */
+          transform: scale(1.08); /* بيكبر شوية */
+          text-shadow: 0 0 15px #e2a530, 0 0 30px #e2a530;
+        }
+      </style>
+      
+      <span dir="ltr" class="dev-badge" style="opacity: 1; font-size: 15px;">
+        Developed by <a href="https://joeadvertiseeg.vercel.app/" target="_blank" rel="noopener">Joe Advertise</a>
       </span>
 
       <span>Slow Sip, Soft Moments 🍔</span>
-    </div>>
+    </div>
 
 </footer>
 
