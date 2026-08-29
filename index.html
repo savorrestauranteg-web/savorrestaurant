@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAVOR Restaurant</title>
+<meta name="description" content="SAVOR - برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة، يوصلك التوصيل لحد باب البيت.">
+<link rel="icon" href="assets/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* تنسيق زر اطلب الآن في الوضع الليلي ليصبح واضحاً */
+body.dark-mode .item-card .add-btn {
+  background: #018055 !important; /* لون خلفية واضح ومميز (أو يمكنك جعله أبيض صريح #ffffff) */
+  color: #ffffff !important;      /* لون النص أبيض بالكامل لضمان أقصى درجات الوضوح */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .item-card .add-btn:hover {
+  background: #02a36f !important;
+}
+  /* تنسيق خانة الكوبون */
+.coupon-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.coupon-box input {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  color: inherit;
+  font-family: inherit;
+  font-size: 14px;
+}
+.coupon-box .btn-apply {
+  background: var(--green-deep); /* خلفية باللون الأخضر الغامق */
+  border: 1px solid var(--green-deep); /* حدود متناسقة */
+  color: #f6f7f6; /* لون النص أبيض واضح */
+  border-radius: 8px;
+  padding: 0 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.coupon-msg {
+  font-size: 12px;
+  margin-bottom: 16px;
+  min-height: 18px;
+}
+.coupon-msg.success { color: #25D366; }
+.coupon-msg.error { color: #c33a28; }
+
+/* تنسيق ملخص الفاتورة */
+.bill-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: #8a8272;
+}
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.discount-row { color: #25D366; }
+.bill-divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 14px 0;
+}
+
+/* تظبيط الألوان في الوضع الليلي */
+body.dark-mode .coupon-box input {
+  border-color: #333;
+  color: #fff;
+}
+body.dark-mode .bill-summary {
+  color: #cfc8b0;
+}
+body.dark-mode .bill-divider {
+  border-top-color: #333;
+}
+  @media (max-width: 900px) {
+    .fab-stack {
+        bottom: 90px !important; /* بيرفع الأزرار لفوق عشان متبقاش فوق السلة */
+    }
+}
+  /* إزالة الخلفية القديمة من الهيرو */
+.hero {
+  background: none !important;
+}
+/* 1. إلغاء التوهج الأصفر من تحت الأزرار (مثل زرار السلة) */
+.btn-gold,
+body.dark-mode .btn-gold {
+    box-shadow: none !important;
+}
+
+/* 2. إلغاء التوهج الأصفر الدائري من خلفية الهيرو وقسم (ليه SAVOR) */
+.hero::after,
+.why::before,
+body.dark-mode .hero::after,
+body.dark-mode .why::before {
+    background: none !important;
+    display: none !important;
+}
+/* تنسيق فيديو الخلفية */
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* لضمان ملء الشاشة بالكامل بدون تشوه */
+  z-index: 0;
+}
+
+/* طبقة التدرج اللوني فوق الفيديو (نفس ألوانك القديمة) */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(100deg, rgba(8,41,33,.94) 15%, rgba(8,41,33,.72) 45%, rgba(8,41,33,.35) 75%);
+  z-index: 1;
+}
+
+/* التأكد أن النصوص والأزرار تظهر فوق الفيديو والطبقة */
+.hero-inner {
+  position: relative;
+  z-index: 2;
+}
+  body.dark-mode {
+  --paper: #121212;
+  --ink: #fbf7ee;
+  --cream: #1e1e1e;
+  --cream-2: #2c2c2c;
+  --line: rgba(255, 255, 255, 0.12);
+  --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+}
+/* تغيير لون العناوين وأسماء المنتجات الأساسية */
+body.dark-mode .item-name,
+body.dark-mode .menu-intro h2,
+body.dark-mode .pm-title,
+body.dark-mode .pm-section-title,
+body.dark-mode .drawer-head h3,
+body.dark-mode .modal-card h3,
+body.dark-mode .cart-row .cr-name,
+body.dark-mode .total-row,
+body.dark-mode .field label,
+body.dark-mode .qty-stepper button {
+    color: #00ffaa; /* ده لون أخضر فاتح مريح للعين، لو عايزة أبيض صريح خليه #ffffff */
+}
+
+/* تغيير لون النصوص الفرعية والملاحظات عشان تكون مقروءة */
+body.dark-mode .menu-intro p,
+body.dark-mode .price-tag small,
+body.dark-mode .pm-vendor,
+body.dark-mode .pm-size-price,
+body.dark-mode .cart-row .cr-size,
+body.dark-mode .modal-card p.hint {
+    color: #00ffaa; /* لون بيج فاتح مناسب للوضع الليلي */
+}
+/* 1. إصلاح ألوان السعر في كروت المنتجات الخارجية */
+body.dark-mode .price-tag {
+    color: #e7d8d8 !important;
+}
+body.dark-mode .price-tag span {
+    color: #ff8a75 !important; /* درجة أحمر فاتحة تليق مع الدارك مود */
+}
+
+/* 2. إصلاح خلفية الصورة وزر الإغلاق في نافذة المنتج (Modal) */
+body.dark-mode .pm-img-wrap {
+    background: #1a1a1a; /* تغيير الخلفية البيضاء المزعجة */
+}
+body.dark-mode .pm-close {
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+}
+
+/* 3. إصلاح ألوان السعر داخل نافذة المنتج */
+body.dark-mode .pm-start-price {
+    color: #018055 !important;
+}
+
+/* 4. إصلاح ألوان أزرار التحكم في الكمية (+ و -) */
+body.dark-mode .pm-qty-stepper button {
+    background:#018055;
+    color: #ffffff;
+}
+body.dark-mode .pm-qty-stepper span {
+    color: #ffffff;
+}
+
+/* 5. إصلاح زر الإضافة للسلة */
+body.dark-mode .pm-add-btn {
+    background: #12503f; /* أخضر زاهي عشان يظهر في الخلفية الغامقة */
+    color: #ffffff !important;
+}
+/* 1. ألوان خلفية الـ Navbar والشريط العلوي في الوضع الليلي */
+body.dark-mode header.site {
+    background: #1a1a1a;
+    border-bottom-color: #333333;
+}
+body.dark-mode .topbar {
+    background: #121212;
+    border-bottom: 1px solid #333333;
+}
+
+/* 2. إظهار النصوص والأيقونات (اللوجو، اللينكات، وأزرار الأيقونات) */
+body.dark-mode .brand .word,
+body.dark-mode nav.links a,
+body.dark-mode .icon-btn,
+body.dark-mode .brand .word span {
+    color: #ffffff; /* لون أبيض عشان يوضح على الخلفية الغامقة */
+}
+
+/* 3. شريط تصنيفات المنيو (Category Quick Nav) */
+body.dark-mode .catnav-wrap {
+    background: #121212;
+    border-bottom-color: #333333;
+}
+body.dark-mode .catnav button {
+    background: #1a1a1a;
+    color: #ffffff;
+    border-color: #333333;
+}
+body.dark-mode .catnav button.active {
+    background: var(--gold);
+    color: var(--green-deep);
+}
+
+/* 4. قائمة الموبايل الجانبية (Mobile Menu) */
+body.dark-mode .mobile-menu {
+    background: #121212;
+}
+body.dark-mode .mobile-menu a.mm-link,
+body.dark-mode .mobile-menu .brand .word {
+    color: #ffffff !important;
+    border-bottom-color: #333333;
+}
+body.dark-mode #mmCloseBtn svg {
+    fill: #ffffff;
+}
+
+/* 5. شريط السلة السفلي في الموبايل (Sticky Cart) */
+body.dark-mode .sticky-cart {
+    background: #018055;
+    color: #ffffff;
+    border-top: 1px solid #333333;
+}
+.hero {
+  background:
+    /* قم بتغيير الأرقام هنا لتغيير اللون ودرجة الشفافية */
+    linear-gradient(100deg, rgba(8,41,33,.94) 15%, rgba(8,41,33,.72) 45%, rgba(8,41,33,.35) 75%),
+    url('assets/beefburger.jpg') center 38% / cover no-repeat;
+}
+.cat-banner .overlay {
+  /* قم بتغيير الأرقام هنا للتحكم في تدرج لون القسم */
+  background: linear-gradient(90deg, rgba(8,41,33,.92) 30%, rgba(124, 151, 144, 0.35) 85%);
+}
+/* 1. إظهار نصوص القسم الرئيسي (الهيدر) باللون الأبيض */
+body.dark-mode .hero,
+body.dark-mode .hero h1,
+body.dark-mode .hero p.lead {
+    color: #ffffff !important;
+}
+
+/* 2. إظهار نصوص بانرات الأقسام (مثل المشروبات) باللون الأبيض */
+body.dark-mode .cat-banner-content,
+body.dark-mode .cat-banner-content h3 {
+    color: #ffffff !important;
+}
+
+/* 3. إظهار نصوص الأزرار المفرغة باللون الأبيض */
+body.dark-mode .btn-outline {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* 4. إظهار نصوص قسم (ليه SAVOR) وقسم (تواصل معنا) باللون الأبيض */
+body.dark-mode .why,
+body.dark-mode .why-card h3,
+body.dark-mode .contact-card,
+body.dark-mode .contact-card h2 {
+    color: #ffffff !important;
+}
+/* 1. تبييض نصوص الفوتر بالكامل في الوضع الليلي */
+body.dark-mode footer.site,
+body.dark-mode footer.site p,
+body.dark-mode footer.site h4,
+body.dark-mode footer.site ul a,
+body.dark-mode .footer-brand span,
+body.dark-mode .bottom-bar span {
+    color: #ffffff !important;
+}
+
+/* 2. تبييض لون النص والأيقونة لزرار "شوف المنيو" في الهيدر */
+body.dark-mode .hero-ctas .btn {
+    color: #ffffff !important;
+}
+
+body.dark-mode .hero-ctas .btn svg {
+    fill: #ffffff !important;
+}
+/* تغيير التوهج حول الأزرار الذهبية */
+body.dark-mode .btn-gold {
+    box-shadow: 0 14px 30px -12px #0f443a !important;
+}
+
+/* تغيير التوهج في خلفية القسم الرئيسي وقسم (ليه SAVOR) */
+body.dark-mode .hero::after,
+body.dark-mode .why::before {
+    background: radial-gradient(circle, rgba(15, 68, 58, 0.5), transparent 65%) !important;
+}
+/* إظهار السعر وتفاصيل الحجم بوضوح */
+body.dark-mode .cart-row .cr-price {
+    color: #fff9f8 !important;
+}
+body.dark-mode .cart-row .cr-size {
+    color: #cfc8b0 !important;
+}
+
+/* إصلاح ألوان أزرار التحكم في الكمية داخل السلة */
+body.dark-mode .qty-stepper .qty-val {
+    color: #ffffff !important;
+}
+body.dark-mode .drawer-body .qty-stepper button {
+    background: #333333;
+    color: #ffffff;
+}
+
+/* إصلاح زر الحذف (X) ليكون واضحاً */
+body.dark-mode .cr-remove {
+    background: #333333;
+    color: #fffdfd;
+}
+
+/* تبييض نص زر إتمام الطلب */
+body.dark-mode #checkoutBtn {
+    color: #ffffff !important;
+}
+/* 1. توضيح زرار الإغلاق (X) ليكون بخلفية فاتحة قليلاً وأيقونة بيضاء */
+body.dark-mode .modal-close,
+body.dark-mode #cartCloseBtn {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+body.dark-mode .modal-close svg,
+body.dark-mode #cartCloseBtn svg {
+    fill: #ffffff !important;
+}
+
+/* 2. إجبار نص إجمالي السعر (الأرقام) على الظهور باللون الأبيض */
+body.dark-mode .total-row b,
+body.dark-mode #cartTotal {
+    color: #ffffff !important;
+}
+/* توضيح نص زرار السلة في الموبايل */
+#stickyCartBtn {
+    color: #ffffff !important;
+}
+/* 1. الوضع المضيء (العادي): النصوص باللون الأبيض */
+.hero-ctas .btn {
+    color: #ffffff !important;
+}
+.hero-ctas .btn svg {
+    fill: #ffffff !important;
+}
+
+/* 2. الوضع الليلي: النصوص باللون الأخضر */
+/* زرار "شوف المنيو" (خلفيته غامقة) ياخد نص أخضر فاتح زاهي */
+body.dark-mode .hero-ctas .btn-gold,
+body.dark-mode .hero-ctas .btn-dark {
+    color: #25D366 !important;
+}
+body.dark-mode .hero-ctas .btn-gold svg,
+body.dark-mode .hero-ctas .btn-dark svg {
+    fill: #25D366 !important;
+}
+
+/* زرار "واتساب" (خلفيته خضراء فاتحة) ياخد نص أخضر غامق عشان يكون مقروء */
+body.dark-mode .hero-ctas .btn-whatsapp {
+    color: #082921 !important; 
+}
+body.dark-mode .hero-ctas .btn-whatsapp svg {
+    fill: #082921 !important;
+}
+  :root{
+    --green-deep:#0f443a;
+    --green:#0c3d30;
+    --green-mid:#12503f;
+    --cream:#f6efdf;
+    --cream-2:#efe6cf;
+    --gold:#018055;
+    --gold-2:#018055;
+    --tomato:#0f443a;
+    --ink:#1c1712;
+    --paper:#fbf7ee;
+    --line:rgba(28,23,18,.12);
+    --line-light:rgba(255,255,255,.16);
+    --shadow:0 18px 40px -18px rgba(8,41,33,.45);
+    --radius:18px;
+    --arch: 999px 999px 18px 18px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:120px;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Tajawal',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:'Lalezar',sans-serif; font-weight:400; letter-spacing:.5px;}
+  .en{font-family:'Oswald',sans-serif; letter-spacing:.06em; text-transform:uppercase;}
+  img{max-width:100%; display:block;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  .container{max-width:1180px; margin:0 auto; padding:0 20px;}
+  ::selection{background:var(--gold); color:var(--green-deep);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background:var(--green-deep); color:#e9e2cc; font-size:13px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 0; position:relative; z-index:60;
+  }
+  .topbar .container{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  .topbar-links{display:flex; gap:18px; align-items:center;}
+  .topbar-links a{display:flex; align-items:center; gap:6px; opacity:.9; transition:opacity .2s;}
+  .topbar-links a:hover{opacity:1; color:var(--gold-2);}
+  .topbar-social{display:flex; gap:12px;}
+  .topbar-social a{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center; transition:background .2s, transform .2s;}
+  .topbar-social a:hover{background:var(--gold); color:var(--green-deep); transform:translateY(-2px);}
+  .topbar svg{width:14px; height:14px; fill:currentColor;}
+
+  /* ---------- Header ---------- */
+  header.site{
+    position:sticky; top:0; z-index:55;
+    background:var(--green); border-bottom:1px solid var(--line-light);
+    box-shadow:0 10px 26px -18px rgba(0,0,0,.5);
+  }
+.nav-wrap { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  padding: 12px 20px; /* تم تعديل الصفر إلى 20px */
+}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{height:44px; width:auto; border-radius:8px;}
+  .brand .word{font-family:'Lalezar',sans-serif; font-size:26px; color:var(--cream); line-height:1;}
+  .brand .word span{color:var(--gold-2);}
+  nav.links{display:flex; gap:30px; align-items:center;}
+  nav.links a{color:var(--cream); font-weight:700; font-size:15px; position:relative; padding:6px 2px;}
+  nav.links a::after{content:"";position:absolute; right:0; bottom:-2px; width:0; height:2px; background:var(--gold); transition:width .25s;}
+  nav.links a:hover::after{width:100%;}
+  .nav-actions{display:flex; align-items:center; gap:12px;}
+  .icon-btn{
+    display:flex; align-items:center; justify-content:center;
+    width:42px; height:42px; border-radius:50%;
+    background:rgba(255,255,255,.08); color:var(--cream); border:1px solid var(--line-light);
+    transition:background .2s, transform .2s;
+  }
+  .icon-btn:hover{background:var(--gold); color:var(--green-deep); transform:translateY(-2px);}
+  .icon-btn svg{width:19px; height:19px; fill:currentColor;}
+  .cart-btn{position:relative;}
+  .cart-count{
+    position:absolute; top:-6px; left:-6px; background:var(--tomato); color:#fff;
+    font-family:'Oswald',sans-serif; font-size:11px; min-width:20px; height:20px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid var(--green);
+  }
+  .burger-toggle{display:none;}
+
+  /* Mobile nav */
+  .mobile-menu{
+    position:fixed; inset:0; background:var(--green-deep); z-index:80;
+    transform:translateY(-100%); transition:transform .35s ease;
+    display:flex; flex-direction:column; padding:26px 22px;
+  }
+  .mobile-menu.open{transform:translateY(0);}
+  .mobile-menu .mm-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;}
+  .mobile-menu a.mm-link{color:var(--cream); font-size:24px; font-family:'Lalezar',sans-serif; padding:14px 0; border-bottom:1px solid var(--line-light);}
+  .mobile-menu .mm-contact{margin-top:auto; display:flex; flex-direction:column; gap:14px;}
+  .mm-btn{display:flex; align-items:center; gap:10px; justify-content:center; padding:14px; border-radius:14px; font-weight:700;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative; min-height:88vh; display:flex; align-items:center;
+    background:
+      linear-gradient(100deg, rgba(8,41,33,.94) 15%, rgba(8,41,33,.72) 45%, rgba(8,41,33,.35) 75%),
+      url('assets/beefburger.jpg') center 38% / cover no-repeat;
+    color:var(--cream); overflow:hidden;
+  }
+  .hero::before{
+    content:""; position:absolute; inset:0;
+    background-image: radial-gradient(rgba(255,255,255,.10) 1.6px, transparent 1.6px);
+    background-size:26px 26px; opacity:.35; pointer-events:none;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-10%; bottom:-30%; width:60%; height:140%;
+    border-radius:50%; background:radial-gradient(circle, rgba(226,165,48,.16), transparent 65%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:2; padding:80px 0 60px;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; background:rgba(226,165,48,.15);
+    border:1px solid rgba(226,165,48,.5); color:var(--gold-2); padding:7px 16px; border-radius:999px;
+    font-size:13px; font-weight:700; margin-bottom:22px; animation:fadeUp .7s ease both;
+  }
+  .hero h1{
+    font-size:clamp(40px,6vw,74px); line-height:1.12; margin:0 0 20px; max-width:820px;
+    animation:fadeUp .8s .05s ease both;
+  }
+  .hero h1 .accent{color:var(--gold-2);}
+  .hero p.lead{
+    font-size:18px; line-height:1.8; max-width:560px; color:#e7e0cb; margin:0 0 34px;
+    animation:fadeUp .8s .12s ease both;
+  }
+  .hero-ctas{display:flex; gap:16px; flex-wrap:wrap; animation:fadeUp .8s .2s ease both;}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; padding:16px 30px; border-radius:var(--arch);
+    font-weight:800; font-size:16px; border:none; transition:transform .22s, box-shadow .22s, background .22s;
+  }
+  .btn svg{width:19px; height:19px; fill:currentColor;}
+  .btn-gold{background:var(--gold); color:var(--green-deep); box-shadow:0 14px 30px -12px rgba(226,165,48,.6);}
+  .btn-gold:hover{background:var(--gold-2); transform:translateY(-3px);}
+  .btn-outline{background:transparent; color:var(--cream); border:2px solid rgba(255,255,255,.55);}
+  .btn-outline:hover{background:rgba(255,255,255,.12); transform:translateY(-3px);}
+  .btn-whatsapp{background:#25D366; color:#04361c;}
+  .btn-whatsapp:hover{background:#2fe377; transform:translateY(-3px);}
+  .btn-dark{background:var(--green-deep); color:var(--cream);}
+  .btn-dark:hover{background:var(--green-mid); transform:translateY(-3px);}
+  .btn-block{width:100%; justify-content:center;}
+
+  @keyframes fadeUp{from{opacity:0; transform:translateY(22px);} to{opacity:1; transform:translateY(0);}}
+
+  .trust-strip{
+    position:relative; z-index:2; margin-top:56px; display:flex; flex-wrap:wrap; gap:14px;
+    animation:fadeUp .9s .3s ease both;
+  }
+  .trust-chip{
+    display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.08);
+    border:1px solid var(--line-light); padding:11px 18px; border-radius:999px; font-size:14px; font-weight:700;
+    backdrop-filter:blur(4px);
+  }
+  .trust-chip svg{width:18px;height:18px;fill:var(--gold-2);}
+
+  /* Arch divider signature element */
+  .arch-divider{position:relative; height:56px; margin-top:-1px;}
+  .arch-divider svg{width:100%; height:100%; display:block;}
+
+  /* ---------- Category quick nav ---------- */
+  .catnav-wrap{
+    position:sticky; top:68px; z-index:40; background:var(--paper);
+    border-bottom:1px solid var(--line); box-shadow:0 8px 18px -16px rgba(0,0,0,.4);
+  }
+  .catnav{display:flex; gap:10px; overflow-x:auto; padding:14px 20px; scrollbar-width:none;}
+  .catnav::-webkit-scrollbar{display:none;}
+  .catnav button{
+    flex:0 0 auto; display:flex; align-items:center; gap:8px; padding:10px 18px; border-radius:999px;
+    background:var(--cream-2); border:1px solid var(--line); font-weight:700; font-size:14px; color:var(--ink);
+    transition:all .22s;
+  }
+  .catnav button .ic{font-size:17px;}
+  .catnav button:hover{border-color:var(--gold);}
+  .catnav button.active{background:var(--green); color:var(--cream); border-color:var(--green);}
+
+  /* ---------- Menu section ---------- */
+  .menu-intro{padding:64px 0 10px; text-align:center;}
+  .menu-intro .kicker{color:var(--tomato); font-weight:800; font-size:14px; letter-spacing:.08em;}
+  .menu-intro h2{font-size:clamp(34px,4.6vw,54px); margin:8px 0 10px; color:var(--green-deep);}
+  .menu-intro p{max-width:560px; margin:0 auto; color:#5a5346; font-size:16px; line-height:1.8;}
+
+  .category-block{padding:46px 0; scroll-margin-top:150px;}
+  .category-block:nth-child(even){background:var(--cream);}
+  .cat-banner{
+    position:relative; border-radius:22px; overflow:hidden; margin-bottom:34px; min-height:150px;
+    display:flex; align-items:center; box-shadow:var(--shadow);
+    background-size:cover; background-position:center;
+  }
+  .cat-banner .overlay{
+    position:absolute; inset:0; background:linear-gradient(90deg, rgba(8,41,33,.92) 30%, rgba(8,41,33,.35) 85%);
+  }
+  .cat-banner-content{position:relative; z-index:2; padding:28px 34px; color:var(--cream);}
+  .cat-banner-content .ic{font-size:34px; margin-bottom:6px; display:block;}
+  .cat-banner-content h3{font-size:clamp(26px,3.4vw,38px); margin:0 0 4px;}
+  .cat-banner-content .en{font-size:12px; color:var(--gold-2); font-weight:600;}
+
+  .items-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:20px;}
+  .item-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; display:flex; flex-direction:column; gap:12px; position:relative;
+    opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease, box-shadow .25s;
+  }
+  .item-card.visible{opacity:1; transform:translateY(0);}
+  .item-card:hover{box-shadow:var(--shadow); border-color:rgba(226,165,48,.5);}
+  .item-card .badge{
+    position:absolute; top:-10px; right:14px; background:var(--tomato); color:#fff; font-size:11px;
+    font-weight:800; padding:5px 12px; border-radius:999px; box-shadow:0 6px 14px -6px rgba(195,58,40,.6);
+  }
+  .item-name{font-size:18px; font-weight:800; color:var(--green-deep);}
+  .size-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .size-pill{
+    border:1.5px solid var(--line); background:var(--cream-2); border-radius:12px; padding:8px 6px;
+    text-align:center; min-width:56px; font-family:'Oswald',sans-serif; font-size:12px; font-weight:600;
+    color:var(--ink); transition:all .18s;
+  }
+  .size-pill b{display:block; font-family:'Tajawal',sans-serif; font-size:14px; margin-top:2px;}
+  .size-pill.active{background:var(--green); border-color:var(--green); color:var(--cream);}
+  .item-foot{display:flex; align-items:center; justify-content:space-between; margin-top:auto; gap:10px;}
+  .price-tag{font-family:'Oswald',sans-serif; font-size:20px; font-weight:700; color:var(--tomato);}
+  .price-tag small{font-size:12px; color:#8a8272; font-weight:500;}
+  .qty-stepper{display:flex; align-items:center; gap:0; border:1.5px solid var(--line); border-radius:10px; overflow:hidden;}
+  .qty-stepper button{width:30px; height:30px; background:var(--cream-2); font-size:16px; font-weight:800; color:var(--green-deep);}
+  .qty-stepper span{width:28px; text-align:center; font-weight:700;}
+  .add-row{display:flex; align-items:center; gap:10px;}
+  .add-btn{
+    flex:1; background:var(--green); color:var(--cream); border-radius:12px; padding:10px 14px;
+    font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; gap:6px;
+    transition:background .2s, transform .2s;
+  }
+  .add-btn:hover{background:var(--green-mid); transform:translateY(-2px);}
+  .add-btn svg{width:16px;height:16px;fill:currentColor;}
+  .add-btn.added{background:var(--gold); color:var(--green-deep);}
+
+  /* ---------- Why Savor ---------- */
+  .why{padding:80px 0; background:var(--green-deep); color:var(--cream); position:relative; overflow:hidden;}
+  .why::before{content:""; position:absolute; left:-8%; top:-20%; width:45%; height:80%; border-radius:50%;
+    background:radial-gradient(circle, rgba(226,165,48,.12), transparent 65%);}
+  .why-head{text-align:center; margin-bottom:48px; position:relative; z-index:2;}
+  .why-head .kicker{color:var(--gold-2); font-weight:800; font-size:14px;}
+  .why-head h2{font-size:clamp(32px,4.4vw,50px); margin:8px 0 0;}
+  .why-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:22px; position:relative; z-index:2;}
+  .why-card{
+    background:rgba(255,255,255,.06); border:1px solid var(--line-light); border-radius:20px; padding:28px 24px;
+    transition:transform .25s, background .25s;
+  }
+  .why-card:hover{transform:translateY(-6px); background:rgba(255,255,255,.1);}
+  .why-card .ic{
+    width:52px; height:52px; border-radius:14px; background:var(--gold); color:var(--green-deep);
+    display:flex; align-items:center; justify-content:center; margin-bottom:16px;
+  }
+  .why-card .ic svg{width:26px; height:26px; fill:currentColor;}
+  .why-card h3{font-size:20px; margin:0 0 8px; font-family:'Tajawal',sans-serif; font-weight:800;}
+  .why-card p{margin:0; font-size:14.5px; line-height:1.8; color:#d7d0bb;}
+
+  /* ---------- Contact / Location ---------- */
+  .contact{padding:80px 0; background:var(--paper);}
+  .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:stretch;}
+  @media (max-width:860px){.contact-grid{grid-template-columns:1fr;}}
+  .contact-card{
+    background:var(--green); color:var(--cream); border-radius:24px; padding:40px 34px;
+    display:flex; flex-direction:column; gap:22px; box-shadow:var(--shadow);
+  }
+  .contact-card h2{font-size:34px; margin:0;}
+  .contact-card p.sub{color:#cfc8b0; margin:-14px 0 6px; line-height:1.8;}
+  .contact-line{display:flex; align-items:center; gap:14px; font-size:16px; font-weight:700;}
+  .contact-line .ic{
+    width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,.1); display:flex;
+    align-items:center; justify-content:center; flex:0 0 auto;
+  }
+  .contact-line .ic svg{width:19px;height:19px;fill:var(--gold-2);}
+  .contact-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:6px;}
+  .social-row{display:flex; gap:12px; margin-top:6px;}
+  .social-row a{
+    width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.08); border:1px solid var(--line-light);
+    display:flex; align-items:center; justify-content:center; transition:all .2s;
+  }
+  .social-row a:hover{background:var(--gold); color:var(--green-deep); transform:translateY(-3px);}
+  .social-row svg{width:19px; height:19px; fill:currentColor;}
+  .map-frame{border-radius:24px; overflow:hidden; box-shadow:var(--shadow); min-height:320px; border:1px solid var(--line);}
+  .map-frame iframe{width:100%; height:100%; min-height:320px; border:0;}
+
+  /* ---------- Footer ---------- */
+  footer.site{background:var(--green-deep); color:#cfc8b0; padding:56px 0 0;}
+  .footer-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:34px; padding-bottom:40px; border-bottom:1px solid var(--line-light);}
+  @media (max-width:760px){.footer-grid{grid-template-columns:1fr;}}
+  .footer-brand{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .footer-brand img{height:38px; border-radius:8px;}
+  .footer-brand span{font-family:'Lalezar',sans-serif; font-size:22px; color:var(--cream);}
+  footer.site h4{color:var(--cream); font-size:16px; margin:0 0 16px;}
+  footer.site ul{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;}
+  footer.site ul a{transition:color .2s;}
+  footer.site ul a:hover{color:var(--gold-2);}
+  .bottom-bar{display:flex; justify-content:space-between; align-items:center; padding:20px 0; font-size:13px; flex-wrap:wrap; gap:10px;}
+
+  /* ---------- Floating action buttons ---------- */
+  .fab-stack{position:fixed; bottom:26px; left:20px; z-index:70; display:flex; flex-direction:column; gap:12px;}
+  .fab{
+    width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 14px 26px -10px rgba(0,0,0,.5); transition:transform .2s;
+  }
+  .fab:hover{transform:scale(1.08);}
+  .fab svg{width:26px; height:26px; fill:#fff;}
+  .fab.wa{background:#25D366; position:relative;}
+  .fab.wa::after{
+    content:""; position:absolute; inset:0; border-radius:50%; background:#25D366; opacity:.6;
+    animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{0%{transform:scale(1); opacity:.6;} 100%{transform:scale(1.9); opacity:0;}}
+  .fab.call{background:var(--green);}
+  .fab.top{background:var(--gold); display:none;}
+  .fab.top svg{fill:var(--green-deep);}
+
+  /* ---------- Sticky mobile cart bar ---------- */
+  .sticky-cart{
+    position:fixed; bottom:0; right:0; left:0; z-index:65; background:var(--green);
+    color:var(--cream); padding:14px 18px; display:none; align-items:center; justify-content:space-between;
+    box-shadow:0 -10px 26px -12px rgba(0,0,0,.5); transform:translateY(120%); transition:transform .3s ease;
+  }
+  .sticky-cart.show{transform:translateY(0);}
+  .sticky-cart .sc-info{display:flex; flex-direction:column;}
+  .sticky-cart .sc-info b{font-family:'Oswald',sans-serif; font-size:18px;}
+  .sticky-cart .sc-info small{color:#cfc8b0;}
+
+  /* ---------- Cart drawer ---------- */
+  .overlay-bg{position:fixed; inset:0; background:rgba(8,41,33,.55); backdrop-filter:blur(2px); z-index:89; opacity:0; pointer-events:none; transition:opacity .3s;}
+  .overlay-bg.show{opacity:1; pointer-events:auto;}
+  .drawer{
+    position:fixed; top:0; bottom:0; left:0; width:min(420px,92vw); background:var(--paper); z-index:90;
+    transform:translateX(-105%); transition:transform .35s ease; display:flex; flex-direction:column;
+    box-shadow:20px 0 50px rgba(0,0,0,.3);
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{display:flex; align-items:center; justify-content:space-between; padding:20px 22px; background:var(--green); color:var(--cream);}
+  .drawer-head h3{margin:0; font-size:24px;}
+  .drawer-body{flex:1; overflow-y:auto; padding:18px 22px; display:flex; flex-direction:column; gap:14px;}
+  .cart-empty{text-align:center; color:#8a8272; padding:50px 10px;}
+  .cart-empty .ic{font-size:44px; margin-bottom:12px;}
+  .cart-row{display:flex; gap:12px; align-items:center; border-bottom:1px dashed var(--line); padding-bottom:14px;}
+  .cart-row .cr-info{flex:1;}
+  .cart-row .cr-name{font-weight:800; color:var(--green-deep); font-size:15px;}
+  .cart-row .cr-size{font-size:12px; color:#8a8272;}
+  .cart-row .cr-price{font-family:'Oswald',sans-serif; font-weight:700; color:var(--tomato); font-size:14px; margin-top:4px;}
+  .cr-remove{width:26px; height:26px; border-radius:50%; background:var(--cream-2); color:var(--tomato); font-size:16px; display:flex; align-items:center; justify-content:center;}
+  .drawer-foot{padding:18px 22px 24px; border-top:1px solid var(--line); background:var(--paper);}
+  .total-row{display:flex; justify-content:space-between; align-items:center; font-size:18px; font-weight:800; margin-bottom:14px; color:var(--green-deep);}
+  .total-row b{font-family:'Oswald',sans-serif; color:var(--tomato); font-size:24px;}
+
+  /* ---------- Checkout modal ---------- */
+  .modal{
+    position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center;
+    padding:20px; opacity:0; pointer-events:none; transition:opacity .3s;
+  }
+  .modal.show{opacity:1; pointer-events:auto;}
+  .modal-card{
+    background:var(--paper); border-radius:22px; width:100%; max-width:460px; padding:30px;
+    max-height:90vh; overflow-y:auto; transform:translateY(20px); transition:transform .3s;
+  }
+  .modal.show .modal-card{transform:translateY(0);}
+  .modal-card h3{margin:0 0 6px; font-size:28px; color:var(--green-deep);}
+  .modal-card p.hint{color:#8a8272; margin:0 0 20px; font-size:14px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-weight:700; font-size:14px; margin-bottom:7px; color:var(--green-deep);}
+  .field input, .field textarea{
+    width:100%; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; font-family:inherit;
+    font-size:15px; background:#fff; color:var(--ink); resize:vertical;
+  }
+  .field input:focus, .field textarea:focus{outline:2px solid var(--gold); border-color:var(--gold);}
+  .modal-close{position:absolute; top:14px; left:14px; width:34px; height:34px; border-radius:50%; background:var(--cream-2); display:flex; align-items:center; justify-content:center; color:var(--ink);}
+  .modal-card{position:relative;}
+
+  .toast{
+    position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); z-index:99;
+    background:var(--green-deep); color:var(--cream); padding:13px 24px; border-radius:999px; font-weight:700;
+    font-size:14px; opacity:0; transition:all .3s; box-shadow:var(--shadow); display:flex; align-items:center; gap:8px;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  a:focus-visible, button:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+
+  @media (max-width:900px){
+    .topbar{display:none;}
+    nav.links{display:none;}
+    .burger-toggle{display:flex;}
+    .catnav-wrap{top:0;}
+    .sticky-cart{display:flex;}
+  }
+  @media (max-width:520px){
+    .hero{min-height:94vh;}
+    .hero-inner{padding:60px 0 40px;}
+    .trust-strip{gap:10px;}
+    .trust-chip{font-size:12.5px; padding:9px 14px;}
+  }
+  /* --- Product Modal (تجربة الطلب الجديدة) --- */
+.pm-card { 
+  padding: 0; 
+  max-width: 420px; 
+  overflow-y: auto; /* لتفعيل السكرول للأسفل */
+  overflow-x: hidden; /* لمنع أي سكرول جانبي غير مرغوب فيه */
+}
+.pm-img-wrap { width: 100%; height: 240px; background: #fff; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid var(--line); position: relative; }
+.pm-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.pm-close { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; color: var(--ink); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.pm-body { padding: 20px; }
+.pm-title { font-size: 24px; color: var(--green-deep); margin: 0 0 4px; font-weight: 800; }
+.pm-vendor { color: #8a8272; font-size: 14px; margin: 0 0 12px; }
+.pm-start-price { font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--green-deep); font-weight: 700; margin-bottom: 20px; }
+.pm-section-title { font-size: 16px; font-weight: 800; color: var(--green-deep); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.pm-section-title span { background: #e5f4ef; color: var(--green); font-size: 11px; padding: 4px 8px; border-radius: 4px; }
+.pm-sizes { display: flex; flex-direction: column; margin-bottom: 24px; }
+.pm-size-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.pm-size-row:last-child { border-bottom: none; }
+.pm-size-name { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.pm-size-name input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+.pm-size-price { font-family: 'Oswald', sans-serif; font-weight: 600; color: #5a5346; }
+.pm-action-bar { display: flex; gap: 12px; align-items: stretch; }
+.pm-qty-stepper { display: flex; align-items: center; justify-content: space-between; background: var(--cream-2); border-radius: 12px; padding: 4px; width: 110px; }
+.pm-qty-stepper button { width: 34px; height: 34px; border: none; background: #fff; border-radius: 8px; font-size: 18px; font-weight: 700; color: var(--green-deep); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.pm-qty-stepper span { font-weight: 800; font-size: 16px; }
+.pm-add-btn { flex: 1; background: var(--green); color: var(--cream); border: none; border-radius: 12px; font-size: 16px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; transition: transform 0.2s; }
+.pm-add-btn:active { transform: scale(0.98); }
+
+/* تعديل الـ Item Card عشان يكون Clickable ويعرض صورة */
+.item-card { cursor: pointer; padding: 14px; gap: 8px; }
+.item-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin-bottom: 8px; background: var(--cream-2); }
+.item-card .price-tag { margin-top: 6px; font-size: 16px; }
+</style>
+</head>
+<body>
+<!-- شريط تنبيه غلق المطعم -->
+<div id="restaurantClosedBanner" style="display: none; background-color: #c33a28; color: white; text-align: center; padding: 10px; font-weight: bold; position: sticky; top: 0; z-index: 1000;">
+  🔴 المطعم مقفول حالياً، مينفعش تكمل الأوردر دلوقتي. جرب تاني بعد شوية.
+</div>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-links">
+      <a href="tel:01203653736">
+        <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1.1.5 1.1 1.1V20c0 .6-.5 1.1-1.1 1.1C10.6 21.1 2.9 13.4 2.9 3.9 2.9 3.3 3.4 2.8 4 2.8h3.3c.6 0 1.1.5 1.1 1.1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1L6.6 10.8z"/></svg>
+        01203653736
+      </a>
+      <a href="https://wa.me/201067841756" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3zm4.6-6.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
+        01067841756
+      </a>
+      <span style="opacity:.8;">آخر شارع الإسكندرية - بجوار حديقة الغزالة</span>
+    </div>
+    <div class="topbar-social" aria-label="روابط السوشيال ميديا">
+      <a href="#" target="_blank" rel="noopener" title="فيسبوك"><svg viewBox="0 0 24 24" width="13" height="13"><path fill="currentColor" d="M13.5 21v-7.9h2.7l.4-3.1h-3.1V8.1c0-.9.2-1.5 1.6-1.5H16.7V3.8C16.4 3.8 15.4 3.7 14.2 3.7c-2.4 0-4.1 1.5-4.1 4.2v2.2H7.4v3.1h2.7V21h3.4z"/></svg></a>
+      <a href="#" target="_blank" rel="noopener" title="انستجرام"><svg viewBox="0 0 24 24" width="13" height="13"><path fill="currentColor" d="M12 2.2c2.7 0 3 0 4 .1 1 0 1.7.2 2.3.4.6.2 1.1.5 1.6 1 .5.5.8 1 1 1.6.2.6.4 1.3.4 2.3.1 1 .1 1.3.1 4s0 3-.1 4c0 1-.2 1.7-.4 2.3-.2.6-.5 1.1-1 1.6-.5.5-1 .8-1.6 1-.6.2-1.3.4-2.3.4-1 .1-1.3.1-4 .1s-3 0-4-.1c-1 0-1.7-.2-2.3-.4-.6-.2-1.1-.5-1.6-1-.5-.5-.8-1-1-1.6-.2-.6-.4-1.3-.4-2.3-.1-1-.1-1.3-.1-4s0-3 .1-4c0-1 .2-1.7.4-2.3.2-.6.5-1.1 1-1.6.5-.5 1-.8 1.6-1 .6-.2 1.3-.4 2.3-.4 1-.1 1.3-.1 4-.1zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8.2A3.2 3.2 0 1112 8.8a3.2 3.2 0 010 6.4zm5.2-8.4a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg></a>
+      <a href="#" target="_blank" rel="noopener" title="تيك توك"><svg viewBox="0 0 24 24" width="13" height="13"><path fill="currentColor" d="M16.6 2h-3.2v13.4a2.6 2.6 0 11-2.4-2.6v-3.3a5.9 5.9 0 105.9 5.9c0-.2 0-.4 0-.6V8.6a7.9 7.9 0 004.5 1.4V6.8a4.6 4.6 0 01-4.8-4.8z"/></svg></a>
+      <a href="#location" title="الموقع على الخريطة"><svg viewBox="0 0 24 24" width="13" height="13"><path fill="currentColor" d="M12 2C7.6 2 4 5.6 4 10c0 5.6 8 12 8 12s8-6.4 8-12c0-4.4-3.6-8-8-8zm0 10.8A2.8 2.8 0 1112 6.4a2.8 2.8 0 010 6.4z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container nav-wrap">
+<a href="#top" class="brand">
+  <img src="logo.jpeg" alt="SAVOR Logo">
+</a>
+    <nav class="links">
+      <a href="#top">الرئيسية</a>
+      <a href="#menu">المنيو</a>
+      <a href="#why">ليه SAVOR</a>
+      <a href="#location">تواصل معنا</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="icon-btn" href="https://wa.me/201067841756" target="_blank" rel="noopener" title="واتساب" aria-label="واتساب">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3zm4.6-6.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
+      </a>
+      <button class="icon-btn" id="darkModeBtn" aria-label="الوضع الليلي">
+  <svg viewBox="0 0 24 24"><path d="M12 21.5c-5.2 0-9.5-4.3-9.5-9.5 0-4.3 2.8-8 6.8-9.1.5-.1 1 .3.9.8-.4 1.5-.4 3.1.2 4.6 1.1 2.9 3.5 5 6.5 5.6 1.5.3 3 .1 4.4-.4.5-.2 1 .3.8.8-1.1 4-4.8 6.8-9.1 6.8z"/></svg>
+</button>
+      <button class="icon-btn cart-btn" id="cartOpenBtn" aria-label="سلة الطلبات">
+        <svg viewBox="0 0 24 24"><path d="M7 4h-2l-1 2H2v2h2l3.6 7.6-1.3 2.4c-.2.4-.3.8-.3 1.2 0 1.1.9 2 2 2h12v-2H8.4c-.1 0-.2-.1-.2-.2l.9-1.8h7.5c.8 0 1.4-.4 1.8-1.1l3.6-6.5c.1-.2.1-.4-.1-.6-.1-.2-.3-.3-.5-.3H6.2L5.3 4H7zm2 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm9 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span class="cart-count" id="cartCount" style="display:none;">0</span>
+      </button>
+      <button class="icon-btn burger-toggle" id="mmOpenBtn" aria-label="القائمة">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mm-top">
+<div class="brand"><img src="logo.jpeg" alt="SAVOR"></div>
+    <button class="icon-btn" id="mmCloseBtn" aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="#f6efdf"><path d="M6.4 5L5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg></button>
+  </div>
+  <a href="#top" class="mm-link">الرئيسية</a>
+  <a href="#menu" class="mm-link">المنيو</a>
+  <a href="#why" class="mm-link">ليه SAVOR</a>
+  <a href="#location" class="mm-link">تواصل معنا</a>
+  <div class="mm-contact">
+    <a href="https://wa.me/201067841756" target="_blank" rel="noopener" class="mm-btn btn-whatsapp">واتساب: 01067841756</a>
+    <a href="tel:01203653736" class="mm-btn btn-outline" style="border-color:#f6efdf; color:#f6efdf;">اتصل بنا: 01203653736</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <!-- كود الفيديو -->
+  <video class="hero-video" autoplay loop muted playsinline>
+    <source src="savorherosection.mp4" type="video/mp4">
+  </video>
+  
+  <!-- طبقة التدرج اللوني فوق الفيديو لتوضيح الكلام -->
+  <div class="hero-overlay"></div>
+  <div class="container hero-inner">
+    <span class="eyebrow">🔥 SAVOR — Slow Sip, Soft Moments</span>
+    <h1>جعت؟ <span class="accent">SAVOR</span> بيوصلك<br>لحد باب البيت</h1>
+    <p class="lead">برجر لحمة، تشيكن كرسبي، تورتيلا، باستا، بطاطس ومشروبات — منيو كامل تطلبه بضغطتين، ويوصلك ساخن وطازة في الإسكندرية.</p>
+    <div class="hero-ctas">
+      <a href="#menu" class="btn btn-gold">
+        <svg viewBox="0 0 24 24"><path d="M7 4h-2l-1 2H2v2h2l3.6 7.6-1.3 2.4c-.2.4-.3.8-.3 1.2 0 1.1.9 2 2 2h12v-2H8.4c-.1 0-.2-.1-.2-.2l.9-1.8h7.5c.8 0 1.4-.4 1.8-1.1l3.6-6.5c.1-.2.1-.4-.1-.6-.1-.2-.3-.3-.5-.3H6.2L5.3 4H7z"/></svg>
+        شوف المنيو
+      </a>
+      <a href="https://wa.me/201067841756?text=%D8%A7%D9%87%D9%84%D8%A7%20SAVOR%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A7%D8%B9%D9%85%D9%84%20%D8%A7%D9%88%D8%B1%D8%AF%D8%B1" target="_blank" rel="noopener" class="btn btn-whatsapp">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+        اطلب واتساب مباشرة
+      </a>
+    </div>
+    <div class="trust-strip">
+      <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M3 13h1v6a1 1 0 001 1h1v-3h12v3h1a1 1 0 001-1v-6h1l-2-7H5l-2 7z"/></svg> توصيل سريع</div>
+      <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4H4V6h16v2z"/></svg> دفع عند الاستلام</div>
+      <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M12 2l1.6 4.9H19l-4.2 3 1.6 4.9-4.2-3-4.2 3 1.6-4.9L5 6.9h5.4z"/></svg> مكونات طازة يوميًا</div>
+      <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.6 8 12 8 12s8-6.4 8-12c0-4.4-3.6-8-8-8z"/></svg> الإسكندرية</div>
+    </div>
+  </div>
+</section>
+<div class="arch-divider">
+  <svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0,0 L0,20 Q600,70 1200,20 L1200,0 Z" fill="#f6efdf"></path></svg>
+</div>
+
+<!-- CATEGORY QUICK NAV -->
+<div class="catnav-wrap">
+  <div class="catnav" id="catNav"></div>
+</div>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="container menu-intro">
+    <div class="kicker">المنيو الكامل</div>
+    <h2>اختار طلبك وضيفه للسلة</h2>
+    <p>كل الأصناف، الأحجام والأسعار زي ما هي بالظبط. اختار الحجم، حدد الكمية، وضيف للسلة — وهنكمل الباقي معاك على واتساب.</p>
+  </div>
+  <div id="menuMount"></div>
+</section>
+
+<!-- WHY SAVOR -->
+<section class="why" id="why">
+  <div class="container">
+    <div class="why-head">
+      <div class="kicker">ليه تطلب من SAVOR؟</div>
+      <h2>طعم يستاهل الوقفة</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 13h1v6a1 1 0 001 1h1v-3h12v3h1a1 1 0 001-1v-6h1l-2-7H5l-2 7z"/></svg></div>
+        <h3>توصيل سريع</h3>
+        <p>طلبك بيتحضر ويوصلك في أسرع وقت من فرع آخر شارع الإسكندرية.</p>
+      </div>
+      <div class="why-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2z"/></svg></div>
+        <h3>دفع عند الاستلام</h3>
+        <p>ادفع كاش لما الطلب يوصلك، من غير أي تعقيد في الدفع أونلاين.</p>
+      </div>
+      <div class="why-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2l1.6 4.9H19l-4.2 3 1.6 4.9-4.2-3-4.2 3 1.6-4.9L5 6.9h5.4z"/></svg></div>
+        <h3>مكونات طازة يوميًا</h3>
+        <p>لحمة، فراخ وصوصات بتتحضر يوميًا عشان كل قضمة تبقى فريش.</p>
+      </div>
+      <div class="why-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg></div>
+        <h3>تواصل مباشر واتساب</h3>
+        <p>أي استفسار أو تعديل على الطلب، احنا رد واحد بعيد على واتساب.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT / LOCATION -->
+<section class="contact" id="location">
+  <div class="container contact-grid">
+    <div class="contact-card">
+      <div class="kicker" style="color:var(--gold-2); font-weight:800; font-size:14px;">تواصل معانا</div>
+      <h2>محتاج تطلب أو تسأل؟</h2>
+      <p class="sub">إحنا موجودين على واتساب والتليفون، وفرعنا في انتظارك.</p>
+      <div class="contact-line">
+        <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.6 8 12 8 12s8-6.4 8-12c0-4.4-3.6-8-8-8z"/></svg></span>
+        آخر شارع الإسكندرية - بجوار حديقة الغزالة - أمام قسم الشرطة
+      </div>
+      <div class="contact-line">
+        <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg></span>
+        واتساب: 01067841756
+      </div>
+      <div class="contact-line">
+        <span class="ic"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1.1.5 1.1 1.1V20c0 .6-.5 1.1-1.1 1.1C10.6 21.1 2.9 13.4 2.9 3.9 2.9 3.3 3.4 2.8 4 2.8h3.3c.6 0 1.1.5 1.1 1.1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1L6.6 10.8z"/></svg></span>
+        تليفون: 01203653736
+      </div>
+      <div class="contact-actions">
+        <a href="https://wa.me/201067841756" target="_blank" rel="noopener" class="btn btn-whatsapp">راسلنا واتساب</a>
+        <a href="tel:01203653736" class="btn btn-outline">اتصل الآن</a>
+      </div>
+      <div>
+        <div style="font-size:13px; color:#cfc8b0; margin-bottom:10px; font-weight:700;">تابعنا على السوشيال ميديا</div>
+        <div class="social-row">
+          <a href="#" target="_blank" rel="noopener" title="فيسبوك"><svg viewBox="0 0 24 24"><path d="M13.5 21v-7.9h2.7l.4-3.1h-3.1V8.1c0-.9.2-1.5 1.6-1.5H16.7V3.8C16.4 3.8 15.4 3.7 14.2 3.7c-2.4 0-4.1 1.5-4.1 4.2v2.2H7.4v3.1h2.7V21h3.4z"/></svg></a>
+          <a href="#" target="_blank" rel="noopener" title="انستجرام"><svg viewBox="0 0 24 24"><path d="M12 2.2c2.7 0 3 0 4 .1 1 0 1.7.2 2.3.4.6.2 1.1.5 1.6 1 .5.5.8 1 1 1.6.2.6.4 1.3.4 2.3.1 1 .1 1.3.1 4s0 3-.1 4c0 1-.2 1.7-.4 2.3-.2.6-.5 1.1-1 1.6-.5.5-1 .8-1.6 1-.6.2-1.3.4-2.3.4-1 .1-1.3.1-4 .1s-3 0-4-.1c-1 0-1.7-.2-2.3-.4-.6-.2-1.1-.5-1.6-1-.5-.5-.8-1-1-1.6-.2-.6-.4-1.3-.4-2.3-.1-1-.1-1.3-.1-4s0-3 .1-4c0-1 .2-1.7.4-2.3.2-.6.5-1.1 1-1.6.5-.5 1-.8 1.6-1 .6-.2 1.3-.4 2.3-.4 1-.1 1.3-.1 4-.1zM12 7a5 5 0 100 10 5 5 0 000-10z"/></svg></a>
+          <a href="#" target="_blank" rel="noopener" title="تيك توك"><svg viewBox="0 0 24 24"><path d="M16.6 2h-3.2v13.4a2.6 2.6 0 11-2.4-2.6v-3.3a5.9 5.9 0 105.9 5.9c0-.2 0-.4 0-.6V8.6a7.9 7.9 0 004.5 1.4V6.8a4.6 4.6 0 01-4.8-4.8z"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="map-frame">
+      <iframe src="https://www.google.com/maps?q=آخر شارع الإسكندرية بجوار حديقة الغزالة أمام قسم الشرطة&output=embed" allowfullscreen="" loading="lazy" title="خريطة موقع SAVOR"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+<div class="footer-brand"><img src="logo.jpeg" alt="SAVOR"></div>
+        <p style="line-height:1.8; max-width:320px; font-size:14.5px;">برجر لحمة، تشيكن كرسبي، تورتيلا، باستا، بطاطس ومشروبات — طلبك يوصلك من فرعنا في آخر شارع الإسكندرية.</p>
+      </div>
+      <div>
+        <h4>روابط سريعة</h4>
+        <ul>
+          <li><a href="#top">الرئيسية</a></li>
+          <li><a href="#menu">المنيو</a></li>
+          <li><a href="#why">ليه SAVOR</a></li>
+          <li><a href="#location">تواصل معنا</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تواصل معنا</h4>
+        <ul>
+          <li><a href="https://wa.me/201067841756" target="_blank" rel="noopener">واتساب: 01067841756</a></li>
+          <li><a href="tel:01203653736">تليفون: 01203653736</a></li>
+          <li>آخر شارع الإسكندرية - بجوار حديقة الغزالة</li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <span>© 2026 SAVOR. جميع الحقوق محفوظة.</span>
+      <span>Slow Sip, Soft Moments 🍔</span>
+    </div>
+  </div>
+</footer>
+
+<!-- FLOATING BUTTONS -->
+<div class="fab-stack">
+  <a class="fab wa" href="https://wa.me/201067841756?text=%D8%A7%D9%87%D9%84%D8%A7%20SAVOR%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A7%D8%B9%D9%85%D9%84%20%D8%A7%D9%88%D8%B1%D8%AF%D8%B1" target="_blank" rel="noopener" aria-label="راسلنا على واتساب">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+  </a>
+  <a class="fab call" href="tel:01203653736" aria-label="اتصل بنا">
+    <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1.1.5 1.1 1.1V20c0 .6-.5 1.1-1.1 1.1C10.6 21.1 2.9 13.4 2.9 3.9 2.9 3.3 3.4 2.8 4 2.8h3.3c.6 0 1.1.5 1.1 1.1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1L6.6 10.8z"/></svg>
+  </a>
+  <button class="fab top" id="topBtn" aria-label="لأعلى">
+    <svg viewBox="0 0 24 24"><path d="M12 5l-7 7 1.4 1.4L11 8.8V19h2V8.8l4.6 4.6L19 12z"/></svg>
+  </button>
+</div>
+
+<!-- STICKY MOBILE CART -->
+<div class="sticky-cart" id="stickyCart">
+  <div class="sc-info">
+    <small>السلة</small>
+    <b id="scTotal">0 ج.م</b>
+  </div>
+  <button class="btn btn-gold" id="stickyCartBtn">شوف السلة (<span id="scCount">0</span>)</button>
+</div>
+
+<!-- CART DRAWER -->
+<div class="overlay-bg" id="overlayBg"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h3>سلة طلبك</h3>
+    <button class="icon-btn" id="cartCloseBtn" aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="#f6efdf"><path d="M6.4 5L5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg></button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+ <div class="drawer-foot">
+    <!-- خانة الكوبون -->
+    <div class="coupon-box">
+      <input type="text" id="cartCouponInput" placeholder="كود الخصم">
+      <button type="button" id="applyCouponBtn" class="btn-apply">تطبيق</button>
+    </div>
+    <div id="couponMsg" class="coupon-msg"></div>
+
+    <!-- ملخص الفاتورة -->
+    <div class="bill-summary">
+      <div class="bill-row">
+        <span>المجموع الفرعي</span>
+        <span id="subTotalVal">0 ج.م</span>
+      </div>
+      <div class="bill-row discount-row" id="discountRow" style="display: none;">
+        <span>الخصم</span>
+        <span id="discountVal">-0 ج.م</span>
+      </div>
+      <div class="bill-row">
+        <span>التوصيل</span>
+        <span id="deliveryVal">15 ج.م</span>
+      </div>
+    </div>
+    
+    <hr class="bill-divider">
+    
+    <div class="total-row">
+      <span>الإجمالي</span>
+      <b id="cartTotal">0 ج.م</b>
+    </div>
+    <button class="btn btn-gold btn-block" id="checkoutBtn">
+      إتمام الطلب ➔
+    </button>
+  </div>
+</div>
+<!-- PRODUCT DETAILS MODAL (تجربة الطلب الجديدة) -->
+<div class="modal" id="productModal">
+  <div class="modal-card pm-card">
+    <div class="pm-img-wrap">
+      <button class="pm-close" id="pmCloseBtn" aria-label="إغلاق">✕</button>
+      <img src="" id="pmImage" alt="Product Image">
+    </div>
+    <div class="pm-body">
+      <h3 class="pm-title" id="pmTitle">اسم المنتج</h3>
+      <div class="pm-vendor">ساڤور</div>
+      <div class="pm-start-price" id="pmStartPrice">يبدأ من 0 ج.م</div>
+      
+      <div id="pmSizesContainer">
+        <div class="pm-section-title">الحجم <span>مطلوب</span></div>
+        <div class="pm-sizes" id="pmSizesList">
+          </div>
+      </div>
+
+      <div class="pm-action-bar">
+        <div class="pm-qty-stepper">
+          <button type="button" id="pmQtyMinus">−</button>
+          <span id="pmQtyVal">1</span>
+          <button type="button" id="pmQtyPlus">+</button>
+        </div>
+        <button type="button" class="pm-add-btn" id="pmAddToCartBtn">
+          <span>إضافة</span>
+          <span id="pmTotalBtn">0 ج.م</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal" id="checkoutModal">
+  <div class="modal-card">
+    <button class="modal-close" id="modalCloseBtn" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6.4 5L5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg>
+    </button>
+    <h3>بيانات التوصيل</h3>
+    <p class="hint">هنبعت طلبك وبياناتك مباشرة على واتساب SAVOR لتأكيد الطلب.</p>
+    <div class="field"><label for="custName">الاسم</label><input id="custName" type="text" placeholder="اسمك بالكامل"></div>
+    <div class="field"><label for="custPhone">رقم الموبايل</label><input id="custPhone" type="tel" placeholder="01xxxxxxxxx"></div>
+    <div class="field"><label for="custAddress">العنوان بالتفصيل</label><textarea id="custAddress" rows="2" placeholder="الحي، الشارع، رقم العمارة/الدور"></textarea></div>
+    <div class="field"><label for="custNotes">ملاحظات (اختياري)</label><textarea id="custNotes" rows="2" placeholder="مثال: من غير بصل، دق الجرس..."></textarea></div>
+    
+    <button class="btn btn-whatsapp btn-block" id="sendOrderBtn">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+      إرسال الطلب على واتساب
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast">تمت الإضافة للسلة ✅</div>
+
+<!-- 1. استدعاء مكتبات فايربيز (لازم تكون بره كود الجافاسكريبت) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+/* ================== إعدادات فايربيز ================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyCmbgtwUgqm1QoCQ9W2Cv7HipbOI7DeCAQ",
+  authDomain: "savor-dashboard.firebaseapp.com",
+  projectId: "savor-dashboard",
+  storageBucket: "savor-dashboard.firebasestorage.app",
+  messagingSenderId: "612222765101",
+  appId: "1:612222765101:web:6e1076706e59d418cb90a4"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ================== هيكل المنيو الأساسي ================== */
+const SIZE_LABELS = {S:'صغير', L:'كبير', D:'دبل', XL:'اكس لارج'};
+
+let MENU = [
+  { id:'drinks', nameAr:'مشروبات', nameEn:'DRINKS', icon:'🥤', banner:'assets/drinks.jpg', items:[] },
+  { id:'fries', nameAr:'باكت بطاطس', nameEn:'FRIES PACKET', icon:'🍟', banner:'assets/fries.jpg', items:[] },
+  { id:'beefburger', nameAr:'برجر لحمة', nameEn:'BEEF BURGER', icon:'🍔', banner:'assets/beefburger.jpg', items:[] },
+  { id:'tortillapotato', nameAr:'تورتيلا بطاطس', nameEn:'TORTILLA POTATO', icon:'🌯', banner:'assets/tortillapotato.jpg', items:[] },
+  { id:'chickencrispy', nameAr:'تشيكن كرسبي', nameEn:'CHICKEN CRISPY', icon:'🍗', banner:'assets/chickencrispy.jpg', items:[] },
+  { id:'chickenpasta', nameAr:'مكرونة تشيكن كرسبي', nameEn:'CHICKEN CRISPY PASTA', icon:'🍝', banner:'assets/chickenpasta.jpg', items:[] },
+  { id:'tortillachicken', nameAr:'تورتيلا تشيكن كرسبي', nameEn:'TORTILLA CHICKEN CRISPY', icon:'🌯', banner:'assets/tortillachicken.jpg', items:[] },
+  { id:'tortillabeef', nameAr:'تورتيلا لحمة', nameEn:'TORTILLA BEEF', icon:'🌯', banner:'assets/tortillabeef.jpg', items:[] },
+  { id:'additions', nameAr:'إضافات', nameEn:'ADDITIONS', icon:'➕', banner:'assets/additions.jpg', items:[] },
+];
+
+/* ================== أزرار التنقل العلوية ================== */
+const catNav = document.getElementById('catNav');
+MENU.forEach(cat=>{
+  const btn = document.createElement('button');
+  btn.innerHTML = `<span class="ic">${cat.icon}</span> ${cat.nameAr}`;
+  btn.dataset.target = cat.id;
+  btn.addEventListener('click', ()=>{
+    document.getElementById('cat-'+cat.id).scrollIntoView({behavior:'smooth'});
+  });
+  catNav.appendChild(btn);
+});
+
+/* ================== جلب المنيو من فايربيز ================== */
+db.collection("menu").onSnapshot(snapshot => {
+  // تفريغ المنتجات القديمة
+  MENU.forEach(cat => cat.items = []); 
+  
+  snapshot.forEach(doc => {
+    const item = doc.data();
+    // إخفاء المنتج لو كان Sold out
+    if(item.status !== 'out_of_stock') {
+      const category = MENU.find(c => c.id === item.category);
+      if(category) category.items.push(item);
+    }
+  });
+  
+  renderMenuToHTML(); 
+});
+
+/* ================== رسم المنيو في الموقع ================== */
+const revealObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+  });
+},{threshold:.12});
+
+function renderItemCard(cat, item){
+  const imgSrc = item.image && item.image !== '' ? item.image : 'assets/logo.jpg'; 
+  let startPrice = item.sizes ? item.sizes[Object.keys(item.sizes)[0]] : item.price;
+  const catIdx = MENU.findIndex(c => c.id === cat.id);
+  const itemIdx = cat.items.indexOf(item);
+  return `
+    <div class="item-card visible" onclick="openProductModal(${catIdx}, ${itemIdx})">
+      ${item.badge ? `<span class="badge">⭐ ${item.badge}</span>` : ''}
+      <img src="${imgSrc}" alt="${item.name}" loading="lazy">
+      <div class="item-name">${item.name}</div>
+      <div class="item-foot" style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: auto;">
+        <div class="price-tag" style="color: #8a8272; margin: 0;">يبدأ من <span style="color: var(--tomato);">${startPrice}</span> <small>ج.م</small></div>
+        <button type="button" class="add-btn" style="flex: unset; padding: 8px 14px; font-size: 13px;" onclick="event.stopPropagation(); openProductModal(${catIdx}, ${itemIdx})">
+          اطلب الآن ➔
+        </button>
+      </div>
+    </div>`;
+}
+function renderMenuToHTML() {
+  const menuMount = document.getElementById('menuMount');
+  menuMount.innerHTML = ''; 
+
+  MENU.forEach(cat => {
+    if(cat.items.length === 0) return; // لو القسم فاضي، ميتعرضش
+    const section = document.createElement('div');
+    section.className = 'category-block';
+    section.id = 'cat-'+cat.id;
+    section.innerHTML = `
+      <div class="container">
+        <div class="cat-banner" style="background-image:url('${cat.banner}')">
+          <div class="overlay"></div>
+          <div class="cat-banner-content">
+            <span class="ic">${cat.icon}</span><h3>${cat.nameAr}</h3><span class="en">${cat.nameEn}</span>
+          </div>
+        </div>
+        <div class="items-grid">
+          ${cat.items.map(item => renderItemCard(cat, item)).join('')}
+        </div>
+      </div>`;
+    menuMount.appendChild(section);
+  });
+  document.querySelectorAll('.item-card').forEach(c=>revealObserver.observe(c));
+  
+  // إعادة تشغيل تظليل القسم النشط
+  document.querySelectorAll('.category-block').forEach(s => catObserver.observe(s));
+}
+
+/* ================== نافذة المنتج (Modal) ================== */
+let activePmItem = null, activePmCat = null, activePmSize = null, activePmQty = 1;
+
+function openProductModal(catIdx, itemIdx) {
+  activePmCat = MENU[catIdx];
+  activePmItem = activePmCat.items[itemIdx];
+  activePmQty = 1;
+
+  document.getElementById('pmImage').src = activePmItem.image || 'assets/logo.jpg';
+  document.getElementById('pmTitle').textContent = activePmItem.name;
+  document.getElementById('pmQtyVal').textContent = activePmQty;
+  
+  const startPrice = activePmItem.sizes ? activePmItem.sizes[Object.keys(activePmItem.sizes)[0]] : activePmItem.price;
+  document.getElementById('pmStartPrice').textContent = `يبدأ من ${startPrice} ج.م`;
+
+  const sizesList = document.getElementById('pmSizesList');
+  const sizesContainer = document.getElementById('pmSizesContainer');
+  sizesList.innerHTML = '';
+
+  if (activePmItem.sizes) {
+    sizesContainer.style.display = 'block';
+    const keys = Object.keys(activePmItem.sizes);
+    activePmSize = keys[0];
+    keys.forEach((k, i) => {
+      const price = activePmItem.sizes[k];
+      const sizeLabel = SIZE_LABELS[k] || k;
+      sizesList.innerHTML += `
+        <label class="pm-size-row">
+          <div class="pm-size-name">
+            <input type="radio" name="pmsize" value="${k}" ${i === 0 ? 'checked' : ''} onchange="changePmSize('${k}')">
+            ${sizeLabel}
+          </div>
+          <div class="pm-size-price">+${price} ج.م</div>
+        </label>
+      `;
+    });
+  } else {
+    sizesContainer.style.display = 'none';
+    activePmSize = null;
+  }
+  updatePmTotal();
+  document.getElementById('productModal').classList.add('show');
+  document.getElementById('overlayBg').classList.add('show');
+}
+
+function changePmSize(sizeKey) { activePmSize = sizeKey; updatePmTotal(); }
+
+function updatePmTotal() {
+  const basePrice = activePmItem.sizes ? activePmItem.sizes[activePmSize] : activePmItem.price;
+  document.getElementById('pmTotalBtn').textContent = `${basePrice * activePmQty} ج.م`;
+}
+
+document.getElementById('pmQtyMinus').addEventListener('click', () => {
+  if (activePmQty > 1) { activePmQty--; document.getElementById('pmQtyVal').textContent = activePmQty; updatePmTotal(); }
+});
+document.getElementById('pmQtyPlus').addEventListener('click', () => {
+  activePmQty++; document.getElementById('pmQtyVal').textContent = activePmQty; updatePmTotal();
+});
+
+document.getElementById('pmCloseBtn').addEventListener('click', () => {
+  document.getElementById('productModal').classList.remove('show');
+  document.getElementById('overlayBg').classList.remove('show');
+});
+
+document.getElementById('pmAddToCartBtn').addEventListener('click', () => {
+  const price = activePmItem.sizes ? activePmItem.sizes[activePmSize] : activePmItem.price;
+  addToCart({
+    cat: activePmCat.nameAr, name: activePmItem.name,
+    size: activePmSize ? (SIZE_LABELS[activePmSize] || activePmSize) : null,
+    price: price, qty: activePmQty
+  });
+  document.getElementById('productModal').classList.remove('show');
+  document.getElementById('overlayBg').classList.remove('show');
+  showToast(`تمت إضافة "${activePmItem.name}" للسلة ✅`);
+});
+
+/* ================== سلة المشتريات ================== */
+let cart = JSON.parse(localStorage.getItem('savor_cart')||'[]');
+function saveCart(){ localStorage.setItem('savor_cart', JSON.stringify(cart)); }
+
+function addToCart({cat,name,size,price,qty}){
+  const existing = cart.find(i=>i.name===name && i.size===size);
+  if(existing) existing.qty += qty; else cart.push({cat,name,size,price,qty});
+  saveCart(); renderCart();
+}
+function removeFromCart(index){ cart.splice(index,1); saveCart(); renderCart(); }
+function changeCartQty(index, delta){
+  cart[index].qty += delta;
+  if(cart[index].qty<=0) cart.splice(index,1);
+  saveCart(); renderCart();
+}
+function cartTotal(){ return cart.reduce((sum,i)=>sum + i.price*i.qty, 0); }
+function cartCount(){ return cart.reduce((sum,i)=>sum + i.qty, 0); }
+
+// متغيرات الخصم والتوصيل تم تعريفها مرة واحدة بـ var لتفادي أخطاء التكرار
+var currentDiscountValue = 0; 
+var DELIVERY_FEE = 15;
+
+function renderCart(){
+  const body = document.getElementById('cartBody');
+  const totalEl = document.getElementById('cartTotal');
+  const countEl = document.getElementById('cartCount');
+  const scTotal = document.getElementById('scTotal');
+  const scCount = document.getElementById('scCount');
+  const stickyCart = document.getElementById('stickyCart');
+  
+  const subTotalVal = document.getElementById('subTotalVal');
+  const discountRow = document.getElementById('discountRow');
+  const discountVal = document.getElementById('discountVal');
+  const deliveryVal = document.getElementById('deliveryVal');
+
+  if(cart.length===0){
+    body.innerHTML = `<div class="cart-empty"><div class="ic">🍗</div>السلة فاضية<br><small style="font-size:12px;">ضيف أكلة لذيذة وابدأ الطلب</small></div>`;
+    currentDiscountValue = 0; 
+    if(document.getElementById('cartCouponInput')) document.getElementById('cartCouponInput').value = '';
+    if(document.getElementById('couponMsg')) document.getElementById('couponMsg').textContent = '';
+  } else {
+    body.innerHTML = cart.map((item,idx)=>`
+      <div class="cart-row">
+        <button class="cr-remove" onclick="removeFromCart(${idx})">✕</button>
+        <div class="qty-stepper">
+          <button type="button" onclick="changeCartQty(${idx},1)">+</button>
+          <span class="qty-val">${item.qty}</span>
+          <button type="button" onclick="changeCartQty(${idx},-1)">−</button>
+        </div>
+        <div class="cr-info" style="text-align:left;">
+          <div class="cr-name">${item.name}</div>
+          <div class="cr-price">${item.qty} × ${item.price} ج.م = ${item.price*item.qty} ج.م</div>
+        </div>
+      </div>`).join('');
+  }
+
+  const subTotal = cartTotal();
+  const count = cartCount();
+  
+  // حساب الخصم بحيث لا يتعدى الإجمالي
+  let validDiscount = currentDiscountValue;
+  if(validDiscount >= subTotal) { validDiscount = subTotal; }
+
+  const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
+
+  if(subTotalVal) subTotalVal.textContent = subTotal + ' ج.م';
+  if(deliveryVal) deliveryVal.textContent = (subTotal > 0 ? DELIVERY_FEE : 0) + ' ج.م';
+  
+  if(validDiscount > 0 && subTotal > 0) {
+    if(discountRow) discountRow.style.display = 'flex';
+    if(discountVal) discountVal.textContent = '-' + validDiscount + ' ج.م';
+  } else {
+    if(discountRow) discountRow.style.display = 'none';
+  }
+
+  if(totalEl) totalEl.textContent = finalTotal + ' ج.م';
+  
+  if(count>0){ countEl.style.display='flex'; countEl.textContent = count; } else { countEl.style.display='none'; }
+  if(scTotal) scTotal.textContent = finalTotal + ' ج.م'; 
+  if(scCount) scCount.textContent = count;
+  if(stickyCart) stickyCart.classList.toggle('show', count>0);
+}
+
+// تفعيل زرار تطبيق الكوبون
+document.getElementById('applyCouponBtn').addEventListener('click', () => {
+  const codeInput = document.getElementById('cartCouponInput');
+  const code = codeInput ? codeInput.value.trim().toUpperCase() : '';
+  const msgEl = document.getElementById('couponMsg');
+  const applyBtn = document.getElementById('applyCouponBtn');
+  
+  if (!msgEl || !applyBtn) return;
+
+  if(cart.length === 0) {
+    msgEl.textContent = 'السلة فاضية!';
+    msgEl.className = 'coupon-msg error';
+    return;
+  }
+
+  if(!code) {
+    msgEl.textContent = 'من فضلك أدخل الكود أولاً';
+    msgEl.className = 'coupon-msg error';
+    return;
+  }
+
+  applyBtn.textContent = '...';
+  applyBtn.disabled = true;
+
+db.collection('coupons').where('code', '==', code).where('active', '==', true).get()
+    .then((snapshot) => {
+      applyBtn.textContent = 'تطبيق';
+      applyBtn.disabled = false;
+
+      if (snapshot.empty) {
+        currentDiscountValue = 0;
+        msgEl.textContent = 'كوبون غير صحيح أو منتهي';
+        msgEl.className = 'coupon-msg error';
+        renderCart();
+      } else {
+        const couponData = snapshot.docs[0].data();
+        // قراءة قيمة الخصم من حقل value أو discount لضمان التوافق
+        let rawDiscount = couponData.value !== undefined ? couponData.value : couponData.discount;
+        currentDiscountValue = parseFloat(rawDiscount);
+        
+        if(isNaN(currentDiscountValue) || currentDiscountValue <= 0) {
+            currentDiscountValue = 0;
+            msgEl.textContent = 'قيمة الكوبون غير صالحة';
+            msgEl.className = 'coupon-msg error';
+        } else {
+            msgEl.textContent = '✓ تم تطبيق الكوبون';
+            msgEl.className = 'coupon-msg success';
+        }
+        renderCart();
+      }
+    })
+    .catch((error) => {
+      applyBtn.textContent = 'تطبيق';
+      applyBtn.disabled = false;
+      msgEl.textContent = 'حدث خطأ في الاتصال';
+      msgEl.className = 'coupon-msg error';
+      console.error(error);
+    });
+});
+
+/* ================== النوافذ والأزرار ================== */
+const cartDrawer = document.getElementById('cartDrawer');
+const overlayBg = document.getElementById('overlayBg');
+function openCart(){ renderCart(); cartDrawer.classList.add('open'); overlayBg.classList.add('show'); }
+function closeCart(){ cartDrawer.classList.remove('open'); overlayBg.classList.remove('show'); }
+document.getElementById('cartOpenBtn').addEventListener('click', openCart);
+document.getElementById('stickyCartBtn').addEventListener('click', openCart);
+document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
+overlayBg.addEventListener('click', ()=>{ closeCart(); closeCheckoutModal(); });
+
+const mobileMenu = document.getElementById('mobileMenu');
+document.getElementById('mmOpenBtn').addEventListener('click', ()=>mobileMenu.classList.add('open'));
+document.getElementById('mmCloseBtn').addEventListener('click', ()=>mobileMenu.classList.remove('open'));
+mobileMenu.querySelectorAll('.mm-link').forEach(l=>l.addEventListener('click', ()=>mobileMenu.classList.remove('open')));
+
+const checkoutModal = document.getElementById('checkoutModal');
+function openCheckoutModal(){
+  if(cart.length===0){ showToast('السلة فاضية! ضيف أصناف الأول 🛒'); return; }
+  closeCart(); checkoutModal.classList.add('show'); overlayBg.classList.add('show');
+}
+function closeCheckoutModal(){ checkoutModal.classList.remove('show'); overlayBg.classList.remove('show'); }
+document.getElementById('checkoutBtn').addEventListener('click', openCheckoutModal);
+document.getElementById('modalCloseBtn').addEventListener('click', closeCheckoutModal);
+
+// إرسال الطلب وحفظه
+document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const address = document.getElementById('custAddress').value.trim();
+  const notes = document.getElementById('custNotes').value.trim();
+  const couponCode = document.getElementById('cartCouponInput') ? document.getElementById('cartCouponInput').value.trim().toUpperCase() : '';
+
+  if(!name || !phone || !address){ showToast('من فضلك اكتب الاسم، الموبايل والعنوان 📝'); return; }
+
+  const btn = document.getElementById('sendOrderBtn');
+  btn.innerHTML = 'جاري إرسال الطلب...';
+  btn.disabled = true;
+
+  const subTotal = cartTotal();
+  let validDiscount = currentDiscountValue;
+  if(validDiscount >= subTotal) { validDiscount = subTotal; }
+  const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
+
+  let msg = `مرحبا SAVOR، عايز أعمل طلب:\n\n`;
+  cart.forEach(item=>{ msg += `• ${item.name}${item.size?' ('+item.size+')':''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; });
+  
+  msg += `\nالمجموع الفرعي: ${subTotal} ج.م`;
+  msg += `\nالتوصيل: ${DELIVERY_FEE} ج.م`;
+  if(validDiscount > 0) {
+      msg += `\nالخصم: -${validDiscount} ج.م (كوبون: ${couponCode})`;
+  }
+  msg += `\nالإجمالي النهائي: ${finalTotal} ج.م\n\nالاسم: ${name}\nرقم الموبايل: ${phone}\nالعنوان: ${address}\n`;
+  if(notes) msg += `ملاحظات: ${notes}\n`;
+
+  db.collection('orders').add({
+    customerName: name, 
+    phone: phone, 
+    address: address, 
+    notes: notes,
+    couponCode: validDiscount > 0 ? couponCode : "",
+    discount: validDiscount,
+    items: cart.map(i => `${i.name} ${i.size?'('+i.size+')':''} x${i.qty}`).join('، '),
+    total: finalTotal,
+    status: 'new', 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    window.open(`https://wa.me/201067841756?text=${encodeURIComponent(msg)}`, '_blank');
+    cart = []; 
+    currentDiscountValue = 0; 
+    if(document.getElementById('cartCouponInput')) document.getElementById('cartCouponInput').value = ''; 
+    saveCart(); 
+    renderCart(); 
+    closeCheckoutModal();
+    btn.innerHTML = 'إرسال الطلب على واتساب'; 
+    btn.disabled = false;
+  }).catch(err => {
+    window.open(`https://wa.me/201067841756?text=${encodeURIComponent(msg)}`, '_blank');
+    btn.innerHTML = 'إرسال الطلب على واتساب'; 
+    btn.disabled = false;
+  });
+});
+
+function showToast(text){
+  const toast = document.getElementById('toast'); toast.textContent = text; toast.classList.add('show');
+  clearTimeout(window._toastTimer); window._toastTimer = setTimeout(()=>toast.classList.remove('show'), 2200);
+}
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', ()=>topBtn.style.display = window.scrollY>500 ? 'flex' : 'none');
+topBtn.addEventListener('click', ()=>window.scrollTo({top:0, behavior:'smooth'}));
+
+const catButtons = Array.from(catNav.children);
+const catObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const id = entry.target.id.replace('cat-','');
+      catButtons.forEach(b=>b.classList.toggle('active', b.dataset.target===id));
+    }
+  });
+},{rootMargin:'-40% 0px -50% 0px'});
+const darkModeBtn = document.getElementById('darkModeBtn');
+
+const moonIcon = `<svg viewBox="0 0 24 24"><path d="M12 21.5c-5.2 0-9.5-4.3-9.5-9.5 0-4.3 2.8-8 6.8-9.1.5-.1 1 .3.9.8-.4 1.5-.4 3.1.2 4.6 1.1 2.9 3.5 5 6.5 5.6 1.5.3 3 .1 4.4-.4.5-.2 1 .3.8.8-1.1 4-4.8 6.8-9.1 6.8z"/></svg>`;
+const sunIcon = `<svg viewBox="0 0 24 24"><path d="M12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0-6a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 18a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1zm9-10a1 1 0 0 1 0 2h-2a1 1 0 1 1 0-2h2zM5 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h2zm13.657-6.071a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0zM6.172 17.828a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0zm12.485 0a1 1 0 0 1 1.414 0l1.414 1.414a1 1 0 1 1-1.414 1.414l-1.414-1.414a1 1 0 0 1 0-1.414zM7.586 4.757a1 1 0 0 1 1.414 0l1.414 1.414a1 1 0 1 1-1.414 1.414L7.586 6.171a1 1 0 0 1 0-1.414z"/></svg>`;
+
+function updateDarkModeIcon() {
+  if (document.body.classList.contains('dark-mode')) {
+    darkModeBtn.innerHTML = sunIcon;
+  } else {
+    darkModeBtn.innerHTML = moonIcon;
+  }
+}
+
+if (localStorage.getItem('savor_theme') === 'dark') {
+  document.body.classList.add('dark-mode');
+}
+updateDarkModeIcon();
+
+darkModeBtn.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  updateDarkModeIcon();
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('savor_theme', 'dark');
+  } else {
+    localStorage.setItem('savor_theme', 'light');
+  }
+});
+</script>
+</body>
+</html>
+</body>
+</html>

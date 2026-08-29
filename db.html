@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAVOR | الإدارة المركزية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Tajawal', sans-serif; background-color: #fbf7ee; color: #1c1712; }
+    .glass-panel { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(8, 41, 33, 0.05); }
+    .nav-active { background-color: #0c3d30; color: #e2a530; font-weight: bold; }
+    .nav-inactive { background-color: transparent; color: #64748b; }
+    .nav-inactive:hover { background-color: #e2e8f0; color: #0c3d30; }
+    .menu-tab-active { border-bottom: 3px solid #e2a530; color: #0c3d30; font-weight: bold; }
+    .menu-tab-inactive { border-bottom: 3px solid transparent; color: #64748b; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+  <!-- ================= شاشة تسجيل الدخول ================= -->
+  <div id="loginScreen" class="glass-panel p-10 rounded-3xl w-full max-w-md text-center shadow-2xl">
+    <h2 class="text-3xl font-black mb-8" style="color: #0c3d30;">إدارة SAVOR</h2>
+    <input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full mb-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+    <input type="password" id="password" placeholder="كلمة المرور" class="w-full mb-8 p-4 rounded-xl bg-slate-50 border border-slate-200">
+    <button onclick="login()" class="w-full text-white font-bold py-4 px-4 rounded-xl shadow-lg" style="background-color: #0c3d30;">تسجيل الدخول</button>
+  </div>
+
+  <!-- ================= لوحة التحكم ================= -->
+  <div id="dashboardScreen" class="hidden w-full min-h-screen flex-col md:flex-row">
+    
+    <!-- القائمة الجانبية -->
+    <aside class="w-full md:w-72 glass-panel flex flex-col border-l border-slate-200">
+      <div class="p-8 border-b border-slate-200">
+        <h1 class="text-3xl font-black" style="color: #0c3d30;">SAVOR</h1>
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-3">
+        <button onclick="switchTab('orders')" id="nav-orders" class="w-full text-right p-4 rounded-xl nav-active flex items-center gap-3">🛒 الطلبات الواردة</button>
+        <button onclick="switchTab('menu')" id="nav-menu" class="w-full text-right p-4 rounded-xl nav-inactive flex items-center gap-3">🍔 إدارة المنيو والمنتجات</button>
+        <button onclick="switchTab('coupons')" id="nav-coupons" class="w-full text-right p-4 rounded-xl nav-inactive flex items-center gap-3">🏷️ كوبونات الخصم</button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="w-full text-right p-4 rounded-xl nav-inactive flex items-center gap-3">⚙️ الإعدادات</button>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-10 h-screen overflow-y-auto bg-slate-50">
+      
+      <!-- قسم الطلبات -->
+      <section id="sec-orders" class="block">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">الطلبات الواردة</h2>
+        <div class="glass-panel rounded-2xl overflow-hidden shadow-sm">
+          <table class="w-full text-right"><tbody id="ordersTableBody"></tbody></table>
+        </div>
+      </section>
+
+      <!-- قسم إدارة المنيو -->
+      <section id="sec-menu" class="hidden">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">إدارة المنيو 🍔</h2>
+        
+        <div class="flex gap-6 mb-8 border-b border-slate-300">
+          <button onclick="switchMenuSubTab('control')" id="subtab-control" class="pb-3 px-2 menu-tab-active">📋 التحكم في الأصناف</button>
+          <button onclick="switchMenuSubTab('add')" id="subtab-add" class="pb-3 px-2 menu-tab-inactive">➕ إضافة منتج جديد</button>
+        </div>
+
+        <!-- جدول المنتجات -->
+        <div id="menu-control-section" class="block glass-panel rounded-2xl overflow-hidden p-4">
+           <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="border-b bg-slate-100 text-slate-700 text-sm">
+                <th class="p-3">الصورة</th>
+                <th class="p-3">اسم المنتج</th>
+                <th class="p-3">السعر / الأسعار (ج.م)</th>
+                <th class="p-3">تغيير الصورة</th>
+                <th class="p-3">الحالة</th>
+                <th class="p-3 text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="menuTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <!-- فورم إضافة منتج جديد متقدمة -->
+        <div id="menu-add-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-amber-200">
+          <h3 class="text-xl font-bold mb-6" style="color: #0c3d30;">تفاصيل المنتج الجديد</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-bold mb-2">القسم</label>
+              <select id="newItemCategory" class="w-full p-3 rounded-xl border border-slate-300">
+                <option value="beefburger">برجر لحمة</option>
+                <option value="chickencrispy">تشيكن كرسبي</option>
+                <option value="tortillapotato">تورتيلا بطاطس</option>
+                <option value="drinks">مشروبات</option>
+                <option value="fries">بطاطس</option>
+                <option value="chickenpasta">مكرونة تشيكن كرسبي</option>
+                <option value="tortillachicken">تورتيلا تشيكن كرسبي</option>
+                <option value="tortillabeef">تورتيلا لحمة</option>
+                <option value="additions">إضافات</option>
+              </select>
+            </div>
+            <div><label class="block text-sm font-bold mb-2">اسم المنتج</label><input type="text" id="newItemName" class="w-full p-3 rounded-xl border border-slate-300"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">المكونات / الوصف (اختياري)</label><textarea id="newItemDesc" rows="2" class="w-full p-3 rounded-xl border border-slate-300"></textarea></div>
+            
+            <div class="md:col-span-2 p-4 bg-slate-100 rounded-xl">
+              <label class="block text-sm font-bold mb-4">التسعير والأحجام (اكتب السعر قدام الحجم المطلوب، أو استخدم السعر الثابت)</label>
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div><small>سعر ثابت</small><input type="number" id="priceFixed" class="w-full p-2 border rounded"></div>
+                <div><small>صغير (S)</small><input type="number" id="priceS" class="w-full p-2 border rounded"></div>
+                <div><small>كبير (L)</small><input type="number" id="priceL" class="w-full p-2 border rounded"></div>
+                <div><small>دبل (D)</small><input type="number" id="priceD" class="w-full p-2 border rounded"></div>
+                <div><small>اكس لارج (XL)</small><input type="number" id="priceXL" class="w-full p-2 border rounded"></div>
+              </div>
+            </div>
+            
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold mb-2">صورة المنتج</label>
+              <input type="file" id="newItemImage" accept="image/*" class="w-full p-2 border rounded-xl">
+            </div>
+          </div>
+          <button onclick="addNewItem()" id="saveItemBtn" class="w-full text-white py-4 rounded-xl font-bold" style="background-color: #e2a530; color: #0c3d30;">💾 حفظ المنتج وإضافته للمنيو</button>
+        </div>
+      </section>
+
+      <!-- قسم الكوبونات -->
+      <section id="sec-coupons" class="hidden">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">كوبونات الخصم 🏷️</h2>
+        <div class="glass-panel p-8 rounded-2xl mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input type="text" id="couponCode" placeholder="كود الخصم (مثال: SAVOR20)" class="p-3 border rounded-xl">
+            <input type="number" id="couponValue" placeholder="قيمة الخصم بالجنية أو %" class="p-3 border rounded-xl">
+            <select id="couponType" class="p-3 border rounded-xl"><option value="fixed">خصم مبلغ ثابت (جنية)</option><option value="percentage">خصم نسبة مئوية (%)</option></select>
+          </div>
+          <button onclick="addCoupon()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold">إضافة الكوبون</button>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl"><table class="w-full text-right"><tbody id="couponsTableBody"></tbody></table></div>
+      </section>
+
+      <!-- قسم الإعدادات -->
+      <section id="sec-settings" class="hidden">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">إعدادات المطعم ⚙️</h2>
+
+        <div class="glass-panel p-8 rounded-2xl mb-6 border-2 border-slate-100">
+          <h3 class="text-xl font-bold mb-4" style="color: #0c3d30;">حالة استقبال الطلبات</h3>
+          <p class="text-slate-500 mb-6 text-sm">لو المطعم مقفول، هيظهر تنبيه في الموقع ومش هيقدر أي زبون يكمل أوردر لحد ما ترجع تفتحه تاني.</p>
+          <button id="restaurantStatusBtn" onclick="toggleRestaurantStatus()" class="py-4 px-8 rounded-xl font-bold text-lg transition text-white bg-slate-400">
+            جاري التحميل...
+          </button>
+        </div>
+
+        <div class="glass-panel p-8 rounded-2xl border-2 border-slate-100">
+          <h3 class="text-xl font-bold mb-4" style="color: #0c3d30;">التنبيه الصوتي للأوردرات الجديدة</h3>
+          <p class="text-slate-500 mb-6 text-sm">فعّل الزرار ده مرة واحدة بعد ما تفتح اللوحة، عشان المتصفح يسمح بتشغيل صوت تنبيه تلقائي لما يوصل أوردر جديد وانت شغال.</p>
+          <button onclick="enableOrderSound()" id="enableSoundBtn" class="bg-slate-700 hover:bg-slate-800 text-white py-4 px-8 rounded-xl font-bold transition text-lg shadow-md">
+            🔔 تفعيل التنبيه الصوتي
+          </button>
+          <span id="soundStatusText" class="mr-4 text-sm font-bold text-green-600"></span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- مكتبات فايربيز -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmbgtwUgqm1QoCQ9W2Cv7HipbOI7DeCAQ",
+      authDomain: "savor-dashboard.firebaseapp.com",
+      projectId: "savor-dashboard",
+      storageBucket: "savor-dashboard.firebasestorage.app",
+      messagingSenderId: "612222765101",
+      appId: "1:612222765101:web:6e1076706e59d418cb90a4"
+    };
+    const IMGBB_API_KEY = "cd96097465b0faa2dc7cea74dfe9ca1b";
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function fetchRestaurantStatus() {
+      db.collection("settings").doc("general").onSnapshot(doc => {
+        const isOpen = doc.exists ? (doc.data().isOpen !== false) : true;
+        const btn = document.getElementById('restaurantStatusBtn');
+        if (isOpen) {
+          btn.textContent = '🟢 المطعم مفتوح دلوقتي (دوس تقفله)';
+          btn.className = 'py-4 px-8 rounded-xl font-bold text-lg transition bg-green-600 hover:bg-green-700 text-white shadow-lg';
+        } else {
+          btn.textContent = '🔴 المطعم مقفول دلوقتي (دوس تفتحه)';
+          btn.className = 'py-4 px-8 rounded-xl font-bold text-lg transition bg-red-600 hover:bg-red-700 text-white shadow-lg';
+        }
+      }, err => console.error('restaurant status error:', err));
+    }
+
+    function toggleRestaurantStatus() {
+      db.collection("settings").doc("general").get().then(doc => {
+        const isOpen = doc.exists ? (doc.data().isOpen !== false) : true;
+        db.collection("settings").doc("general").set({ isOpen: !isOpen }, { merge: true });
+      });
+    }
+
+    let audioCtx = null;
+    function enableOrderSound() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      playOrderBeep();
+      document.getElementById('soundStatusText').textContent = '✅ التنبيه الصوتي شغال دلوقتي';
+    }
+
+    function playOrderBeep() {
+      if (!audioCtx) return;
+      const ring = (freq, delay) => {
+        setTimeout(() => {
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'sine'; osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+        }, delay);
+      };
+      ring(880, 0);
+      ring(1100, 250);
+    }
+
+    function sendWhatsApp(phone, name, orderNum, status) {
+      let formattedPhone = phone.startsWith('01') ? '+2' + phone : phone;
+      let msg = `أهلاً بك يا ${name}\nبخصوص طلبك رقم (${orderNum}).\n\n`;
+      if (status === 'new') {
+        msg += "حالة الطلب: استلمنا طلبك بنجاح وجاري تجهيزه الآن 🍳";
+      } else if (status === 'shipped') {
+        msg += "حالة الطلب: طلبك خرج مع المندوب وفي الطريق إليك 🛵";
+      } else if (status === 'delivered') {
+        msg += "حالة الطلب: تم توصيل الطلب بنجاح، نتمنى لك وجبة شهية! 🔥";
+      }
+      window.open(`https://wa.me/${formattedPhone.replace('+', '')}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    let isFirstOrdersLoad = true;
+    function fetchOrders() {
+      db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        if (!isFirstOrdersLoad) {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === 'added') { playOrderBeep(); }
+          });
+        }
+        isFirstOrdersLoad = false;
+        const tbody = document.getElementById('ordersTableBody');
+        tbody.innerHTML = ''; 
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">لا توجد طلبات حالياً.</td></tr>`;
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const order = { id: doc.id, ...doc.data() };
+          let dateStr = "غير محدد";
+          if (order.timestamp) {
+            const dateObj = order.timestamp.toDate ? order.timestamp.toDate() : new Date(order.timestamp);
+            dateStr = dateObj.toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          }
+          const orderNum = order.orderNumber || order.id.substring(0, 6);
+          const tr = document.createElement('tr');
+          tr.className = "border-b hover:bg-slate-100 transition duration-150";
+          tr.innerHTML = `
+            <td class="p-4 font-bold text-orange-600">#${orderNum}</td>
+            <td class="p-4">
+              <div class="font-bold">${order.customerName || 'بدون اسم'}</div>
+              <div class="text-sm text-slate-500" dir="ltr">${order.phone || ''}</div>
+            </td>
+            <td class="p-4 font-black text-green-700">${order.total} ج.م</td>
+            <td class="p-4 text-slate-600 text-sm">${dateStr}</td>
+            <td class="p-4">
+              <select onchange="updateOrderStatus('${order.id}', this.value)" class="bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2 w-full">
+                <option value="new" ${order.status === 'new' ? 'selected' : ''}>🟠 جديد</option>
+                <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>🔵 تم الشحن</option>
+                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>🟢 تم التوصيل</option>
+              </select>
+            </td>
+            <td class="p-4 flex justify-center gap-2">
+              <button onclick="viewDetails('${order.items}', '${order.address}', '${order.notes}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm" title="التفاصيل">📄</button>
+              <button onclick="printOrder('${orderNum}', '${order.customerName}', '${order.phone}', '${order.items}', '${order.total}')" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm" title="طباعة الفاتورة">🖨️</button>
+              <button onclick="sendWhatsApp('${order.phone || ''}', '${order.customerName || ''}', '${orderNum}', '${order.status}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm" title="مراسلة واتساب">💬</button>
+              <button onclick="deleteOrder('${order.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm" title="حذف الطلب">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    function updateOrderStatus(docId, newStatus) {
+      db.collection("orders").doc(docId).update({ status: newStatus });
+    }
+
+    function deleteOrder(docId) {
+      if (confirm("هل أنت متأكد من حذف هذا الطلب نهائياً؟")) {
+        db.collection("orders").doc(docId).delete();
+      }
+    }
+
+    function viewDetails(items, address, notes) {
+      alert(`تفاصيل الطلب:\n${items}\n\nالعنوان:\n${address}\n\nملاحظات:\n${notes || 'لا يوجد'}`);
+    }
+
+    function printOrder(orderNum, name, phone, items, total) {
+      const win = window.open('', '_blank', 'width=400,height=600');
+      win.document.write(`
+        <html dir="rtl">
+        <body style="font-family: Tahoma; padding: 20px;">
+          <h2 style="text-align: center;">SAVOR</h2>
+          <hr>
+          <p><b>رقم الطلب:</b> #${orderNum}</p>
+          <p><b>العميل:</b> ${name}</p>
+          <p><b>الموبايل:</b> ${phone}</p>
+          <hr>
+          <h3>الأصناف:</h3>
+          <p style="line-height: 1.8;">${items}</p>
+          <hr>
+          <h2>الإجمالي: ${total} ج.م</h2>
+          <script>window.onload = function() { window.print(); }<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById('sec-' + tabName).classList.remove('hidden');
+      document.querySelectorAll('aside nav button').forEach(btn => {
+        btn.classList.remove('nav-active'); btn.classList.add('nav-inactive');
+      });
+      document.getElementById('nav-' + tabName).classList.add('nav-active');
+      document.getElementById('nav-' + tabName).classList.remove('nav-inactive');
+    }
+
+    function switchMenuSubTab(tabName) {
+      document.getElementById('menu-control-section').classList.add('hidden');
+      document.getElementById('menu-add-section').classList.add('hidden');
+      document.getElementById('menu-' + tabName + '-section').classList.remove('hidden');
+      document.getElementById('subtab-control').className = "pb-3 px-2 " + (tabName==='control' ? 'menu-tab-active' : 'menu-tab-inactive');
+      document.getElementById('subtab-add').className = "pb-3 px-2 " + (tabName==='add' ? 'menu-tab-active' : 'menu-tab-inactive');
+    }
+
+ auth.onAuthStateChanged(user => {
+  if(user) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('dashboardScreen').classList.remove('hidden');
+    document.getElementById('dashboardScreen').classList.add('flex');
+    
+    fetchMenu(); 
+    fetchCoupons();
+    fetchOrders(); 
+    fetchRestaurantStatus(); // <== تأكد من وجود هذا السطر هنا ليعمل الزر ويحدث حالته فوراً
+  }
+});
+
+    function login() {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      auth.signInWithEmailAndPassword(email, pass).catch(err => {
+        alert("خطأ في تسجيل الدخول: " + err.message);
+      });
+    }
+
+    // --- جلب وعرض المنيو مع إمكانية التعديل المباشر ---
+    function fetchMenu() {
+      db.collection("menu").onSnapshot(snapshot => {
+        const tbody = document.getElementById('menuTableBody');
+        tbody.innerHTML = '';
+        snapshot.forEach(doc => {
+          const item = { id: doc.id, ...doc.data() };
+          const imgSrc = item.image || 'https://placehold.co/100x100?text=Savor';
+          
+          let priceFieldHTML = '';
+          if (item.sizes) {
+            priceFieldHTML = `
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div><span class="text-slate-500">S:</span> <input type="number" id="price_s_${item.id}" value="${item.sizes.S || ''}" class="w-full p-1 border rounded"></div>
+                <div><span class="text-slate-500">L:</span> <input type="number" id="price_l_${item.id}" value="${item.sizes.L || ''}" class="w-full p-1 border rounded"></div>
+                <div><span class="text-slate-500">D:</span> <input type="number" id="price_d_${item.id}" value="${item.sizes.D || ''}" class="w-full p-1 border rounded"></div>
+                <div><span class="text-slate-500">XL:</span> <input type="number" id="price_xl_${item.id}" value="${item.sizes.XL || ''}" class="w-full p-1 border rounded"></div>
+              </div>
+            `;
+          } else {
+            priceFieldHTML = `
+              <div><input type="number" id="price_fixed_${item.id}" value="${item.price || 0}" class="w-full p-2 border rounded text-sm"></div>
+            `;
+          }
+
+          tbody.innerHTML += `
+            <tr class="border-b">
+              <td class="p-3"><img src="${imgSrc}" class="w-12 h-12 rounded object-cover"></td>
+              <td class="p-3">
+                <input type="text" id="name_${item.id}" value="${item.name}" class="w-full p-2 border rounded font-bold text-sm">
+              </td>
+              <td class="p-3 w-48">${priceFieldHTML}</td>
+              <td class="p-3"><input type="file" id="file_${item.id}" class="text-xs" onchange="uploadImageToImgBB('${item.id}')"></td>
+              <td class="p-3">
+                <select onchange="db.collection('menu').doc('${item.id}').update({status: this.value})" class="border p-1 rounded text-sm ${item.status === 'out_of_stock' ? 'text-red-600' : 'text-green-600'}">
+                  <option value="available" ${item.status !== 'out_of_stock' ? 'selected':''}>متاح</option>
+                  <option value="out_of_stock" ${item.status === 'out_of_stock' ? 'selected':''}>نفذ (Sold Out)</option>
+                </select>
+              </td>
+              <td class="p-3 text-center">
+                <button onclick="updateExistingItem('${item.id}', ${item.sizes ? true : false})" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">💾 حفظ</button>
+                <button onclick="deleteMenuItem('${item.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow mr-1">🗑️ حذف</button>
+              </td>
+            </tr>
+          `;
+        });
+      });
+    }
+
+    // --- تحديث بيانات المنتج الحالي (الاسم والسعر) ---
+    function updateExistingItem(itemId, hasSizes) {
+      const newName = document.getElementById(`name_${itemId}`).value.trim();
+      if (!newName) return alert("اسم المنتج لا يمكن أن يكون فارغاً");
+
+      let updateData = { name: newName };
+
+      if (hasSizes) {
+        let sizes = {};
+        const sVal = document.getElementById(`price_s_${itemId}`).value;
+        const lVal = document.getElementById(`price_l_${itemId}`).value;
+        const dVal = document.getElementById(`price_d_${itemId}`).value;
+        const xlVal = document.getElementById(`price_xl_${itemId}`).value;
+
+        if (sVal) sizes.S = Number(sVal);
+        if (lVal) sizes.L = Number(lVal);
+        if (dVal) sizes.D = Number(dVal);
+        if (xlVal) sizes.XL = Number(xlVal);
+
+        updateData.sizes = sizes;
+      } else {
+        const fixedVal = document.getElementById(`price_fixed_${itemId}`).value;
+        updateData.price = Number(fixedVal);
+      }
+
+      db.collection("menu").doc(itemId).update(updateData)
+        .then(() => alert("✅ تم تحديث المنتج بنجاح!"))
+        .catch(err => alert("❌ حدث خطأ أثناء التحديث: " + err.message));
+    }
+
+    function deleteMenuItem(itemId) {
+      if (confirm("هل أنت متأكد من حذف هذا المنتج نهائياً من المنيو؟")) {
+        db.collection("menu").doc(itemId).delete();
+      }
+    }
+
+    async function uploadImageToImgBB(itemId) {
+      const file = document.getElementById(`file_${itemId}`).files[0];
+      if(!file) return;
+      const formData = new FormData(); formData.append('image', file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
+      const data = await res.json();
+      if(data.success) db.collection('menu').doc(itemId).update({ image: data.data.display_url });
+    }
+
+    async function addNewItem() {
+      const btn = document.getElementById('saveItemBtn');
+      btn.innerText = "جاري الحفظ والرفع...";
+      
+      const category = document.getElementById('newItemCategory').value;
+      const name = document.getElementById('newItemName').value;
+      const desc = document.getElementById('newItemDesc').value;
+      const imageFile = document.getElementById('newItemImage').files[0];
+      
+      let sizes = {};
+      let price = document.getElementById('priceFixed').value;
+      if(document.getElementById('priceS').value) sizes.S = Number(document.getElementById('priceS').value);
+      if(document.getElementById('priceL').value) sizes.L = Number(document.getElementById('priceL').value);
+      if(document.getElementById('priceD').value) sizes.D = Number(document.getElementById('priceD').value);
+      if(document.getElementById('priceXL').value) sizes.XL = Number(document.getElementById('priceXL').value);
+
+      if(!name) return alert("اكتب اسم المنتج");
+
+      let imageUrl = '';
+      if(imageFile) {
+        const formData = new FormData(); formData.append('image', imageFile);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
+        const data = await res.json();
+        if(data.success) imageUrl = data.data.display_url;
+      }
+
+      const itemData = {
+        name: name,
+        category: category,
+        description: desc,
+        status: 'available',
+        image: imageUrl
+      };
+      
+      if(Object.keys(sizes).length > 0) itemData.sizes = sizes;
+      else if(price) itemData.price = Number(price);
+
+      await db.collection("menu").add(itemData);
+      alert("تم إضافة المنتج بنجاح للموقع!");
+      btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
+      switchMenuSubTab('control');
+    }
+
+    function fetchCoupons() {
+      db.collection("coupons").onSnapshot(snap => {
+        const tbody = document.getElementById('couponsTableBody');
+        tbody.innerHTML = '';
+        snap.forEach(doc => {
+          const c = doc.data();
+          tbody.innerHTML += `<tr><td class="p-4 font-bold text-lg">${c.code}</td><td class="p-4 text-green-600 font-bold">${c.value} ${c.type === 'fixed' ? 'ج.م' : '%'}</td><td class="p-4"><button onclick="db.collection('coupons').doc('${doc.id}').delete()" class="text-red-500">حذف 🗑️</button></td></tr>`;
+        });
+      });
+    }
+
+    function addCoupon() {
+      const code = document.getElementById('couponCode').value.toUpperCase();
+      const value = document.getElementById('couponValue').value;
+      const type = document.getElementById('couponType').value;
+      if(code && value) db.collection('coupons').add({ code, value: Number(value), type, active: true });
+    }
+  </script>
+</body>
+</html>
