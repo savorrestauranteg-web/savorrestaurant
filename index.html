@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <meta property="og:type" content="website">
+<meta property="og:title" content="SAVOR Restaurant | أفضل مطعم في الإسكندرية">
+<meta property="og:description" content="برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة، يوصلك التوصيل لحد باب البيت.">
+<meta property="og:image" content="https://yourwebsite.com/logo.jpeg"> <meta property="og:url" content="https://yourwebsite.com/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAVOR Restaurant</title>
+<title>Savor Restaurant</title>
 <meta name="description" content="SAVOR - برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة، يوصلك التوصيل لحد باب البيت.">
-<link rel="icon" href="assets/logo.jpg">
+<link rel="icon" href="savor.jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1446,8 +1450,11 @@ const revealObserver = new IntersectionObserver((entries)=>{
 
 function renderItemCard(cat, item){
   const imgSrc = item.image && item.image !== '' ? item.image : 'assets/logo.jpg'; 
-  let startPrice = item.sizes ? item.sizes[Object.keys(item.sizes)[0]] : item.price;
-  const catIdx = MENU.findIndex(c => c.id === cat.id);
+let startPrice = item.price;
+  if(item.sizes) {
+    const validSizes = Object.keys(item.sizes).filter(k => item.sizes[k] > 0);
+    if(validSizes.length > 0) startPrice = item.sizes[validSizes[0]];
+  }  const catIdx = MENU.findIndex(c => c.id === cat.id);
   const itemIdx = cat.items.indexOf(item);
   
   // التحقق من حالة المنتج
@@ -1515,18 +1522,22 @@ function openProductModal(catIdx, itemIdx) {
   document.getElementById('pmTitle').textContent = activePmItem.name;
   document.getElementById('pmQtyVal').textContent = activePmQty;
   
-  const startPrice = activePmItem.sizes ? activePmItem.sizes[Object.keys(activePmItem.sizes)[0]] : activePmItem.price;
+ let validSizes = [];
+  if (activePmItem.sizes) {
+    validSizes = Object.keys(activePmItem.sizes).filter(k => activePmItem.sizes[k] > 0);
+  }
+
+  const startPrice = validSizes.length > 0 ? activePmItem.sizes[validSizes[0]] : activePmItem.price;
   document.getElementById('pmStartPrice').textContent = `السعر ${startPrice} ج.م`;
 
   const sizesList = document.getElementById('pmSizesList');
   const sizesContainer = document.getElementById('pmSizesContainer');
   sizesList.innerHTML = '';
 
-  if (activePmItem.sizes) {
+  if (validSizes.length > 0) {
     sizesContainer.style.display = 'block';
-    const keys = Object.keys(activePmItem.sizes);
-    activePmSize = keys[0];
-    keys.forEach((k, i) => {
+    activePmSize = validSizes[0];
+    validSizes.forEach((k, i) => {
       const price = activePmItem.sizes[k];
       const sizeLabel = SIZE_LABELS[k] || k;
       sizesList.innerHTML += `
@@ -1543,6 +1554,8 @@ function openProductModal(catIdx, itemIdx) {
     sizesContainer.style.display = 'none';
     activePmSize = null;
   }
+
+
   updatePmTotal();
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlayBg').classList.add('show');

@@ -768,10 +768,10 @@ fetchCategories();  }
         const dVal = document.getElementById(`price_d_${itemId}`).value;
         const xlVal = document.getElementById(`price_xl_${itemId}`).value;
 
-        if (sVal) sizes.S = Number(sVal);
-        if (lVal) sizes.L = Number(lVal);
-        if (dVal) sizes.D = Number(dVal);
-        if (xlVal) sizes.XL = Number(xlVal);
+      if (sVal && Number(sVal) > 0) sizes.S = Number(sVal);
+        if (lVal && Number(lVal) > 0) sizes.L = Number(lVal);
+        if (dVal && Number(dVal) > 0) sizes.D = Number(dVal);
+        if (xlVal && Number(xlVal) > 0) sizes.XL = Number(xlVal);
 
         updateData.sizes = sizes;
       } else {
