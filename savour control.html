@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAVOR | الإدارة المركزية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Tajawal', sans-serif; background-color: #fbf7ee; color: #1c1712; }
+    .glass-panel { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(8, 41, 33, 0.05); }
+    .nav-active { background-color: #0c3d30; color: #e2a530; font-weight: bold; }
+    .nav-inactive { background-color: transparent; color: #64748b; }
+    .nav-inactive:hover { background-color: #e2e8f0; color: #0c3d30; }
+    .menu-tab-active { border-bottom: 3px solid #e2a530; color: #0c3d30; font-weight: bold; }
+    .menu-tab-inactive { border-bottom: 3px solid transparent; color: #64748b; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between">
+  <!-- ================= شاشة تسجيل الدخول ================= -->
+  <div id="loginScreen" class="glass-panel p-10 rounded-3xl w-full max-w-md text-center shadow-2xl">
+    <h2 class="text-3xl font-black mb-8" style="color: #0c3d30;">إدارة SAVOR</h2>
+    <input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full mb-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+    <input type="password" id="password" placeholder="كلمة المرور" class="w-full mb-8 p-4 rounded-xl bg-slate-50 border border-slate-200">
+    <button onclick="login()" class="w-full text-white font-bold py-4 px-4 rounded-xl shadow-lg" style="background-color: #0c3d30;">تسجيل الدخول</button>
+  </div>
+
+  <!-- ================= لوحة التحكم ================= -->
+  <div id="dashboardScreen" class="hidden w-full min-h-screen flex-col md:flex-row">
+    
+    <!-- القائمة الجانبية -->
+    <aside class="w-full md:w-72 glass-panel flex flex-col border-l border-slate-200">
+      <div class="p-8 border-b border-slate-200">
+        <h1 class="text-3xl font-black" style="color: #0c3d30;">SAVOR</h1>
+      </div>
+   <nav class="flex-1 px-4 py-6 space-y-3">
+        <button onclick="switchTab('overview')" id="nav-overview" class="w-full text-right p-4 rounded-xl nav-active flex items-center gap-3">📊 نظرة عامة على الأداء</button>
+        <button onclick="switchTab('orders')" id="nav-orders" class="w-full text-right p-4 rounded-xl nav-inactive flex items-center gap-3">🛒 الطلبات الواردة</button>
+        <button onclick="switchTab('menu')" id="nav-menu" class="w-full text-right p-4 rounded-xl nav-inactive flex items-center gap-3">🍔 إدارة المنيو والمنتجات</button>
+        <button onclick="switchTab('coupons')" id="nav-coupons" class="w-full text-right p-4 rounded-xl nav-inactive flex items-center gap-3">🏷️ كوبونات الخصم</button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="w-full text-right p-4 rounded-xl nav-inactive flex items-center gap-3">⚙️ الإعدادات</button>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-10 h-screen overflow-y-auto bg-slate-50">
+      <!-- قسم نظرة عامة -->
+      <section id="sec-overview" class="block">
+        <div class="flex items-center gap-3 mb-6">
+          <h2 class="text-3xl font-bold" style="color: #0c3d30;">نظرة عامة على الأداء</h2>
+          <span class="text-2xl">📈</span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="glass-panel p-6 rounded-2xl border-r-4 border-slate-700 flex flex-col items-start shadow-sm">
+            <span class="text-slate-500 text-sm font-bold mb-2">إجمالي طلبات الشهر</span>
+            <span class="text-4xl font-black text-slate-800" id="statMonthOrders">0</span>
+          </div>
+          <div class="glass-panel p-6 rounded-2xl border-r-4 border-orange-500 flex flex-col items-start shadow-sm">
+            <span class="text-slate-500 text-sm font-bold mb-2">طلبات جديدة (تحتاج متابعة)</span>
+            <span class="text-4xl font-black text-orange-600" id="statNewOrders">0</span>
+          </div>
+          <div class="glass-panel p-6 rounded-2xl border-r-4 border-green-500 flex flex-col items-start shadow-sm">
+            <span class="text-slate-500 text-sm font-bold mb-2">إجمالي مبيعات اليوم (للمكتمل)</span>
+            <span class="text-4xl font-black text-green-600" id="statTodaySales">0 ج.م</span>
+          </div>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl shadow-sm">
+          <h3 class="font-bold text-lg mb-4 text-slate-700">مبيعات آخر 7 أيام</h3>
+          <canvas id="salesChart" height="80"></canvas>
+        </div>
+      </section>
+
+      <!-- قسم الطلبات -->
+      <section id="sec-orders" class="hidden">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">إدارة الطلبات الواردة</h2>
+        
+        <!-- شريط البحث والفلاتر للطلبات -->
+        <div class="glass-panel p-4 rounded-xl mb-6 flex flex-col md:flex-row gap-4 shadow-sm items-center bg-slate-800">
+          <button onclick="clearOrderFilters()" class="bg-slate-600 hover:bg-slate-500 text-white px-5 py-3 rounded-lg font-bold transition whitespace-nowrap">إلغاء الفلاتر</button>
+          <input type="date" id="orderDateFilter" onchange="filterOrders()" class="p-3 rounded-lg border-0 bg-slate-700 text-white outline-none">
+          <select id="orderStatusFilter" onchange="filterOrders()" class="p-3 rounded-lg border-0 bg-slate-700 text-white outline-none appearance-none">
+            <option value="all">كل الحالات</option>
+            <option value="new">جديد</option>
+            <option value="shipped">تم الشحن</option>
+            <option value="delivered">تم التوصيل</option>
+          </select>
+          <input type="text" id="orderSearch" onkeyup="filterOrders()" placeholder="بحث برقم الطلب، العميل، الهاتف..." class="flex-1 p-3 rounded-lg border-0 bg-slate-700 text-white outline-none w-full">
+        </div>
+
+        <div class="glass-panel rounded-2xl overflow-hidden shadow-sm">
+          <table class="w-full text-right"><tbody id="ordersTableBody"></tbody></table>
+        </div>
+      </section>
+
+      <!-- قسم إدارة المنيو -->
+      <section id="sec-menu" class="hidden">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">إدارة المنيو 🍔</h2>
+        
+        <div class="flex gap-6 mb-6 border-b border-slate-300">
+          <button onclick="switchMenuSubTab('control')" id="subtab-control" class="pb-3 px-2 menu-tab-active">📋 التحكم في الأصناف</button>
+          <button onclick="switchMenuSubTab('add')" id="subtab-add" class="pb-3 px-2 menu-tab-inactive">➕ إضافة منتج جديد</button>
+<button onclick="switchMenuSubTab('categories')" id="subtab-categories" class="pb-3 px-2 menu-tab-inactive">📂 إدارة الأقسام</button>        </div>
+
+        <!-- جدول المنتجات وشريط البحث -->
+        <div id="menu-control-section" class="block glass-panel rounded-2xl overflow-hidden p-4">
+          <!-- شريط بحث وترتيب المنتجات -->
+          <div class="flex flex-col md:flex-row gap-4 mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <input type="text" id="menuSearch" onkeyup="filterMenu()" placeholder="🔍 ابحث عن منتج بالاسم..." class="flex-1 p-3 rounded-lg border border-slate-300 outline-none focus:border-amber-400 transition">
+            <select id="menuSort" onchange="filterMenu()" class="p-3 rounded-lg border border-slate-300 outline-none w-full md:w-48">
+              <option value="default">الترتيب الافتراضي</option>
+              <option value="newest">الأحدث أولاً</option>
+              <option value="az">أ - ي</option>
+              <option value="za">ي - أ</option>
+            </select>
+          </div>
+
+           <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="border-b bg-slate-100 text-slate-700 text-sm">
+                <th class="p-3">الصورة</th>
+                <th class="p-3">اسم المنتج</th>
+                <th class="p-3">السعر / الأسعار (ج.م)</th>
+                <th class="p-3">تغيير الصورة</th>
+                <th class="p-3">الحالة</th>
+                <th class="p-3 text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="menuTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+       <!-- قسم إدارة الأقسام -->
+        <div id="menu-categories-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-slate-100">
+          <h3 class="text-xl font-bold mb-4" style="color: #0c3d30;">إدارة وترتيب الأقسام</h3>
+          <p class="text-slate-500 text-sm mb-6">تقدر تعدل أسماء الأقسام الحالية، ترتبها، أو تضيف قسم جديد (وبيسمّع تلقائياً في فورم إضافة المنتجات والموقع).</p>
+          
+     <!-- فورم إضافة قسم جديد -->
+          <div class="flex flex-col gap-3 mb-8 p-5 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="flex flex-col md:flex-row gap-3">
+              <input type="text" id="newCatNameAr" placeholder="اسم القسم (عربي)" class="flex-1 p-3 border rounded-xl">
+              <input type="text" id="newCatNameEn" placeholder="اسم القسم (انجليزي - اختياري)" class="flex-1 p-3 border rounded-xl">
+              <input type="text" id="newCatId" placeholder="معرف بالانجليزي (بدون مسافات، مثال: pizzas)" class="flex-1 p-3 border rounded-xl">
+              <input type="text" id="newCatIcon" placeholder="إيموجي 🍕" class="w-24 p-3 border rounded-xl text-center">
+            </div>
+            <div class="flex flex-col md:flex-row gap-3">
+              <input type="text" id="newCatBanner" placeholder="رابط صورة خلفية القسم (URL)" class="flex-1 p-3 border rounded-xl" value="assets/beefburger.jpg">
+              <button onclick="addNewCategory()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-bold transition">➕ إضافة قسم</button>
+            </div>
+          </div>
+
+          <ul id="categoriesListUI" class="space-y-3"></ul>
+          <button onclick="saveCategories()" class="w-full mt-6 bg-amber-600 hover:bg-amber-700 text-white py-4 rounded-xl font-bold text-lg transition">💾 حفظ التعديلات والترتيب</button>
+        </div>
+
+        <!-- فورم إضافة منتج جديد متقدمة -->
+        <div id="menu-add-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-amber-200">
+          <h3 class="text-xl font-bold mb-6" style="color: #0c3d30;">تفاصيل المنتج الجديد</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-bold mb-2">القسم</label>
+              <select id="newItemCategory" class="w-full p-3 rounded-xl border border-slate-300">
+                <option value="beefburger">برجر لحمة</option>
+                <option value="chickencrispy">تشيكن كرسبي</option>
+                <option value="tortillapotato">تورتيلا بطاطس</option>
+                <option value="drinks">مشروبات</option>
+                <option value="fries">بطاطس</option>
+                <option value="chickenpasta">مكرونة تشيكن كرسبي</option>
+                <option value="tortillachicken">تورتيلا تشيكن كرسبي</option>
+                <option value="tortillabeef">تورتيلا لحمة</option>
+                <option value="additions">إضافات</option>
+              </select>
+            </div>
+            <div><label class="block text-sm font-bold mb-2">اسم المنتج</label><input type="text" id="newItemName" class="w-full p-3 rounded-xl border border-slate-300"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">المكونات / الوصف (اختياري)</label><textarea id="newItemDesc" rows="2" class="w-full p-3 rounded-xl border border-slate-300"></textarea></div>
+            
+            <div class="md:col-span-2 p-4 bg-slate-100 rounded-xl">
+              <label class="block text-sm font-bold mb-4">التسعير والأحجام (اكتب السعر قدام الحجم المطلوب، أو استخدم السعر الثابت)</label>
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div><small>سعر ثابت</small><input type="number" id="priceFixed" class="w-full p-2 border rounded"></div>
+                <div><small>صغير (S)</small><input type="number" id="priceS" class="w-full p-2 border rounded"></div>
+                <div><small>كبير (L)</small><input type="number" id="priceL" class="w-full p-2 border rounded"></div>
+                <div><small>دبل (D)</small><input type="number" id="priceD" class="w-full p-2 border rounded"></div>
+                <div><small>اكس لارج (XL)</small><input type="number" id="priceXL" class="w-full p-2 border rounded"></div>
+              </div>
+            </div>
+            
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold mb-2">صورة المنتج</label>
+              <input type="file" id="newItemImage" accept="image/*" class="w-full p-2 border rounded-xl">
+            </div>
+          </div>
+          <button onclick="addNewItem()" id="saveItemBtn" class="w-full text-white py-4 rounded-xl font-bold" style="background-color: #e2a530; color: #0c3d30;">💾 حفظ المنتج وإضافته للمنيو</button>
+        </div>
+      </section>
+
+      <!-- قسم الكوبونات -->
+      <section id="sec-coupons" class="hidden">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">كوبونات الخصم 🏷️</h2>
+        <div class="glass-panel p-8 rounded-2xl mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input type="text" id="couponCode" placeholder="كود الخصم (مثال: SAVOR20)" class="p-3 border rounded-xl">
+            <input type="number" id="couponValue" placeholder="قيمة الخصم بالجنية أو %" class="p-3 border rounded-xl">
+            <select id="couponType" class="p-3 border rounded-xl"><option value="fixed">خصم مبلغ ثابت (جنية)</option><option value="percentage">خصم نسبة مئوية (%)</option></select>
+          </div>
+          <button onclick="addCoupon()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold">إضافة الكوبون</button>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl"><table class="w-full text-right"><tbody id="couponsTableBody"></tbody></table></div>
+      </section>
+
+      <!-- قسم الإعدادات -->
+      <section id="sec-settings" class="hidden">
+        <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">إعدادات المطعم ⚙️</h2>
+
+        <div class="glass-panel p-8 rounded-2xl mb-6 border-2 border-slate-100">
+          <h3 class="text-xl font-bold mb-4" style="color: #0c3d30;">حالة استقبال الطلبات</h3>
+          <p class="text-slate-500 mb-6 text-sm">لو المطعم مقفول، هيظهر تنبيه في الموقع ومش هيقدر أي زبون يكمل أوردر لحد ما ترجع تفتحه تاني.</p>
+          <button id="restaurantStatusBtn" onclick="toggleRestaurantStatus()" class="py-4 px-8 rounded-xl font-bold text-lg transition text-white bg-slate-400">
+            جاري التحميل...
+          </button>
+        </div>
+
+        <div class="glass-panel p-8 rounded-2xl border-2 border-slate-100">
+          <h3 class="text-xl font-bold mb-4" style="color: #0c3d30;">التنبيه الصوتي للأوردرات الجديدة</h3>
+          <p class="text-slate-500 mb-6 text-sm">فعّل الزرار ده مرة واحدة بعد ما تفتح اللوحة، عشان المتصفح يسمح بتشغيل صوت تنبيه تلقائي لما يوصل أوردر جديد وانت شغال.</p>
+          <button onclick="enableOrderSound()" id="enableSoundBtn" class="bg-slate-700 hover:bg-slate-800 text-white py-4 px-8 rounded-xl font-bold transition text-lg shadow-md">
+            🔔 تفعيل التنبيه الصوتي
+          </button>
+          <span id="soundStatusText" class="mr-4 text-sm font-bold text-green-600"></span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- مكتبات فايربيز -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmbgtwUgqm1QoCQ9W2Cv7HipbOI7DeCAQ",
+      authDomain: "savor-dashboard.firebaseapp.com",
+      projectId: "savor-dashboard",
+      storageBucket: "savor-dashboard.firebasestorage.app",
+      messagingSenderId: "612222765101",
+      appId: "1:612222765101:web:6e1076706e59d418cb90a4"
+    };
+    const IMGBB_API_KEY = "cd96097465b0faa2dc7cea74dfe9ca1b";
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+function fetchRestaurantStatus() {
+      // غيرنا المسار لـ menu و status
+      db.collection("menu").doc("status").onSnapshot(doc => {
+        const isOpen = doc.exists ? (doc.data().isOpen !== false) : true;
+        const btn = document.getElementById('restaurantStatusBtn');
+        if (isOpen) {
+          btn.textContent = '🟢 المطعم مفتوح دلوقتي (دوس تقفله)';
+          btn.className = 'py-4 px-8 rounded-xl font-bold text-lg transition bg-green-600 hover:bg-green-700 text-white shadow-lg';
+        } else {
+          btn.textContent = '🔴 المطعم مقفول دلوقتي (دوس تفتحه)';
+          btn.className = 'py-4 px-8 rounded-xl font-bold text-lg transition bg-red-600 hover:bg-red-700 text-white shadow-lg';
+        }
+      }, err => console.error('restaurant status error:', err));
+    }
+
+    function toggleRestaurantStatus() {
+      // غيرنا المسار لـ menu و status
+      db.collection("menu").doc("status").get().then(doc => {
+        const isOpen = doc.exists ? (doc.data().isOpen !== false) : true;
+        db.collection("menu").doc("status").set({ isOpen: !isOpen }, { merge: true });
+      });
+    }
+    let audioCtx = null;
+    function enableOrderSound() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      playOrderBeep();
+      document.getElementById('soundStatusText').textContent = '✅ التنبيه الصوتي شغال دلوقتي';
+    }
+
+    function playOrderBeep() {
+      if (!audioCtx) return;
+      const ring = (freq, delay) => {
+        setTimeout(() => {
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'sine'; osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+        }, delay);
+      };
+      ring(880, 0);
+      ring(1100, 250);
+    }
+
+    function sendWhatsApp(phone, name, orderNum, status) {
+      let formattedPhone = phone.startsWith('01') ? '+2' + phone : phone;
+      let msg = `أهلاً بك يا ${name}\nبخصوص طلبك رقم (${orderNum}).\n\n`;
+      if (status === 'new') {
+        msg += "حالة الطلب: استلمنا طلبك بنجاح وجاري تجهيزه الآن 🍳";
+      } else if (status === 'shipped') {
+        msg += "حالة الطلب: طلبك خرج مع المندوب وفي الطريق إليك 🛵";
+      } else if (status === 'delivered') {
+        msg += "حالة الطلب: تم توصيل الطلب بنجاح، نتمنى لك وجبة شهية! 🔥";
+      }
+      window.open(`https://wa.me/${formattedPhone.replace('+', '')}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    let isFirstOrdersLoad = true;
+    // متغيرات عامة عشان الفلاتر والرسم البياني
+    let allOrders = [];
+    let allMenuItems = [];
+    let salesChartInstance = null;
+  /* ================== نظام الطلبات والإحصائيات ================== */
+    function fetchOrders() {
+      db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        if (!isFirstOrdersLoad) {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === 'added') { playOrderBeep(); }
+          });
+        }
+        isFirstOrdersLoad = false;
+        allOrders = [];
+        
+        let todaySales = 0;
+        let newOrdersCount = 0;
+        let monthOrdersCount = 0;
+
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        // تجهيز بيانات آخر 7 أيام للرسم البياني
+        const last7Days = [...Array(7)].map((_, i) => {
+          const d = new Date(todayStart);
+          d.setDate(d.getDate() - i);
+          return d;
+        }).reverse();
+        let dailySales = [0, 0, 0, 0, 0, 0, 0];
+
+        snapshot.forEach(doc => {
+          const order = { id: doc.id, ...doc.data() };
+          allOrders.push(order);
+
+          // حساب الإحصائيات
+          let orderDate = order.timestamp ? (order.timestamp.toDate ? order.timestamp.toDate() : new Date(order.timestamp)) : new Date();
+          
+          if(order.status === 'new') newOrdersCount++;
+          if(orderDate >= monthStart) monthOrdersCount++;
+          
+          if (order.status === 'delivered') {
+            if(orderDate >= todayStart) {
+               todaySales += parseFloat(order.total) || 0;
+            }
+            // بيانات الرسم البياني
+            for(let i=0; i<7; i++) {
+              if (orderDate.toDateString() === last7Days[i].toDateString()) {
+                dailySales[i] += parseFloat(order.total) || 0;
+              }
+            }
+          }
+        });
+// تحديث أرقام النظرة العامة
+        document.getElementById('statTodaySales').innerText = todaySales + ' ج.م';
+        document.getElementById('statNewOrders').innerText = newOrdersCount;
+        document.getElementById('statMonthOrders').innerText = monthOrdersCount;
+// تحديث الرسم البياني
+        updateChart(last7Days.map(d => d.toLocaleDateString('ar-EG', {weekday: 'short', month: 'numeric', day: 'numeric'})), dailySales);
+
+        // تفعيل الفلتر وعرض الجدول
+        filterOrders(); 
+      });
+    }
+function updateChart(labels, data) {
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      if (salesChartInstance) salesChartInstance.destroy();
+      
+      salesChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'المبيعات اليومية (ج.م)',
+            data: data,
+            borderColor: '#059669',
+            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function filterOrders() {
+      const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
+      const statusFilter = document.getElementById('orderStatusFilter').value;
+      const dateFilter = document.getElementById('orderDateFilter').value;
+
+      const filtered = allOrders.filter(o => {
+        const orderNum = o.orderNumber || o.id.substring(0, 6);
+        const matchesSearch = (o.customerName || '').toLowerCase().includes(searchTerm) ||
+                              (o.phone || '').includes(searchTerm) ||
+                              orderNum.toLowerCase().includes(searchTerm);
+        
+        const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
+        
+        let matchesDate = true;
+        if (dateFilter) {
+           const d = o.timestamp ? (o.timestamp.toDate ? o.timestamp.toDate() : new Date(o.timestamp)) : new Date();
+           // ضبط التوقيت عشان يتطابق مع الـ input date
+           const dLocal = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+           matchesDate = (dLocal === dateFilter);
+        }
+        
+        return matchesSearch && matchesStatus && matchesDate;
+      });
+
+      renderOrdersTableHTML(filtered);
+    }
+
+    function clearOrderFilters() {
+      document.getElementById('orderSearch').value = '';
+      document.getElementById('orderStatusFilter').value = 'all';
+      document.getElementById('orderDateFilter').value = '';
+      filterOrders();
+    }
+
+    function renderOrdersTableHTML(data) {
+      const tbody = document.getElementById('ordersTableBody');
+      tbody.innerHTML = ''; 
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-bold">لا توجد طلبات متطابقة مع البحث.</td></tr>`;
+        return;
+      }
+
+      data.forEach(order => {
+        let dateStr = "غير محدد";
+        if (order.timestamp) {
+          const dateObj = order.timestamp.toDate ? order.timestamp.toDate() : new Date(order.timestamp);
+          dateStr = dateObj.toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        const orderNum = order.orderNumber || order.id.substring(0, 6);
+        tbody.innerHTML += `
+          <tr class="border-b hover:bg-slate-100 transition duration-150">
+            <td class="p-4 font-bold text-orange-600">#${orderNum}</td>
+            <td class="p-4">
+              <div class="font-bold">${order.customerName || 'بدون اسم'}</div>
+              <div class="text-sm text-slate-500" dir="ltr">${order.phone || ''}</div>
+            </td>
+            <td class="p-4 font-black text-green-700">${order.total} ج.م</td>
+            <td class="p-4 text-slate-600 text-sm">${dateStr}</td>
+            <td class="p-4">
+              <select onchange="updateOrderStatus('${order.id}', this.value)" class="bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2 w-full font-bold">
+                <option value="new" ${order.status === 'new' ? 'selected' : ''}>🟠 جديد</option>
+                <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>🔵 تم الشحن</option>
+                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>🟢 تم التوصيل</option>
+              </select>
+            </td>
+            <td class="p-4 flex justify-center gap-2">
+              <button onclick="viewDetails('${order.items}', '${order.address}', '${order.notes}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm" title="التفاصيل">📄</button>
+              <button onclick="printOrder('${orderNum}', '${order.customerName}', '${order.phone}', '${order.items}', '${order.total}')" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm" title="طباعة الفاتورة">🖨️</button>
+              <button onclick="sendWhatsApp('${order.phone || ''}', '${order.customerName || ''}', '${orderNum}', '${order.status}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm" title="مراسلة واتساب">💬</button>
+              <button onclick="deleteOrder('${order.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm" title="حذف الطلب">🗑️</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    /* ================== نظام المنيو والبحث ================== */
+    function fetchMenu() {
+      db.collection("menu").onSnapshot(snapshot => {
+        allMenuItems = [];
+        snapshot.forEach(doc => {
+if (doc.id === 'categoriesData' || doc.id === 'categoriesOrder' || doc.id === 'status') return;          allMenuItems.push({ id: doc.id, ...doc.data() });
+        });
+        filterMenu(); // تطبيق البحث والترتيب
+      });
+    }
+
+    function filterMenu() {
+      const term = document.getElementById('menuSearch').value.toLowerCase();
+      const sortValue = document.getElementById('menuSort').value;
+
+      let filtered = allMenuItems.filter(item => (item.name || '').toLowerCase().includes(term));
+
+      if (sortValue === 'az') {
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+      } else if (sortValue === 'za') {
+        filtered.sort((a, b) => (b.name || '').localeCompare(a.name || '', 'ar'));
+      } else if (sortValue === 'newest') {
+        filtered.reverse(); // افتراضياً العناصر الأحدث بتضاف في الآخر
+      }
+
+      renderMenuTableHTML(filtered);
+    }
+
+    function renderMenuTableHTML(data) {
+      const tbody = document.getElementById('menuTableBody');
+      tbody.innerHTML = '';
+      if(data.length === 0) {
+         tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-bold">لا يوجد منتجات بهذا الاسم.</td></tr>`;
+         return;
+      }
+      
+      data.forEach(item => {
+        const imgSrc = item.image || 'https://placehold.co/100x100?text=Savor';
+        let priceFieldHTML = item.sizes ? `
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div><span class="text-slate-500">S:</span> <input type="number" id="price_s_${item.id}" value="${item.sizes.S || ''}" class="w-full p-1 border rounded"></div>
+            <div><span class="text-slate-500">L:</span> <input type="number" id="price_l_${item.id}" value="${item.sizes.L || ''}" class="w-full p-1 border rounded"></div>
+            <div><span class="text-slate-500">D:</span> <input type="number" id="price_d_${item.id}" value="${item.sizes.D || ''}" class="w-full p-1 border rounded"></div>
+            <div><span class="text-slate-500">XL:</span> <input type="number" id="price_xl_${item.id}" value="${item.sizes.XL || ''}" class="w-full p-1 border rounded"></div>
+          </div>
+        ` : `<div><input type="number" id="price_fixed_${item.id}" value="${item.price || 0}" class="w-full p-2 border rounded text-sm"></div>`;
+
+        tbody.innerHTML += `
+          <tr class="border-b">
+            <td class="p-3"><img src="${imgSrc}" class="w-12 h-12 rounded object-cover"></td>
+            <td class="p-3"><input type="text" id="name_${item.id}" value="${item.name}" class="w-full p-2 border rounded font-bold text-sm"></td>
+            <td class="p-3 w-48">${priceFieldHTML}</td>
+            <td class="p-3"><input type="file" id="file_${item.id}" class="text-xs w-full" onchange="uploadImageToImgBB('${item.id}')"></td>
+            <td class="p-3">
+              <select onchange="db.collection('menu').doc('${item.id}').update({status: this.value})" class="border p-1 rounded font-bold text-sm ${item.status === 'out_of_stock' ? 'text-red-600 bg-red-50' : 'text-green-600 bg-green-50'}">
+                <option value="available" ${item.status !== 'out_of_stock' ? 'selected':''}>متاح</option>
+                <option value="out_of_stock" ${item.status === 'out_of_stock' ? 'selected':''}>نفذ (Sold Out)</option>
+              </select>
+            </td>
+            <td class="p-3 text-center">
+              <button onclick="updateExistingItem('${item.id}', ${item.sizes ? true : false})" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow mb-1 md:mb-0">💾 حفظ</button>
+              <button onclick="deleteMenuItem('${item.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">🗑️ حذف</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+    function updateOrderStatus(docId, newStatus) {
+      db.collection("orders").doc(docId).update({ status: newStatus });
+    }
+
+    function deleteOrder(docId) {
+      if (confirm("هل أنت متأكد من حذف هذا الطلب نهائياً؟")) {
+        db.collection("orders").doc(docId).delete();
+      }
+    }
+
+    function viewDetails(items, address, notes) {
+      alert(`تفاصيل الطلب:\n${items}\n\nالعنوان:\n${address}\n\nملاحظات:\n${notes || 'لا يوجد'}`);
+    }
+
+    function printOrder(orderNum, name, phone, items, total) {
+      const win = window.open('', '_blank', 'width=400,height=600');
+      win.document.write(`
+        <html dir="rtl">
+        <body style="font-family: Tahoma; padding: 20px;">
+          <h2 style="text-align: center;">SAVOR</h2>
+          <hr>
+          <p><b>رقم الطلب:</b> #${orderNum}</p>
+          <p><b>العميل:</b> ${name}</p>
+          <p><b>الموبايل:</b> ${phone}</p>
+          <hr>
+          <h3>الأصناف:</h3>
+          <p style="line-height: 1.8;">${items}</p>
+          <hr>
+          <h2>الإجمالي: ${total} ج.م</h2>
+          <script>window.onload = function() { window.print(); }<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById('sec-' + tabName).classList.remove('hidden');
+      document.querySelectorAll('aside nav button').forEach(btn => {
+        btn.classList.remove('nav-active'); btn.classList.add('nav-inactive');
+      });
+      document.getElementById('nav-' + tabName).classList.add('nav-active');
+      document.getElementById('nav-' + tabName).classList.remove('nav-inactive');
+    }
+
+function switchMenuSubTab(tabName) {
+  document.getElementById('menu-control-section').classList.add('hidden');
+  document.getElementById('menu-add-section').classList.add('hidden');
+  document.getElementById('menu-categories-section').classList.add('hidden'); 
+  
+  document.getElementById('menu-' + tabName + '-section').classList.remove('hidden');
+  
+  document.getElementById('subtab-control').className = "pb-3 px-2 " + (tabName==='control' ? 'menu-tab-active' : 'menu-tab-inactive');
+  document.getElementById('subtab-add').className = "pb-3 px-2 " + (tabName==='add' ? 'menu-tab-active' : 'menu-tab-inactive');
+  document.getElementById('subtab-categories').className = "pb-3 px-2 " + (tabName==='categories' ? 'menu-tab-active' : 'menu-tab-inactive'); 
+}
+// الأقسام الافتراضية كبداية للمطعم
+const DEFAULT_CATEGORIES = [
+  { id:'drinks', nameAr:'مشروبات', icon:'🥤', banner:'assets/drinks.jpg' },
+  { id:'fries', nameAr:'باكت بطاطس', icon:'🍟', banner:'assets/fries.jpg' },
+  { id:'beefburger', nameAr:'برجر لحمة', icon:'🍔', banner:'assets/beefburger.jpg' },
+  { id:'tortillapotato', nameAr:'تورتيلا بطاطس', icon:'🌯', banner:'assets/tortillapotato.jpg' },
+  { id:'chickencrispy', nameAr:'تشيكن كرسبي', icon:'🍗', banner:'assets/chickencrispy.jpg' },
+  { id:'chickenpasta', nameAr:'مكرونة تشيكن كرسبي', icon:'🍝', banner:'assets/chickenpasta.jpg' },
+  { id:'tortillachicken', nameAr:'تورتيلا تشيكن كرسبي', icon:'🌯', banner:'assets/tortillachicken.jpg' },
+  { id:'tortillabeef', nameAr:'تورتيلا لحمة', icon:'🌯', banner:'assets/tortillabeef.jpg' },
+  { id:'additions', nameAr:'إضافات', icon:'➕', banner:'assets/additions.jpg' }
+];
+let appCategories = [];
+
+function fetchCategories() {
+  db.collection("menu").doc("categoriesData").onSnapshot(doc => {
+    if(doc.exists && doc.data().list) {
+      appCategories = doc.data().list;
+    } else {
+      appCategories = [...DEFAULT_CATEGORIES];
+      db.collection("menu").doc("categoriesData").set({ list: appCategories }); // تفعيلها لأول مرة
+    }
+    renderCategoriesUI();
+    populateCategoryDropdown(); // بيحدث قائمة "اختر القسم" في إضافة منتج
+  });
+}
+
+function renderCategoriesUI() {
+  const list = document.getElementById('categoriesListUI');
+  list.innerHTML = '';
+  appCategories.forEach((cat, index) => {
+    list.innerHTML += `
+      <li class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition flex flex-col gap-3">
+        <div class="flex justify-between items-center gap-3">
+          <div class="flex gap-2 items-center flex-1">
+            <span class="text-2xl w-8 text-center">${cat.icon}</span>
+            <input type="text" id="catName_${index}" value="${cat.nameAr}" placeholder="الاسم عربي" class="p-2 border rounded-lg font-bold text-sm w-1/3 focus:border-amber-400">
+            <input type="text" id="catNameEn_${index}" value="${cat.nameEn || ''}" placeholder="الاسم انجليزي" class="p-2 border rounded-lg font-bold text-sm w-1/3 text-left focus:border-amber-400">
+          </div>
+          <div class="flex gap-2">
+            <button onclick="moveCatObj(${index}, -1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+            <button onclick="moveCatObj(${index}, 1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold" ${index === appCategories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
+            <button onclick="deleteCategory(${index})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg font-bold transition" title="حذف القسم">🗑️</button>
+          </div>
+        </div>
+        <div>
+          <input type="text" id="catBanner_${index}" value="${cat.banner || 'assets/beefburger.jpg'}" placeholder="رابط صورة الخلفية" class="w-full p-2 border rounded-lg text-sm text-slate-500 focus:border-amber-400" dir="ltr">
+        </div>
+      </li>
+    `;
+  });
+}
+function moveCatObj(index, dir) {
+  if (index + dir < 0 || index + dir >= appCategories.length) return;
+  saveInputsToMemory(); // نحفظ التعديلات قبل ما نحرك عشان متضيعش
+  const temp = appCategories[index];
+  appCategories[index] = appCategories[index + dir];
+  appCategories[index + dir] = temp;
+  renderCategoriesUI();
+}
+function deleteCategory(index) {
+  const catName = appCategories[index].nameAr;
+  
+  // رسالة تأكيد قبل الحذف عشان ميتمسحش بالغلط
+  if (confirm(`هل أنت متأكد من حذف قسم "${catName}" نهائياً؟\n\n(ملحوظة: لو القسم ده جواه منتجات، المنتجات دي هتختفي من الموقع لحد ما تضيفها من جديد في قسم تاني)`)) {
+    
+    // مسح القسم من المصفوفة
+    appCategories.splice(index, 1);
+    
+    // حفظ التعديلات في قاعدة البيانات وتحديث اللوحة والموقع
+    saveCategories(); 
+  }
+}
+function saveInputsToMemory() {
+  appCategories.forEach((cat, index) => {
+    const nameInput = document.getElementById(`catName_${index}`);
+    const nameEnInput = document.getElementById(`catNameEn_${index}`);
+    const bannerInput = document.getElementById(`catBanner_${index}`);
+    
+    if(nameInput) cat.nameAr = nameInput.value;
+    if(nameEnInput) cat.nameEn = nameEnInput.value;
+    if(bannerInput) cat.banner = bannerInput.value;
+  });
+}
+function saveCategories() {
+  saveInputsToMemory();
+  db.collection("menu").doc("categoriesData").set({ list: appCategories })
+    .then(() => alert("✅ تم حفظ الأقسام والترتيب بنجاح!"))
+    .catch(err => alert("❌ حدث خطأ: " + err.message));
+}
+
+function addNewCategory() {
+  const nameAr = document.getElementById('newCatNameAr').value.trim();
+  const nameEn = document.getElementById('newCatNameEn').value.trim();
+  const id = document.getElementById('newCatId').value.trim().toLowerCase().replace(/\s+/g, '');
+  const icon = document.getElementById('newCatIcon').value.trim() || '🍔';
+  const banner = document.getElementById('newCatBanner').value.trim() || 'assets/beefburger.jpg';
+  
+  if(!nameAr || !id) return alert("الرجاء كتابة اسم القسم (عربي) والمعرف الإنجليزي!");
+  if(appCategories.find(c => c.id === id)) return alert("المعرف الإنجليزي ده موجود قبل كدا، اكتب واحد غيره.");
+
+  appCategories.push({
+    id: id,
+    nameAr: nameAr,
+    nameEn: nameEn,
+    icon: icon,
+    banner: banner
+  });
+  
+  document.getElementById('newCatNameAr').value = '';
+  document.getElementById('newCatNameEn').value = '';
+  document.getElementById('newCatId').value = '';
+  document.getElementById('newCatIcon').value = '';
+  document.getElementById('newCatBanner').value = 'assets/beefburger.jpg';
+  
+  saveCategories(); // حفظ وتحديث تلقائي
+}
+
+// الدالة السحرية اللي بتحدث فورم "إضافة منتج"
+function populateCategoryDropdown() {
+  const select = document.getElementById('newItemCategory');
+  if(!select) return;
+  select.innerHTML = '';
+  appCategories.forEach(cat => {
+    select.innerHTML += `<option value="${cat.id}">${cat.nameAr}</option>`;
+  });
+}
+auth.onAuthStateChanged(user => {
+  if(user) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('dashboardScreen').classList.remove('hidden');
+    document.getElementById('dashboardScreen').classList.add('flex');
+    
+    switchTab('overview'); // <== ضيف السطر ده عشان يفتح النظرة العامة أول حاجة
+    
+    fetchMenu(); 
+    fetchCoupons();
+    fetchOrders(); 
+    fetchRestaurantStatus(); 
+fetchCategories();  }
+});
+
+    function login() {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      auth.signInWithEmailAndPassword(email, pass).catch(err => {
+        alert("خطأ في تسجيل الدخول: " + err.message);
+      });
+    }
+
+    // --- تحديث بيانات المنتج الحالي (الاسم والسعر) ---
+    function updateExistingItem(itemId, hasSizes) {
+      const newName = document.getElementById(`name_${itemId}`).value.trim();
+      if (!newName) return alert("اسم المنتج لا يمكن أن يكون فارغاً");
+
+      let updateData = { name: newName };
+
+      if (hasSizes) {
+        let sizes = {};
+        const sVal = document.getElementById(`price_s_${itemId}`).value;
+        const lVal = document.getElementById(`price_l_${itemId}`).value;
+        const dVal = document.getElementById(`price_d_${itemId}`).value;
+        const xlVal = document.getElementById(`price_xl_${itemId}`).value;
+
+        if (sVal) sizes.S = Number(sVal);
+        if (lVal) sizes.L = Number(lVal);
+        if (dVal) sizes.D = Number(dVal);
+        if (xlVal) sizes.XL = Number(xlVal);
+
+        updateData.sizes = sizes;
+      } else {
+        const fixedVal = document.getElementById(`price_fixed_${itemId}`).value;
+        updateData.price = Number(fixedVal);
+      }
+
+      db.collection("menu").doc(itemId).update(updateData)
+        .then(() => alert("✅ تم تحديث المنتج بنجاح!"))
+        .catch(err => alert("❌ حدث خطأ أثناء التحديث: " + err.message));
+    }
+
+    function deleteMenuItem(itemId) {
+      if (confirm("هل أنت متأكد من حذف هذا المنتج نهائياً من المنيو؟")) {
+        db.collection("menu").doc(itemId).delete();
+      }
+    }
+
+    async function uploadImageToImgBB(itemId) {
+      const file = document.getElementById(`file_${itemId}`).files[0];
+      if(!file) return;
+      const formData = new FormData(); formData.append('image', file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
+      const data = await res.json();
+      if(data.success) db.collection('menu').doc(itemId).update({ image: data.data.display_url });
+    }
+
+    async function addNewItem() {
+      const btn = document.getElementById('saveItemBtn');
+      btn.innerText = "جاري الحفظ والرفع...";
+      
+      const category = document.getElementById('newItemCategory').value;
+      const name = document.getElementById('newItemName').value;
+      const desc = document.getElementById('newItemDesc').value;
+      const imageFile = document.getElementById('newItemImage').files[0];
+      
+      let sizes = {};
+      let price = document.getElementById('priceFixed').value;
+      if(document.getElementById('priceS').value) sizes.S = Number(document.getElementById('priceS').value);
+      if(document.getElementById('priceL').value) sizes.L = Number(document.getElementById('priceL').value);
+      if(document.getElementById('priceD').value) sizes.D = Number(document.getElementById('priceD').value);
+      if(document.getElementById('priceXL').value) sizes.XL = Number(document.getElementById('priceXL').value);
+
+      if(!name) return alert("اكتب اسم المنتج");
+
+      let imageUrl = '';
+      if(imageFile) {
+        const formData = new FormData(); formData.append('image', imageFile);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
+        const data = await res.json();
+        if(data.success) imageUrl = data.data.display_url;
+      }
+
+      const itemData = {
+        name: name,
+        category: category,
+        description: desc,
+        status: 'available',
+        image: imageUrl
+      };
+      
+      if(Object.keys(sizes).length > 0) itemData.sizes = sizes;
+      else if(price) itemData.price = Number(price);
+
+      await db.collection("menu").add(itemData);
+      alert("تم إضافة المنتج بنجاح للموقع!");
+      btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
+      switchMenuSubTab('control');
+    }
+
+    function fetchCoupons() {
+      db.collection("coupons").onSnapshot(snap => {
+        const tbody = document.getElementById('couponsTableBody');
+        tbody.innerHTML = '';
+        snap.forEach(doc => {
+          const c = doc.data();
+          tbody.innerHTML += `<tr><td class="p-4 font-bold text-lg">${c.code}</td><td class="p-4 text-green-600 font-bold">${c.value} ${c.type === 'fixed' ? 'ج.م' : '%'}</td><td class="p-4"><button onclick="db.collection('coupons').doc('${doc.id}').delete()" class="text-red-500">حذف 🗑️</button></td></tr>`;
+        });
+      });
+    }
+
+    function addCoupon() {
+      const code = document.getElementById('couponCode').value.toUpperCase();
+      const value = document.getElementById('couponValue').value;
+      const type = document.getElementById('couponType').value;
+      if(code && value) db.collection('coupons').add({ code, value: Number(value), type, active: true });
+    }
+  </script>
+<!-- التوقيع ثابت أسفل الشاشة -->
+<footer class="fixed bottom-0 left-0 z-50 w-full py-2 text-center bg-white/90 backdrop-blur-md border-t border-slate-200 shadow-md">
+  <a href="https://joeadvertiseeg.vercel.app/" target="_blank" class="text-xs md:text-sm font-bold text-slate-700 hover:text-emerald-700 transition">
+    Designed & Developed by Joe Advertise 🚀
+  </a>
+</footer>
+
+</body>
+</html>
+</body>
+</html>
