@@ -1522,6 +1522,9 @@ const DEFAULT_MENU = [
 let MENU = [];
 
 /* ================== جلب البيانات من فايربيز (الأقسام + المنتجات) ================== */
+/* ================== جلب البيانات من فايربيز (الأقسام + المنتجات) ================== */
+let isMenuFirstLoad = true; // متغير عشان نفتح اللينك مرة واحدة بس أول ما الموقع يفتح
+
 db.collection("menu").onSnapshot(snapshot => {
   let fetchedCategories = [];
   let fetchedProducts = [];
@@ -1561,27 +1564,34 @@ db.collection("menu").onSnapshot(snapshot => {
 
   renderCatNav();
   renderMenuToHTML();
-  // فحص الرابط لفتح الكارت المشترك بعد تأكد تحميل واجهة المنيو
-  setTimeout(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sharedItemName = urlParams.get('item');
 
-    if (sharedItemName) {
-      let itemFound = false;
-      for (let c = 0; c < MENU.length; c++) {
-        for (let i = 0; i < MENU[c].items.length; i++) {
-          if (MENU[c].items[i].name === sharedItemName) {
-            openProductModal(c, i);
-            itemFound = true;
-            break;
+  // الكود الجديد لفتح المنتج بعد التأكد 100% إن المنيو اتحمل من قاعدة البيانات
+  if (isMenuFirstLoad) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shortId = urlParams.get('p'); // اللينك بقى اسمه p وواخد كود قصير
+
+    if (shortId) {
+      try {
+        // بنفك التشفير بتاع الكود القصير عشان نرجع اسم المنتج الأصلي
+        const sharedItemName = decodeURIComponent(escape(atob(shortId)));
+        let itemFound = false;
+        for (let c = 0; c < MENU.length; c++) {
+          for (let i = 0; i < MENU[c].items.length; i++) {
+            if (MENU[c].items[i].name === sharedItemName) {
+              openProductModal(c, i);
+              itemFound = true;
+              break;
+            }
           }
+          if (itemFound) break;
         }
-        if (itemFound) break;
+      } catch(e) {
+        console.log('رابط غير صالح');
       }
     }
-  }, 200); // تأخير بـ 200 مللي ثانية
+    isMenuFirstLoad = false;
+  }
 });
-
 /* ================== أزرار التنقل العلوية والأسهم ================== */
 function renderCatNav() {
   const catNav = document.getElementById('catNav');
@@ -1742,7 +1752,7 @@ function openProductModal(catIdx, itemIdx) {
   document.getElementById('pmTitle').textContent = activePmItem.name;
   document.getElementById('pmQtyVal').textContent = activePmQty;
   
-let validSizes = [];
+  let validSizes = [];
   if (activePmItem.sizes) {
     validSizes = Object.keys(activePmItem.sizes).filter(k => activePmItem.sizes[k] > 0);
     
@@ -1781,7 +1791,10 @@ let validSizes = [];
   updatePmTotal();
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlayBg').classList.add('show');
-  const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?item=' + encodeURIComponent(activePmItem.name);
+  
+  // تشفير اسم المنتج عشان اللينك يكون قصير ونظيف
+  const shortId = btoa(unescape(encodeURIComponent(activePmItem.name)));
+  const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?p=' + shortId;
   window.history.pushState({ path: newUrl }, '', newUrl);
 }
 
@@ -1799,29 +1812,28 @@ document.getElementById('pmQtyPlus').addEventListener('click', () => {
   activePmQty++; document.getElementById('pmQtyVal').textContent = activePmQty; updatePmTotal();
 });
 
-// مستمع لزر الإغلاق
-document.getElementById('pmCloseBtn').addEventListener('click', () => {
+// دالة مخصصة لقفل كارت المنتج بترجع اللينك لأصله
+function closeProductModal() {
   document.getElementById('productModal').classList.remove('show');
   document.getElementById('overlayBg').classList.remove('show');
-  
-  // إرجاع الرابط لشكله الطبيعي بدون اسم المنتج عند الإغلاق
   const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
   window.history.pushState({ path: cleanUrl }, '', cleanUrl);
-});
+}
 
-// مستمع لزر المشاركة (Native Share الآمن)
+// مستمع لزر الإغلاق (X)
+document.getElementById('pmCloseBtn').addEventListener('click', closeProductModal);
+
+// مستمع لزر المشاركة (بالرسالة الجديدة واللينك القصير)
 document.getElementById('pmShareBtn').addEventListener('click', async () => {
   const currentUrl = window.location.href;
+  const shareMsg = `شوف ( ${activePmItem.name} ) من Savor !`; // الرسالة الجديدة
   const shareData = {
     title: 'SAVOR Restaurant',
-    text: `شوف ${activePmItem.name} من SAVOR!`,
+    text: shareMsg,
     url: currentUrl
   };
 
-  // 1. التأكد من أن الموقع مرفوع على سيرفر وليس ملف محلي (لمنع الكراش)
   const isLocal = window.location.protocol === 'file:';
-
-  // 2. التحقق من دعم المتصفح لميزة المشاركة الأصلية
   const canNativeShare = !isLocal && navigator.share && navigator.canShare && navigator.canShare(shareData);
 
   if (canNativeShare) {
@@ -1831,10 +1843,10 @@ document.getElementById('pmShareBtn').addEventListener('click', async () => {
       console.log('تم إلغاء المشاركة:', err);
     }
   } else {
-    // البديل (Fallback): النسخ المباشر للكمبيوتر أو أثناء التجربة المحلية
     try {
-      await navigator.clipboard.writeText(currentUrl);
-      showToast('تم نسخ رابط المنتج بنجاح 🔗');
+      // لو العميل فاتح من كمبيوتر أو متصفح مش بيدعم الشير بننسخ الرسالة + اللينك
+      await navigator.clipboard.writeText(shareMsg + "\n" + currentUrl);
+      showToast('تم نسخ رسالة ورابط المنتج بنجاح 🔗');
     } catch (err) {
       showToast('حدث خطأ أثناء نسخ الرابط ❌');
     }
@@ -1997,8 +2009,7 @@ function closeCart(){ cartDrawer.classList.remove('open'); overlayBg.classList.r
 document.getElementById('cartOpenBtn').addEventListener('click', openCart);
 document.getElementById('stickyCartBtn').addEventListener('click', openCart);
 document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
-overlayBg.addEventListener('click', ()=>{ closeCart(); closeCheckoutModal(); });
-
+overlayBg.addEventListener('click', ()=>{ closeCart(); closeCheckoutModal(); closeProductModal(); });
 const mobileMenu = document.getElementById('mobileMenu');
 document.getElementById('mmOpenBtn').addEventListener('click', ()=>mobileMenu.classList.add('open'));
 document.getElementById('mmCloseBtn').addEventListener('click', ()=>mobileMenu.classList.remove('open'));
