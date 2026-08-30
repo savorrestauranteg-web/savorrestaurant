@@ -863,18 +863,17 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   transition: opacity .3s;
 }
   .modal.show{opacity:1; pointer-events:auto;}
-/* إرجاع كارت الـ Modal الأساسي لشكله وتناسقه الأصلي */
+/* 2. إرجاع كارت الدفع لشكله وتناسقه الأصلي */
 .modal-card {
   background: var(--paper);
   border-radius: 22px;
-  width: 100%; /* العودة للعرض الكامل مع الاعتماد على الـ padding الخاص بالـ modal الأم */
+  width: 100%;
   max-width: 460px;
   padding: 30px;
   max-height: 90vh;
   overflow-y: auto;
   transform: translateY(20px);
   transition: transform .3s;
-  /* تم إزالة الهوامش الإضافية التي سببت التشوه */
 }
   .modal.show .modal-card{transform:translateY(0);}
   .modal-card h3{margin:0 0 6px; font-size:28px; color:var(--green-deep);}
@@ -911,7 +910,7 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
     .trust-strip{gap:10px;}
     .trust-chip{font-size:12.5px; padding:9px 14px;}
   }
-/* إرجاع كارت المنتج لشكله الأصلي */
+/* 3. إرجاع كارت المنتج (اللي فيه الصورة) لحجمه الأصلي */
 .pm-card { 
   padding: 0; 
   max-width: 420px; 
@@ -921,7 +920,7 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
 .pm-img-wrap { width: 100%; height: 240px; background: #fff; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid var(--line); position: relative; }
 .pm-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
 .pm-close { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; color: var(--ink); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-/* إرجاع التباعد الداخلي الأصلي لكارت المنتج */
+/* 4. إرجاع التباعد الداخلي للكلام لـ 20 بيكسل */
 .pm-body { 
   padding: 20px; 
 }
@@ -1352,22 +1351,25 @@ body.dark-mode .item-card.sold-out::after {
     </button>
   </div>
 </div>
-<!-- PRODUCT DETAILS MODAL (تجربة الطلب الجديدة) -->
 <div class="modal" id="productModal">
   <div class="modal-card pm-card">
     <div class="pm-img-wrap">
       <button class="pm-close" id="pmCloseBtn" aria-label="إغلاق">✕</button>
       <img src="" id="pmImage" alt="Product Image">
     </div>
- <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-  <div>
-    <h3 class="pm-title" id="pmTitle" style="margin-bottom: 4px;">اسم المنتج</h3>
-    <div class="pm-vendor">ساڤور</div>
-  </div>
-  <button id="pmShareBtn" style="background: var(--cream-2); border: 1px solid var(--line); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--green-deep); cursor: pointer; transition: 0.2s;" aria-label="مشاركة">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
-  </button>
-</div>
+
+    <div class="pm-body">
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div>
+          <h3 class="pm-title" id="pmTitle" style="margin-bottom: 4px;">اسم المنتج</h3>
+          <div class="pm-vendor">ساڤور</div>
+        </div>
+        <button id="pmShareBtn" style="background: var(--cream-2); border: 1px solid var(--line); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--green-deep); cursor: pointer; transition: 0.2s;" aria-label="مشاركة">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+        </button>
+      </div>
+      
       <div class="pm-start-price" id="pmStartPrice"> السعر 0 ج.م</div>
       
       <div id="pmSizesContainer">
@@ -1387,8 +1389,8 @@ body.dark-mode .item-card.sold-out::after {
           <span id="pmTotalBtn">0 ج.م</span>
         </button>
       </div>
-    </div>
-  </div>
+
+    </div> </div>
 </div>
 
 <!-- CHECKOUT MODAL -->
