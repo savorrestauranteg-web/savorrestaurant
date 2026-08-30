@@ -849,10 +849,18 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   .total-row b{font-family:'Oswald',sans-serif; color:var(--tomato); font-size:24px;}
 
   /* ---------- Checkout modal ---------- */
-.modal{
-  position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center;
-  padding:10px; /* هذه هي المسافة الآمنة من جميع الاتجاهات */
-  opacity:0; pointer-events:none; transition:opacity .3s;
+/* 1. إرجاع مساحة الأمان الأساسية للشاشة (20 بيكسل) */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px; 
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
 }
   .modal.show{opacity:1; pointer-events:auto;}
 /* إرجاع كارت الـ Modal الأساسي لشكله وتناسقه الأصلي */
