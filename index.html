@@ -849,15 +849,25 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   .total-row b{font-family:'Oswald',sans-serif; color:var(--tomato); font-size:24px;}
 
   /* ---------- Checkout modal ---------- */
-  .modal{
-    position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center;
-    padding:20px; opacity:0; pointer-events:none; transition:opacity .3s;
-  }
+.modal{
+  position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center;
+  padding:10px; /* هذه هي المسافة الآمنة من جميع الاتجاهات */
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
   .modal.show{opacity:1; pointer-events:auto;}
-  .modal-card{
-    background:var(--paper); border-radius:22px; width:100%; max-width:460px; padding:30px;
-    max-height:90vh; overflow-y:auto; transform:translateY(20px); transition:transform .3s;
-  }
+/* إرجاع كارت الـ Modal الأساسي لشكله وتناسقه الأصلي */
+.modal-card {
+  background: var(--paper);
+  border-radius: 22px;
+  width: 100%; /* العودة للعرض الكامل مع الاعتماد على الـ padding الخاص بالـ modal الأم */
+  max-width: 460px;
+  padding: 30px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(20px);
+  transition: transform .3s;
+  /* تم إزالة الهوامش الإضافية التي سببت التشوه */
+}
   .modal.show .modal-card{transform:translateY(0);}
   .modal-card h3{margin:0 0 6px; font-size:28px; color:var(--green-deep);}
   .modal-card p.hint{color:#8a8272; margin:0 0 20px; font-size:14px;}
@@ -893,18 +903,21 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
     .trust-strip{gap:10px;}
     .trust-chip{font-size:12.5px; padding:9px 14px;}
   }
-  /* --- Product Modal (تجربة الطلب الجديدة) --- */
+/* إرجاع كارت المنتج لشكله الأصلي */
 .pm-card { 
   padding: 0; 
   max-width: 420px; 
-  overflow-y: auto; /* لتفعيل السكرول للأسفل */
-  overflow-x: hidden; /* لمنع أي سكرول جانبي غير مرغوب فيه */
+  overflow-y: auto; 
+  overflow-x: hidden; 
 }
 .pm-img-wrap { width: 100%; height: 240px; background: #fff; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid var(--line); position: relative; }
 .pm-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
 .pm-close { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; color: var(--ink); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.pm-body { padding: 20px; }
-.pm-title { font-size: 24px; color: var(--green-deep); margin: 0 0 4px; font-weight: 800; }
+/* إرجاع التباعد الداخلي الأصلي لكارت المنتج */
+.pm-body { 
+  padding: 20px; 
+}
+  .pm-title { font-size: 24px; color: var(--green-deep); margin: 0 0 4px; font-weight: 800; }
 .pm-vendor { color: #8a8272; font-size: 14px; margin: 0 0 12px; }
 .pm-start-price { font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--green-deep); font-weight: 700; margin-bottom: 20px; }
 .pm-section-title { font-size: 16px; font-weight: 800; color: var(--green-deep); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -1069,7 +1082,7 @@ body.dark-mode .item-card.sold-out::after {
 <section class="hero" id="top">
   <!-- كود الفيديو -->
   <video class="hero-video" autoplay loop muted playsinline>
-    <source src="savorherosection.mp4" type="video/mp4">
+    <source src="savorvideo.mp4" type="video/mp4">
   </video>
   
   <!-- طبقة التدرج اللوني فوق الفيديو لتوضيح الكلام -->
@@ -1338,9 +1351,15 @@ body.dark-mode .item-card.sold-out::after {
       <button class="pm-close" id="pmCloseBtn" aria-label="إغلاق">✕</button>
       <img src="" id="pmImage" alt="Product Image">
     </div>
-    <div class="pm-body">
-      <h3 class="pm-title" id="pmTitle">اسم المنتج</h3>
-      <div class="pm-vendor">ساڤور</div>
+ <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+  <div>
+    <h3 class="pm-title" id="pmTitle" style="margin-bottom: 4px;">اسم المنتج</h3>
+    <div class="pm-vendor">ساڤور</div>
+  </div>
+  <button id="pmShareBtn" style="background: var(--cream-2); border: 1px solid var(--line); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--green-deep); cursor: pointer; transition: 0.2s;" aria-label="مشاركة">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+  </button>
+</div>
       <div class="pm-start-price" id="pmStartPrice"> السعر 0 ج.م</div>
       
       <div id="pmSizesContainer">
@@ -1532,6 +1551,25 @@ db.collection("menu").onSnapshot(snapshot => {
 
   renderCatNav();
   renderMenuToHTML();
+  // فحص الرابط لفتح الكارت المشترك بعد تأكد تحميل واجهة المنيو
+  setTimeout(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedItemName = urlParams.get('item');
+
+    if (sharedItemName) {
+      let itemFound = false;
+      for (let c = 0; c < MENU.length; c++) {
+        for (let i = 0; i < MENU[c].items.length; i++) {
+          if (MENU[c].items[i].name === sharedItemName) {
+            openProductModal(c, i);
+            itemFound = true;
+            break;
+          }
+        }
+        if (itemFound) break;
+      }
+    }
+  }, 200); // تأخير بـ 200 مللي ثانية
 });
 
 /* ================== أزرار التنقل العلوية والأسهم ================== */
@@ -1602,6 +1640,10 @@ function renderItemCard(cat, item){
   let startPrice = item.price;
   if(item.sizes) {
     const validSizes = Object.keys(item.sizes).filter(k => item.sizes[k] > 0);
+    
+    // السطر ده بيرتب الأسعار من الأقل للأعلى تلقائياً
+    validSizes.sort((a, b) => item.sizes[a] - item.sizes[b]);
+    
     if(validSizes.length > 0) startPrice = item.sizes[validSizes[0]];
   }  
   const catIdx = MENU.findIndex(c => c.id === cat.id);
@@ -1690,9 +1732,12 @@ function openProductModal(catIdx, itemIdx) {
   document.getElementById('pmTitle').textContent = activePmItem.name;
   document.getElementById('pmQtyVal').textContent = activePmQty;
   
- let validSizes = [];
+let validSizes = [];
   if (activePmItem.sizes) {
     validSizes = Object.keys(activePmItem.sizes).filter(k => activePmItem.sizes[k] > 0);
+    
+    // الترتيب الإجباري كأرقام من السعر الأصغر للأكبر
+    validSizes.sort((a, b) => parseFloat(activePmItem.sizes[a]) - parseFloat(activePmItem.sizes[b]));
   }
 
   const startPrice = validSizes.length > 0 ? activePmItem.sizes[validSizes[0]] : activePmItem.price;
@@ -1726,6 +1771,8 @@ function openProductModal(catIdx, itemIdx) {
   updatePmTotal();
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlayBg').classList.add('show');
+  const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?item=' + encodeURIComponent(activePmItem.name);
+  window.history.pushState({ path: newUrl }, '', newUrl);
 }
 
 function changePmSize(sizeKey) { activePmSize = sizeKey; updatePmTotal(); }
@@ -1742,9 +1789,46 @@ document.getElementById('pmQtyPlus').addEventListener('click', () => {
   activePmQty++; document.getElementById('pmQtyVal').textContent = activePmQty; updatePmTotal();
 });
 
+// مستمع لزر الإغلاق
 document.getElementById('pmCloseBtn').addEventListener('click', () => {
   document.getElementById('productModal').classList.remove('show');
   document.getElementById('overlayBg').classList.remove('show');
+  
+  // إرجاع الرابط لشكله الطبيعي بدون اسم المنتج عند الإغلاق
+  const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+  window.history.pushState({ path: cleanUrl }, '', cleanUrl);
+});
+
+// مستمع لزر المشاركة (Native Share الآمن)
+document.getElementById('pmShareBtn').addEventListener('click', async () => {
+  const currentUrl = window.location.href;
+  const shareData = {
+    title: 'SAVOR Restaurant',
+    text: `شوف ${activePmItem.name} من SAVOR!`,
+    url: currentUrl
+  };
+
+  // 1. التأكد من أن الموقع مرفوع على سيرفر وليس ملف محلي (لمنع الكراش)
+  const isLocal = window.location.protocol === 'file:';
+
+  // 2. التحقق من دعم المتصفح لميزة المشاركة الأصلية
+  const canNativeShare = !isLocal && navigator.share && navigator.canShare && navigator.canShare(shareData);
+
+  if (canNativeShare) {
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      console.log('تم إلغاء المشاركة:', err);
+    }
+  } else {
+    // البديل (Fallback): النسخ المباشر للكمبيوتر أو أثناء التجربة المحلية
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      showToast('تم نسخ رابط المنتج بنجاح 🔗');
+    } catch (err) {
+      showToast('حدث خطأ أثناء نسخ الرابط ❌');
+    }
+  }
 });
 
 document.getElementById('pmAddToCartBtn').addEventListener('click', () => {
