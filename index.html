@@ -3,7 +3,7 @@
 <head>
   <meta property="og:type" content="website">
 <meta property="og:title" content="SAVOR Restaurant">
-<meta property="og:description" content="برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة، يوصلك التوصيل لحد باب البيت.">
+<meta property="og:description" content="برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة، يوصلك الطلب لحد باب البيت.">
 <meta property="og:image" content="https://yourwebsite.com/logo.jpeg"> <meta property="og:url" content="https://yourwebsite.com/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,6 @@
   opacity: 0;
   transform: translateY(40px);
   transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s, border-color 0.25s;
-  will-change: opacity, transform;
 }
 
 /* ─── تأثير ظهور الكارت عند وصوله للشاشة ─── */
@@ -694,7 +693,6 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
     box-shadow 0.25s, 
     border-color 0.25s;
     
-  will-change: opacity, transform;
 }
 
 .item-card.visible {
@@ -1535,7 +1533,12 @@ const catObserver = new IntersectionObserver((entries) => {
         window.catButtonsArray.forEach(b => {
           if (b.dataset.target === id) {
             b.classList.add('active');
-            b.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            // تمرير أفقي دقيق لشريط الأقسام بدون التأثير على نزول الصفحة
+            const catNavContainer = document.getElementById('catNav');
+            if (catNavContainer) {
+              const scrollPos = b.offsetLeft - (catNavContainer.offsetWidth / 2) + (b.offsetWidth / 2);
+              catNavContainer.scrollTo({ left: scrollPos, behavior: 'smooth' });
+            }
           } else {
             b.classList.remove('active');
           }
