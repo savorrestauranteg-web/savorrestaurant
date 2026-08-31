@@ -1171,6 +1171,33 @@ body.dark-mode .item-card.sold-out::after {
     padding-bottom: 90px !important;
   }
 }
+/* =========================================
+   إصلاحات الوضع الليلي بناءً على طلبك
+========================================= */
+
+/* 1. السعر وكلمة (ملاحظات المنتج) باللون الأبيض */
+body.dark-mode .pm-start-price,
+body.dark-mode .field label {
+    color: #ffffff !important;
+}
+
+/* 2. نص الإشعار (تمت الإضافة للسلة) باللون الأبيض */
+body.dark-mode .toast {
+    color: #ffffff !important;
+}
+
+/* 3. بيانات العميل باللون الأسود الواضح (لأن الخلفية بيضاء) */
+body.dark-mode .field input,
+body.dark-mode .field textarea {
+    color: #000000 !important;
+    background-color: #ffffff !important; /* تأكيد بقاء الخلفية بيضاء */
+}
+
+/* توضيح النص الإرشادي (Placeholder) داخل الخانات ليكون رمادي واضح */
+body.dark-mode .field input::placeholder,
+body.dark-mode .field textarea::placeholder {
+    color: #666666 !important;
+}
 </style>
 </head>
 <body>
@@ -1337,10 +1364,10 @@ body.dark-mode .item-card.sold-out::after {
       <div class="kicker" style="color:var(--gold-2); font-weight:800; font-size:14px;">تواصل معانا</div>
       <h2>محتاج تطلب أو تسأل؟</h2>
       <p class="sub">إحنا موجودين على واتساب والتليفون، وفرعنا في انتظارك.</p>
-      <div class="contact-line">
-        <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.6 8 12 8 12s8-6.4 8-12c0-4.4-3.6-8-8-8z"/></svg></span>
-        آخر شارع الإسكندرية - بجوار حديقة الغزالة - أمام قسم الشرطة
-      </div>
+   <a href="https://share.google/9vkkliHRV07VuVREE" target="_blank" rel="noopener" class="contact-line" style="text-decoration: none; color: inherit; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+  <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.6 8 12 8 12s8-6.4 8-12c0-4.4-3.6-8-8-8z"/></svg></span>
+  آخر شارع الإسكندرية - بجوار حديقة الغزالة - أمام قسم الشرطة 
+</a>
       <div class="contact-line">
         <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg></span>
         واتساب: 01067841756
@@ -1398,7 +1425,11 @@ body.dark-mode .item-card.sold-out::after {
         <ul>
           <li><a href="https://wa.me/201067841756" target="_blank" rel="noopener">واتساب: 01067841756</a></li>
           <li><a href="tel:01203653736">تليفون: 01203653736</a></li>
-          <li>آخر شارع الإسكندرية - بجوار حديقة الغزالة</li>
+       <li>
+  <a href="https://share.google.com/9vkkliHRV07VuVREE" target="_blank" rel="noopener" style="transition: color 0.2s;">
+    📍 آخر شارع الإسكندرية - بجوار حديقة الغزالة
+  </a>
+</li>
         </ul>
       </div>
     </div>
