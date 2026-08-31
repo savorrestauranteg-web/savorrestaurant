@@ -18,8 +18,9 @@
     -webkit-user-select: none; /* لدعم سفاري وآيفون */
 }
 .pm-qty-stepper button, .qty-stepper button {
+    cursor: pointer; /* أضف هذا السطر */
     touch-action: manipulation !important;
-    -webkit-tap-highlight-color: transparent !important; /* إخفاء الوميض الرمادي المزعج */
+    -webkit-tap-highlight-color: transparent !important;
     outline: none;
     transition: transform 0.05s ease, background 0.05s ease;
 }
@@ -1412,11 +1413,11 @@ body.dark-mode .item-card.sold-out::after {
       </div>
 
       <div class="pm-action-bar">
-        <div class="pm-qty-stepper">
-          <button type="button" id="pmQtyMinus">−</button>
-          <span id="pmQtyVal">1</span>
-          <button type="button" id="pmQtyPlus">+</button>
-        </div>
+      <div class="pm-qty-stepper">
+  <button type="button" id="pmQtyMinus" ontouchstart="">−</button>
+  <span id="pmQtyVal">1</span>
+  <button type="button" id="pmQtyPlus" ontouchstart="">+</button>
+</div>
         <button type="button" class="pm-add-btn" id="pmAddToCartBtn">
           <span>إضافة</span>
           <span id="pmTotalBtn">0 ج.م</span>
@@ -1978,11 +1979,11 @@ function renderCart(){
     body.innerHTML = cart.map((item,idx)=>`
       <div class="cart-row">
         <button class="cr-remove" onclick="removeFromCart(${idx})">✕</button>
-        <div class="qty-stepper">
-          <button type="button" onclick="changeCartQty(${idx},1)">+</button>
-          <span class="qty-val">${item.qty}</span>
-          <button type="button" onclick="changeCartQty(${idx},-1)">−</button>
-        </div>
+   <div class="qty-stepper">
+  <button type="button" ontouchstart="" onclick="changeCartQty(${idx},1)">+</button>
+  <span class="qty-val">${item.qty}</span>
+  <button type="button" ontouchstart="" onclick="changeCartQty(${idx},-1)">−</button>
+</div>
         <div class="cr-info" style="text-align:left;">
           <div class="cr-name">${item.name}</div>
           <div class="cr-price">${item.qty} × ${item.price} ج.م = ${item.price*item.qty} ج.م</div>
