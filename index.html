@@ -1912,8 +1912,18 @@ document.getElementById('pmAddToCartBtn').addEventListener('click', () => {
 });
 
 /* ================== سلة المشتريات ================== */
+// 1. تعريف السلة واسترجاع البيانات المحفوظة (أهم خطوة لازم تكون فوق)
 let cart = JSON.parse(localStorage.getItem('savor_cart')||'[]');
-function saveCart(){ localStorage.setItem('savor_cart', JSON.stringify(cart)); }
+
+// 2. دالة حفظ السلة
+function saveCart(){ 
+  localStorage.setItem('savor_cart', JSON.stringify(cart)); 
+}
+
+// 3. تحديث الأرقام والشريط السفلي فور تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+  renderCart();
+});
 
 function addToCart({cat,name,size,price,qty}){
   const existing = cart.find(i=>i.name===name && i.size===size);
