@@ -1467,7 +1467,13 @@ if(callModalCloseBtn) {
     document.getElementById('overlayBg').classList.remove('show');
   });
 }
-
+// إغلاق نافذة المنتج عند الضغط خارج الكارت
+document.getElementById('productModal').addEventListener('click', function(e) {
+  // e.target === this تتأكد إن الضغطة كانت على الخلفية مش على الكارت نفسه
+  if (e.target === this) {
+    closeProductModal();
+  }
+});
 /* ================== إعدادات فايربيز ================== */
 const firebaseConfig = {
   apiKey: "AIzaSyCmbgtwUgqm1QoCQ9W2Cv7HipbOI7DeCAQ",
