@@ -13,6 +13,42 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+#menuScrollTopBtn {
+  position: fixed;
+  bottom: 90px; 
+  left: 20px;  
+  z-index: 60;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #018055 !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.25s, background 0.25s;
+}
+
+#menuScrollTopBtn.show {
+  opacity: 1;
+  pointer-events: auto;
+  display: flex !important;
+}
+
+#menuScrollTopBtn:hover {
+  transform: scale(1.1);
+  background: #02a36f !important;
+}
+
+#menuScrollTopBtn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
   .pm-qty-stepper {
     user-select: none;
     -webkit-user-select: none; /* لدعم سفاري وآيفون */
@@ -1133,6 +1169,7 @@ body.dark-mode .item-card.sold-out::after {
 </style>
 </head>
 <body>
+  
 <div id="restaurantClosedBanner" style="display: none; background-color: #c33a28; color: white; text-align: center; padding: 10px; font-weight: bold; position: sticky; top: 0; z-index: 1000;">
   🔴 المطعم مقفول حالياً، مينفعش تكمل الأوردر دلوقتي. جرب تاني بعد شوية.
 </div>
@@ -1175,8 +1212,8 @@ body.dark-mode .item-card.sold-out::after {
       <a class="icon-btn" href="https://wa.me/201067841756" target="_blank" rel="noopener" title="واتساب" aria-label="واتساب">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3zm4.6-6.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
       </a>
-      <button class="icon-btn" id="darkModeBtn" aria-label="الوضع الليلي">
-  <svg viewBox="0 0 24 24"><path d="M12 21.5c-5.2 0-9.5-4.3-9.5-9.5 0-4.3 2.8-8 6.8-9.1.5-.1 1 .3.9.8-.4 1.5-.4 3.1.2 4.6 1.1 2.9 3.5 5 6.5 5.6 1.5.3 3 .1 4.4-.4.5-.2 1 .3.8.8-1.1 4-4.8 6.8-9.1 6.8z"/></svg>
+<button class="icon-btn" id="darkModeBtn" aria-label="الوضع الليلي">
+  <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.5c-5.2 0-9.5-4.3-9.5-9.5 0-4.3 2.8-8 6.8-9.1.5-.1 1 .3.9.8-.4 1.5-.4 3.1.2 4.6 1.1 2.9 3.5 5 6.5 5.6 1.5.3 3 .1 4.4-.4.5-.2 1 .3.8.8-1.1 4-4.8 6.8-9.1 6.8z"/></svg>
 </button>
       <button class="icon-btn cart-btn" id="cartOpenBtn" aria-label="سلة الطلبات">
         <svg viewBox="0 0 24 24"><path d="M7 4h-2l-1 2H2v2h2l3.6 7.6-1.3 2.4c-.2.4-.3.8-.3 1.2 0 1.1.9 2 2 2h12v-2H8.4c-.1 0-.2-.1-.2-.2l.9-1.8h7.5c.8 0 1.4-.4 1.8-1.1l3.6-6.5c.1-.2.1-.4-.1-.6-.1-.2-.3-.3-.5-.3H6.2L5.3 4H7zm2 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm9 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
@@ -1403,7 +1440,9 @@ body.dark-mode .item-card.sold-out::after {
   </div>
   <button class="btn btn-gold" id="stickyCartBtn">شوف السلة (<span id="scCount">0</span>)</button>
 </div>
-
+<button id="menuScrollTopBtn" aria-label="الرجوع لأعلى المنيو">
+  <svg viewBox="0 0 24 24"><path d="M12 4l-8 8h6v8h4v-8h6z"/></svg>
+</button>
 <!-- CART DRAWER -->
 <div class="overlay-bg" id="overlayBg"></div>
 <div class="drawer" id="cartDrawer">
@@ -2290,15 +2329,17 @@ function showToast(text){
   clearTimeout(window._toastTimer); window._toastTimer = setTimeout(()=>toast.classList.remove('show'), 2200);
 }
 const topBtn = document.getElementById('topBtn');
-window.addEventListener('scroll', ()=>topBtn.style.display = window.scrollY>500 ? 'flex' : 'none');
-topBtn.addEventListener('click', ()=>window.scrollTo({top:0, behavior:'smooth'}));
+if (topBtn) {
+  window.addEventListener('scroll', ()=>topBtn.style.display = window.scrollY>500 ? 'flex' : 'none');
+  topBtn.addEventListener('click', ()=>window.scrollTo({top:0, behavior:'smooth'}));
+}
 
 const darkModeBtn = document.getElementById('darkModeBtn');
-
 const moonIcon = `<svg viewBox="0 0 24 24"><path d="M12 21.5c-5.2 0-9.5-4.3-9.5-9.5 0-4.3 2.8-8 6.8-9.1.5-.1 1 .3.9.8-.4 1.5-.4 3.1.2 4.6 1.1 2.9 3.5 5 6.5 5.6 1.5.3 3 .1 4.4-.4.5-.2 1 .3.8.8-1.1 4-4.8 6.8-9.1 6.8z"/></svg>`;
 const sunIcon = `<svg viewBox="0 0 24 24"><path d="M12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0-6a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 18a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1zm9-10a1 1 0 0 1 0 2h-2a1 1 0 1 1 0-2h2zM5 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h2zm13.657-6.071a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0zM6.172 17.828a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0zm12.485 0a1 1 0 0 1 1.414 0l1.414 1.414a1 1 0 1 1-1.414 1.414l-1.414-1.414a1 1 0 0 1 0-1.414zM7.586 4.757a1 1 0 0 1 1.414 0l1.414 1.414a1 1 0 1 1-1.414 1.414L7.586 6.171a1 1 0 0 1 0-1.414z"/></svg>`;
 
 function updateDarkModeIcon() {
+  if (!darkModeBtn) return;
   if (document.body.classList.contains('dark-mode')) {
     darkModeBtn.innerHTML = sunIcon;
   } else {
@@ -2311,15 +2352,13 @@ if (localStorage.getItem('savor_theme') === 'dark') {
 }
 updateDarkModeIcon();
 
-darkModeBtn.addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-  updateDarkModeIcon();
-  if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('savor_theme', 'dark');
-  } else {
-    localStorage.setItem('savor_theme', 'light');
-  }
-});
+if (darkModeBtn) {
+  darkModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    updateDarkModeIcon();
+    localStorage.setItem('savor_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+  });
+}
 window.addEventListener('scroll', () => {
   // نستهدف الفوتر بالكامل
   const footer = document.querySelector('footer.site');
@@ -2329,17 +2368,33 @@ window.addEventListener('scroll', () => {
     const footerRect = footer.getBoundingClientRect();
     const windowHeight = window.innerHeight;
     
-    // لو الفوتر بدأ يظهر في الشاشة، اخفي الأزرار
     if (footerRect.top < windowHeight) {
       fabStack.style.opacity = '0';
-      fabStack.style.pointerEvents = 'none'; // عشان محدش يقدر يدوس عليها وهي مخفية
+      fabStack.style.pointerEvents = 'none'; 
     } else {
-      // لو المستخدم طلع لفوق تاني، أظهر الأزرار
       fabStack.style.opacity = '1';
       fabStack.style.pointerEvents = 'auto';
     }
   }
 });
+const menuScrollTopBtn = document.getElementById('menuScrollTopBtn');
+window.addEventListener('scroll', () => {
+  if (!menuScrollTopBtn) return;
+  if (window.scrollY > 500) {
+    menuScrollTopBtn.classList.add('show');
+  } else {
+    menuScrollTopBtn.classList.remove('show');
+  }
+});
+
+if(menuScrollTopBtn) {
+  menuScrollTopBtn.addEventListener('click', () => {
+    const menuSection = document.getElementById('menu');
+    if(menuSection) {
+      menuSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+}
 </script>
 </body>
 </html>
