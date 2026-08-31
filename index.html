@@ -2191,8 +2191,7 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
     status: 'new', 
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
-window.location.href = `https://wa.me/201067841756?text=${encodeURIComponent(msg)}`;
-    cart = []; 
+window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;    cart = []; 
     currentDiscountValue = 0; 
     if(document.getElementById('cartCouponInput')) document.getElementById('cartCouponInput').value = ''; 
     saveCart(); 
@@ -2201,7 +2200,8 @@ window.location.href = `https://wa.me/201067841756?text=${encodeURIComponent(msg
     btn.innerHTML = 'إرسال الطلب على واتساب'; 
     btn.disabled = false;
   }).catch(err => {
-window.location.href = `https://wa.me/201067841756?text=${encodeURIComponent(msg)}`;    btn.innerHTML = 'إرسال الطلب على واتساب'; 
+window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
+ btn.innerHTML = 'إرسال الطلب على واتساب'; 
     btn.disabled = false;
   });
 });
