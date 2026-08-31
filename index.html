@@ -18,17 +18,18 @@
     -webkit-user-select: none; /* لدعم سفاري وآيفون */
 }
 .pm-qty-stepper button, .qty-stepper button {
-    cursor: pointer; /* أضف هذا السطر */
+    cursor: pointer;
     touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
     outline: none;
-    transition: transform 0.05s ease, background 0.05s ease;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    transition: background 0.1s ease;
 }
 
-/* تأثير كليك لحظي عشان تحس إن الزرار استجاب فوراً تحت صباعك */
 .pm-qty-stepper button:active, .qty-stepper button:active {
-    transform: scale(0.85);
-    background: #e5f4ef !important;
+    background: #cce8dd !important; 
+    transform: scale(0.96); 
 }
 @media (hover: hover) {
     .pm-qty-stepper button:hover {
@@ -1414,9 +1415,9 @@ body.dark-mode .item-card.sold-out::after {
 
       <div class="pm-action-bar">
       <div class="pm-qty-stepper">
-  <button type="button" id="pmQtyMinus" ontouchstart="">−</button>
+  <button type="button" id="pmQtyMinus">−</button>
   <span id="pmQtyVal">1</span>
-  <button type="button" id="pmQtyPlus" ontouchstart="">+</button>
+  <button type="button" id="pmQtyPlus">+</button>
 </div>
         <button type="button" class="pm-add-btn" id="pmAddToCartBtn">
           <span>إضافة</span>
@@ -1980,9 +1981,9 @@ function renderCart(){
       <div class="cart-row">
         <button class="cr-remove" onclick="removeFromCart(${idx})">✕</button>
    <div class="qty-stepper">
-  <button type="button" ontouchstart="" onclick="changeCartQty(${idx},1)">+</button>
+  <button type="button" onclick="changeCartQty(${idx},1)">+</button>
   <span class="qty-val">${item.qty}</span>
-  <button type="button" ontouchstart="" onclick="changeCartQty(${idx},-1)">−</button>
+  <button type="button" onclick="changeCartQty(${idx},-1)">−</button>
 </div>
         <div class="cr-info" style="text-align:left;">
           <div class="cr-name">${item.name}</div>
