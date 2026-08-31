@@ -12,65 +12,59 @@
 <link rel="icon" href="savor.jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-
-  /* 🌟 تنسيق كروت الخطوة الأولى 🌟 */
+<style> 
+/* 🌟 تنسيق كروت الخطوة الأولى (تم حل مشكلة الرص) 🌟 */
 .big-order-types {
-  display: flex;
-  flex-direction: row; /* إجبار إنهم يكونوا جنب بعض دايماً */
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 12px !important;
+  width: 100% !important;
 }
 .big-ot-card {
-  flex: 1;
-  width: 33.33%;
-  background: var(--cream-2);
-  border: 2px solid var(--line);
-  border-radius: 18px;
-  padding: 20px 5px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  position: relative;
+  background: var(--cream-2) !important;
+  border: 2px solid var(--line) !important;
+  border-radius: 18px !important;
+  padding: 20px 5px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  transition: all 0.3s ease !important;
+  overflow: hidden !important;
+  position: relative !important;
 }
 .big-ot-card:hover {
-  border-color: var(--gold);
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(1, 128, 85, 0.15);
+  border-color: var(--gold) !important;
+  transform: translateY(-5px) !important;
+  box-shadow: 0 10px 25px rgba(1, 128, 85, 0.15) !important;
 }
 body.dark-mode .big-ot-card {
-  background: #1a1a1a;
-  border-color: #333;
+  background: #1a1a1a !important;
+  border-color: #333 !important;
 }
 body.dark-mode .big-ot-card:hover {
-  border-color: var(--gold);
+  border-color: var(--gold) !important;
 }
 .bot-icon-wrap {
-  font-size: 40px; 
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 60px !important; /* مساحة أكبر للصور */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 .bot-icon {
-  display: inline-block;
+  width: 55px !important;
+  height: 55px !important;
+  object-fit: contain;
+  display: block;
   transform-origin: center bottom;
+  will-change: transform; /* دي بتجبر المتصفح يخلي الحركة سلسة جداً */
 }
-.bot-text {
-  font-weight: 800;
-  font-size: 15px;
-  color: var(--ink);
-}
-body.dark-mode .bot-text { color: #fff; }
 
 /* 🌟 الأنميشنز الكرييتف 🌟 */
 .big-ot-card.animating-delivery .delivery-icon {
-  animation: rideAway 0.7s forwards ease-in-out;
+  animation: rideAway 0.75s ease-in-out forwards !important;
 }
 @keyframes rideAway {
   0% { transform: translateX(0) rotate(0); }
@@ -79,7 +73,7 @@ body.dark-mode .bot-text { color: #fff; }
 }
 
 .big-ot-card.animating-takeaway .takeaway-icon {
-  animation: grabBag 0.7s forwards ease-in-out;
+  animation: grabBag 0.75s ease-in-out forwards !important;
 }
 @keyframes grabBag {
   0% { transform: scale(1) translateY(0); }
@@ -88,7 +82,7 @@ body.dark-mode .bot-text { color: #fff; }
 }
 
 .big-ot-card.animating-dinein .dinein-icon {
-  animation: servePlate 0.7s forwards ease-in-out;
+  animation: servePlate 0.75s ease-in-out forwards !important;
 }
 @keyframes servePlate {
   0% { transform: scale(1); }
@@ -96,34 +90,15 @@ body.dark-mode .bot-text { color: #fff; }
   70% { transform: scale(1.3) rotate(-15deg); }
   100% { transform: scale(1) rotate(0); opacity: 0; }
 }
-
 /* 🌟 تنسيق زرار الرجوع الشيك 🌟 */
 .back-btn {
-  background: rgba(1, 128, 85, 0.1);
-  color: var(--gold);
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
+  background: rgba(1, 128, 85, 0.1); color: var(--gold); border: none; width: 40px; height: 40px;
+  border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: all 0.2s ease; padding: 0;
 }
-.back-btn:hover {
-  background: var(--gold);
-  color: #ffffff;
-  transform: translateX(4px);
-}
-body.dark-mode .back-btn {
-  background: rgba(255, 255, 255, 0.08);
-}
-body.dark-mode .back-btn:hover {
-  background: var(--gold);
-  color: var(--green-deep);
-}
+.back-btn:hover { background: var(--gold); color: #ffffff; transform: translateX(4px); }
+body.dark-mode .back-btn { background: rgba(255, 255, 255, 0.08); }
+body.dark-mode .back-btn:hover { background: var(--gold); color: var(--green-deep); }
 #menuScrollTopBtn {
   position: fixed;
   bottom: 90px; 
@@ -1681,42 +1656,46 @@ body.dark-mode .field textarea::placeholder {
       <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6.4 5L5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg>
     </button>
     
-    <div id="step1-OrderType">
+    <div id="step1-OrderType" style="opacity: 1; transition: opacity 0.3s ease; padding-bottom: 5px;">
       <h3 style="text-align: center; margin-bottom: 24px;">هتستلم طلبك إزاي؟</h3>
       <div class="big-order-types">
         
         <div class="big-ot-card" data-type="دليفري">
-          <div class="bot-icon-wrap"><span class="bot-icon delivery-icon">🛵</span></div>
+          <div class="bot-icon-wrap">
+            <!-- أيقونة الدليفري الرسمية من جوجل -->
+            <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Motor%20Scooter.png" alt="دليفري" class="bot-icon delivery-icon">
+          </div>
           <span class="bot-text">دليفري</span>
         </div>
         
         <div class="big-ot-card" data-type="تيك أواي">
-          <div class="bot-icon-wrap"><span class="bot-icon takeaway-icon">🛍️</span></div>
+          <div class="bot-icon-wrap">
+            <!-- أيقونة التيك أواي الرسمية من جوجل -->
+            <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shopping%20Bags.png" alt="تيك أواي" class="bot-icon takeaway-icon">
+          </div>
           <span class="bot-text">تيك أواي</span>
         </div>
         
         <div class="big-ot-card" data-type="صالة">
-          <div class="bot-icon-wrap"><span class="bot-icon dinein-icon">🍽️</span></div>
+          <div class="bot-icon-wrap">
+            <!-- أيقونة الصالة الرسمية من جوجل -->
+            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f37d_fe0f/512.webp" alt="صالة" class="bot-icon dinein-icon">
+          </div>
           <span class="bot-text">صالة</span>
         </div>
-        
       </div>
     </div>
-
-<div id="step2-OrderForm" style="display: none; opacity: 0; transition: opacity 0.4s ease;">
-  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-    
-    <button id="backToStep1" class="back-btn" aria-label="رجوع">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <!-- السهم متجه لليمين عشان ده عربي RTL (رجوع) -->
-        <path d="M9 18l6-6-6-6"/>
-      </svg>
-    </button>
-    
-    <h3 style="margin: 0;">بيانات <span id="selectedTypeText" style="color: var(--gold);">الطلب</span></h3>
-  </div>
-      <input type="hidden" id="finalOrderType" value="دليفري">
+    <div id="step2-OrderForm" style="display: none; opacity: 0; transition: opacity 0.3s ease; margin-top: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+        <button id="backToStep1" class="back-btn" aria-label="رجوع">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+        <h3 style="margin: 0;">بيانات <span id="selectedTypeText" style="color: var(--gold);">الطلب</span></h3>
+      </div>
       
+      <input type="hidden" id="finalOrderType" value="دليفري">
       <div class="field"><label for="custName">الاسم</label><input id="custName" type="text" placeholder="اسمك بالكامل"></div>
       <div class="field" id="phoneField"><label for="custPhone">رقم الموبايل</label><input id="custPhone" type="tel" placeholder="01xxxxxxxxx"></div>
       <div class="field" id="addressField"><label for="custAddress">العنوان بالتفصيل</label><textarea id="custAddress" rows="2" placeholder="الحي، الشارع، رقم العمارة/الدور"></textarea></div>
@@ -1730,7 +1709,6 @@ body.dark-mode .field textarea::placeholder {
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast">تمت الإضافة للسلة ✅</div>
 
 <!-- CALL MODAL (نافذة أرقام التواصل) -->
@@ -2432,80 +2410,83 @@ const backBtn = document.getElementById('backToStep1');
 const typeText = document.getElementById('selectedTypeText');
 const finalTypeInput = document.getElementById('finalOrderType');
 
-// لما العميل يدوس على كارت من الكروت
 document.querySelectorAll('.big-ot-card').forEach(card => {
   card.addEventListener('click', function(e) {
-    // لمنع العميل يدوس مرتين ورا بعض ويبوظ الأنيميشن
-    if(this.classList.contains('is-animating')) return;
+    if(this.classList.contains('is-animating')) return; 
     
     const type = this.dataset.type;
     finalTypeInput.value = type;
 
-    // نقفل الكروت مؤقتاً عشان الأنيميشن ياخد وقته
-    document.querySelectorAll('.big-ot-card').forEach(c => c.classList.add('is-animating'));
+    // تعطيل الضغط على أي كارت تاني أثناء الأنيميشن
+    document.querySelectorAll('.big-ot-card').forEach(c => {
+      c.classList.add('is-animating');
+      c.style.pointerEvents = 'none'; 
+    });
 
-    // تشغيل الأنيميشن المناسب
+    // تشغيل الأنيميشن
     if (type === 'دليفري') this.classList.add('animating-delivery');
     else if (type === 'تيك أواي') this.classList.add('animating-takeaway');
     else if (type === 'صالة') this.classList.add('animating-dinein');
 
-    // تأخير النقل للخطوة التانية 750 مللي ثانية (عشان الأنيميشن يكمل براحته)
+    // تأخير النقل عشان الأنيميشن يخلص براحته (750ms)
     setTimeout(() => {
-      step1.style.display = 'none';
-      step2.style.display = 'block';
+      step1.style.opacity = '0'; // إخفاء ناعم للخطوة الأولى
       
-      // ريفريش خفيف عشان تأثير الظهور
-      requestAnimationFrame(() => {
-        step2.style.opacity = '1';
-      });
+      setTimeout(() => {
+        step1.style.display = 'none';
+        step2.style.display = 'block';
+        
+        requestAnimationFrame(() => { step2.style.opacity = '1'; });
 
-      // تظهير الخانات حسب الاختيار
-      typeText.textContent = type;
-      const addressField = document.getElementById('addressField');
-      const tableField = document.getElementById('tableField');
-      const phoneField = document.getElementById('phoneField');
+        typeText.textContent = type;
+        const addressField = document.getElementById('addressField');
+        const tableField = document.getElementById('tableField');
+        const phoneField = document.getElementById('phoneField');
 
-      if (type === 'دليفري') {
-        addressField.style.display = 'block'; tableField.style.display = 'none'; phoneField.style.display = 'block';
-      } else if (type === 'تيك أواي') {
-        addressField.style.display = 'none'; tableField.style.display = 'none'; phoneField.style.display = 'block';
-      } else if (type === 'صالة') {
-        addressField.style.display = 'none'; tableField.style.display = 'block'; phoneField.style.display = 'none';
-      }
+        if (type === 'دليفري') {
+          addressField.style.display = 'block'; tableField.style.display = 'none'; phoneField.style.display = 'block';
+        } else if (type === 'تيك أواي') {
+          addressField.style.display = 'none'; tableField.style.display = 'none'; phoneField.style.display = 'block';
+        } else if (type === 'صالة') {
+          addressField.style.display = 'none'; tableField.style.display = 'block'; phoneField.style.display = 'none';
+        }
 
-      // تنظيف الكلاسات عشان لو داس "رجوع" يشتغل معاه تاني
-      this.classList.remove('animating-delivery', 'animating-takeaway', 'animating-dinein');
-      document.querySelectorAll('.big-ot-card').forEach(c => c.classList.remove('is-animating'));
-      
-    }, 750); // نفس مدة الـ CSS (0.7s) + شعرة صغيرة
+        // إرجاع الكروت لحالتها الأصلية عشان لو العميل داس "رجوع"
+        this.classList.remove('animating-delivery', 'animating-takeaway', 'animating-dinein');
+        document.querySelectorAll('.big-ot-card').forEach(c => {
+          c.classList.remove('is-animating');
+          c.style.pointerEvents = 'auto';
+        });
+      }, 200); 
+    }, 750); 
   });
 });
 
-// زرار الرجوع للخطوة الأولى
 backBtn.addEventListener('click', () => {
   step2.style.opacity = '0';
   setTimeout(() => {
     step2.style.display = 'none';
     step1.style.display = 'block';
-  }, 400);
+    requestAnimationFrame(() => {
+      step1.style.opacity = '1';
+    });
+  }, 250);
 });
 
-// تصفير النافذة لما تتقفل عشان تفتح دايماً على الخطوة الأولى
 function resetCheckoutModal() {
   step2.style.opacity = '0';
   step2.style.display = 'none';
   step1.style.display = 'block';
+  step1.style.opacity = '1';
 }
 
-// تعديل الدالة القديمة بتاعة إغلاق النافذة
 function closeCheckoutModal(){ 
   checkoutModal.classList.remove('show'); 
   overlayBg.classList.remove('show'); 
-  setTimeout(resetCheckoutModal, 300); // بيرست النافذة وهي بتختفي
+  setTimeout(resetCheckoutModal, 300);
 }
 
-
-/* ================== إرسال الطلب لواتساب (محدث) ================== */
+/* ================== إرسال الطلب لواتساب المحدث ================== */
 document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
@@ -2513,9 +2494,8 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   const table = document.getElementById('custTable') ? document.getElementById('custTable').value.trim() : '';
   const notes = document.getElementById('custNotes').value.trim();
   const couponCode = document.getElementById('cartCouponInput') ? document.getElementById('cartCouponInput').value.trim().toUpperCase() : '';
-  const orderType = finalTypeInput.value; // بيقرا النوع اللي اتسجل في الخطوة الأولى
+  const orderType = finalTypeInput.value;
 
-  // تحقق من البيانات
   if(!name){ showToast('من فضلك اكتب الاسم 📝'); return; }
   if(orderType === 'دليفري' && (!phone || !address)){ showToast('من فضلك اكتب الموبايل والعنوان 📝'); return; }
   if(orderType === 'تيك أواي' && !phone){ showToast('من فضلك اكتب الموبايل للتواصل 📝'); return; }
@@ -2530,7 +2510,6 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(validDiscount >= subTotal) { validDiscount = subTotal; }
   const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
 
-  // تجهيز الرسالة
   let msg = `مرحبا SAVOR، عندي أوردر جديد:\n`;
   msg += `📍 نوع الطلب: *${orderType}*\n\n`;
   
@@ -2550,12 +2529,9 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(orderType === 'صالة') msg += `🍽️ رقم الترابيزة: ${table}\n`;
   if(notes) msg += `📝 ملاحظات إضافية: ${notes}\n`;
 
-  // حفظ في فايربيز والتوجه لواتساب
   db.collection('orders').add({
-    orderType: orderType,
-    customerName: name, phone: phone, address: address, table: table, notes: notes,
-    couponCode: validDiscount > 0 ? couponCode : "",
-    discount: validDiscount,
+    orderType: orderType, customerName: name, phone: phone, address: address, table: table, notes: notes,
+    couponCode: validDiscount > 0 ? couponCode : "", discount: validDiscount,
     items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [ملاحظة: '+i.notes+']' : ''}`).join('، '),
     total: finalTotal, status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
