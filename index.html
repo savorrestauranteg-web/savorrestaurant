@@ -1982,6 +1982,8 @@ function saveCart(){
 // 3. تحديث الأرقام والشريط السفلي فور تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
   renderCart();
+  
+  // أولاً: استرجاع البيانات لو العميل كان كاتبها قبل كده
   if (localStorage.getItem('savor_custName')) {
     document.getElementById('custName').value = localStorage.getItem('savor_custName');
   }
@@ -1991,6 +1993,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('savor_custAddress')) {
     document.getElementById('custAddress').value = localStorage.getItem('savor_custAddress');
   }
+
+  // ثانياً: حفظ البيانات حرف بحرف وقت الكتابة (ده اللي هيمنع مسحها في كل الحالات)
+  document.getElementById('custName').addEventListener('input', (e) => {
+    localStorage.setItem('savor_custName', e.target.value);
+  });
+  
+  document.getElementById('custPhone').addEventListener('input', (e) => {
+    localStorage.setItem('savor_custPhone', e.target.value);
+  });
+  
+  document.getElementById('custAddress').addEventListener('input', (e) => {
+    localStorage.setItem('savor_custAddress', e.target.value);
+  });
 });
 
 function addToCart({cat,name,size,price,qty}){
