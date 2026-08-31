@@ -2030,10 +2030,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-function addToCart({cat,name,size,price,qty}){
-  const existing = cart.find(i=>i.name===name && i.size===size);
-  if(existing) existing.qty += qty; else cart.push({cat,name,size,price,qty});
-  saveCart(); renderCart();
+function addToCart({cat, name, size, price, qty, notes}){
+  // دمجنا البحث بحيث يتأكد من اسم المنتج، الحجم، ونفس الملاحظة أيضاً
+  const existing = cart.find(i => i.name === name && i.size === size && i.notes === notes);
+  if(existing) {
+    existing.qty += qty; 
+  } else {
+    cart.push({ cat, name, size, price, qty, notes: notes || "" });
+  }
+  saveCart(); 
+  renderCart();
 }
 function removeFromCart(index){ cart.splice(index,1); saveCart(); renderCart(); }
 function changeCartQty(index, delta){
@@ -2199,13 +2205,15 @@ document.getElementById('checkoutBtn').addEventListener('click', openCheckoutMod
 document.getElementById('modalCloseBtn').addEventListener('click', closeCheckoutModal);
 
 // إرسال الطلب وحفظه
+// إرسال الطلب وحفظه
 document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const address = document.getElementById('custAddress').value.trim();
   const notes = document.getElementById('custNotes').value.trim();
   const couponCode = document.getElementById('cartCouponInput') ? document.getElementById('cartCouponInput').value.trim().toUpperCase() : '';
-localStorage.setItem('savor_custName', name);
+  
+  localStorage.setItem('savor_custName', name);
   localStorage.setItem('savor_custPhone', phone);
   localStorage.setItem('savor_custAddress', address);
 
@@ -2220,12 +2228,31 @@ localStorage.setItem('savor_custName', name);
   if(validDiscount >= subTotal) { validDiscount = subTotal; }
   const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
 
-let msg = `مرحبا SAVOR، ممكن أطلب أوردر :\n\n`;
-  cart.forEach(item=>{ 
-    msg += `• ${item.name}${item.size?' ('+item.size+')':''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; 
-    if(item.notes) msg + `   └ ملاحظة: ${item.notes}\n`; // إضافة ملاحظة المنتج للرسالة
+  // 1. بناء رسالة الواتساب مع تضمين بيانات العميل، المنتجات، ملاحظات المنتجات، والملاحظات العامة
+  let msg = `مرحبا SAVOR، عندي أوردر جديد:\n\n`;
+  
+  cart.forEach(item => { 
+    msg += `• ${item.name}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; 
+    if(item.notes) {
+      msg += `   └ ملاحظة المنتج: ${item.notes}\n`; 
+    }
   });
+  
+  msg += `\n-------------------\n`;
+  msg += `المجموع الفرعي: ${subTotal} ج.م\n`;
+  if(validDiscount > 0) {
+      msg += `الخصم: -${validDiscount} ج.م (كوبون: ${couponCode})\n`;
+  }
+  msg += `الإجمالي النهائي: ${finalTotal} ج.م\n`;
+  msg += `-------------------\n\n`;
+  msg += `👤 الاسم: ${name}\n`;
+  msg += `📱 الموبايل: ${phone}\n`;
+  msg += `📍 العنوان: ${address}\n`;
+  if(notes) {
+    msg += `📝 ملاحظات التوصيل: ${notes}\n`;
+  }
 
+  // 2. حفظ الطلب في فايربيز (للوحة التحكم) ثم التحويل للواتساب في خطوتين لضمان عدم الضياع
   db.collection('orders').add({
     customerName: name, 
     phone: phone, 
@@ -2233,11 +2260,13 @@ let msg = `مرحبا SAVOR، ممكن أطلب أوردر :\n\n`;
     notes: notes,
     couponCode: validDiscount > 0 ? couponCode : "",
     discount: validDiscount,
-items: cart.map(i => `${i.name} ${i.size?'('+i.size+')':''} x${i.qty} ${i.notes ? '[ملاحظة: '+i.notes+']' : ''}`).join('، '),    total: finalTotal,
+    items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [ملاحظة: '+i.notes+']' : ''}`).join('، '),
+    total: finalTotal,
     status: 'new', 
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;    cart = []; 
+  })
+  .then(() => {
+    cart = []; 
     currentDiscountValue = 0; 
     if(document.getElementById('cartCouponInput')) document.getElementById('cartCouponInput').value = ''; 
     saveCart(); 
@@ -2245,13 +2274,17 @@ window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURICompo
     closeCheckoutModal();
     btn.innerHTML = 'إرسال الطلب على واتساب'; 
     btn.disabled = false;
-  }).catch(err => {
-window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
- btn.innerHTML = 'إرسال الطلب على واتساب'; 
+    
+    // الانتقال للواتساب بالرسالة الكاملة
+    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
+  })
+  .catch(err => {
+    // حتى لو حدث خطأ في قاعدة البيانات، يتم فتح الواتساب بالطلب أيضاً لضمان راحة العميل
+    btn.innerHTML = 'إرسال الطلب على واتساب'; 
     btn.disabled = false;
+    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
   });
 });
-
 function showToast(text){
   const toast = document.getElementById('toast'); toast.textContent = text; toast.classList.add('show');
   clearTimeout(window._toastTimer); window._toastTimer = setTimeout(()=>toast.classList.remove('show'), 2200);
