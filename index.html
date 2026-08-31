@@ -21,8 +21,16 @@
   margin-bottom: 20px !important; 
 }
 .trust-strip {
-  margin-top: 10px !important;
-  justify-content: flex-start !important; 
+  position: relative;
+  z-index: 2;
+  margin-top: 56px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center !important; /* ضمان التوسيط التام أفقياً */
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  animation: fadeUp .9s .3s ease both;
 }
 body.dark-mode #pmItemNotes {
   border-color: #333333;
