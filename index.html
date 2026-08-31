@@ -30,6 +30,7 @@
     display: inline-block;
 }
 .pm-qty-stepper button, .qty-stepper button {
+  transform: translateZ(0);
     cursor: pointer;
     touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
@@ -64,7 +65,7 @@
 }
 .pm-qty-stepper button:active, .qty-stepper button:active {
     background: #cce8dd !important; 
-    transform: scale(0.92) !important; 
+transform: scale(0.97) !important;
 }
 
 .pm-qty-stepper { width: 130px !important; padding: 6px !important; }
@@ -955,7 +956,7 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   transition: transform .3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .modal.show .modal-card {
-  transform: scale(1);
+transform: none !important;
 }
 .pm-action-bar {
   position: relative;
