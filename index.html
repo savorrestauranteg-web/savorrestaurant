@@ -1982,6 +1982,15 @@ function saveCart(){
 // 3. تحديث الأرقام والشريط السفلي فور تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
   renderCart();
+  if (localStorage.getItem('savor_custName')) {
+    document.getElementById('custName').value = localStorage.getItem('savor_custName');
+  }
+  if (localStorage.getItem('savor_custPhone')) {
+    document.getElementById('custPhone').value = localStorage.getItem('savor_custPhone');
+  }
+  if (localStorage.getItem('savor_custAddress')) {
+    document.getElementById('custAddress').value = localStorage.getItem('savor_custAddress');
+  }
 });
 
 function addToCart({cat,name,size,price,qty}){
@@ -2157,6 +2166,9 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   const address = document.getElementById('custAddress').value.trim();
   const notes = document.getElementById('custNotes').value.trim();
   const couponCode = document.getElementById('cartCouponInput') ? document.getElementById('cartCouponInput').value.trim().toUpperCase() : '';
+localStorage.setItem('savor_custName', name);
+  localStorage.setItem('savor_custPhone', phone);
+  localStorage.setItem('savor_custAddress', address);
 
   if(!name || !phone || !address){ showToast('من فضلك اكتب الاسم، الموبايل والعنوان 📝'); return; }
 
