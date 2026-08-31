@@ -13,6 +13,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  .fab-stack {
+  transition: opacity 0.3s ease, pointer-events 0s !important;
+}
   @media (max-width: 900px) {
   .fab.top {
     display: none !important;
@@ -2171,18 +2174,22 @@ darkModeBtn.addEventListener('click', () => {
   }
 });
 window.addEventListener('scroll', () => {
-  const bottomBar = document.querySelector('.bottom-bar');
+  // نستهدف الفوتر بالكامل
+  const footer = document.querySelector('footer.site');
   const fabStack = document.querySelector('.fab-stack');
   
-  if (bottomBar && fabStack) {
-    const barRect = bottomBar.getBoundingClientRect();
+  if (footer && fabStack) {
+    const footerRect = footer.getBoundingClientRect();
     const windowHeight = window.innerHeight;
     
-    if (barRect.top < windowHeight) {
-      const overlap = windowHeight - barRect.top;
-      fabStack.style.transform = `translateY(-${overlap + 10}px)`; 
+    // لو الفوتر بدأ يظهر في الشاشة، اخفي الأزرار
+    if (footerRect.top < windowHeight) {
+      fabStack.style.opacity = '0';
+      fabStack.style.pointerEvents = 'none'; // عشان محدش يقدر يدوس عليها وهي مخفية
     } else {
-      fabStack.style.transform = 'translateY(0)';
+      // لو المستخدم طلع لفوق تاني، أظهر الأزرار
+      fabStack.style.opacity = '1';
+      fabStack.style.pointerEvents = 'auto';
     }
   }
 });
