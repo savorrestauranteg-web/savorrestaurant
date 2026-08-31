@@ -19,11 +19,7 @@
 }
 
 
-.pm-qty-stepper button::before, .qty-stepper button::before {
-    content: "";
-    position: absolute;
-    top: -12px; left: -12px; right: -12px; bottom: -12px;
-}.pm-qty-stepper, .qty-stepper, .pm-qty-stepper span, .qty-stepper span {
+.pm-qty-stepper, .qty-stepper, .pm-qty-stepper span, .qty-stepper span {
     user-select: none !important;
     -webkit-user-select: none !important;
     touch-action: manipulation !important;
@@ -669,15 +665,17 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   }
   .btn svg{width:19px; height:19px; fill:currentColor;}
   .btn-gold{background:var(--gold); color:var(--green-deep); box-shadow:0 14px 30px -12px rgba(226,165,48,.6);}
-  .btn-gold:hover{background:var(--gold-2); transform:translateY(-3px);}
   .btn-outline{background:transparent; color:var(--cream); border:2px solid rgba(255,255,255,.55);}
-  .btn-outline:hover{background:rgba(255,255,255,.12); transform:translateY(-3px);}
   .btn-whatsapp{background:#25D366; color:#04361c;}
-  .btn-whatsapp:hover{background:#2fe377; transform:translateY(-3px);}
   .btn-dark{background:var(--green-deep); color:var(--cream);}
-  .btn-dark:hover{background:var(--green-mid); transform:translateY(-3px);}
   .btn-block{width:100%; justify-content:center;}
-
+@media (hover: hover) {
+  .btn-gold:hover { background: var(--gold-2); transform: translateY(-3px); }
+  .btn-outline:hover { background: rgba(255,255,255,.12); transform: translateY(-3px); }
+  .btn-whatsapp:hover { background: #2fe377; transform: translateY(-3px); }
+  .btn-dark:hover { background: var(--green-mid); transform: translateY(-3px); }
+  .add-btn:hover { background: var(--green-mid); transform: translateY(-2px); }
+}
   @keyframes fadeUp{from{opacity:0; transform:translateY(22px);} to{opacity:1; transform:translateY(0);}}
 
  .trust-strip{
@@ -1024,7 +1022,17 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
 .pm-size-price { font-family: 'Oswald', sans-serif; font-weight: 600; color: #5a5346; }
 .pm-action-bar { display: flex; gap: 12px; align-items: stretch; }
 .pm-qty-stepper { display: flex; align-items: center; justify-content: space-between; background: var(--cream-2); border-radius: 12px; padding: 4px; width: 110px; }
-.pm-qty-stepper button { width: 34px; height: 34px; border: none; background: #fff; border-radius: 8px; font-size: 18px; font-weight: 700; color: var(--green-deep); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.pm-qty-stepper button { 
+    width: 38px !important; 
+    height: 38px !important; 
+    border: none; 
+    background: #fff; 
+    border-radius: 8px; 
+    font-size: 22px !important; 
+    font-weight: 700; 
+    color: var(--green-deep); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+}
 .pm-qty-stepper span { font-weight: 800; font-size: 16px; }
 .pm-add-btn { flex: 1; background: var(--green); color: var(--cream); border: none; border-radius: 12px; font-size: 16px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; transition: transform 0.2s; }
 .pm-add-btn:active { transform: scale(0.98); }
