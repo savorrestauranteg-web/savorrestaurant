@@ -900,7 +900,6 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   transition: opacity .3s;
 }
   .modal.show{opacity:1; pointer-events:auto;}
-/* 2. إرجاع كارت الدفع لشكله وتناسقه الأصلي */
 .modal-card {
   background: var(--paper);
   border-radius: 22px;
@@ -909,10 +908,18 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   padding: 30px;
   max-height: 90vh;
   overflow-y: auto;
-  transform: translateY(20px);
-  transition: transform .3s;
+  -webkit-overflow-scrolling: touch; 
+  
+  transform: scale(0.95);
+  transition: transform .3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-  .modal.show .modal-card{transform:translateY(0);}
+.modal.show .modal-card {
+  transform: scale(1);
+}
+.pm-action-bar {
+  position: relative;
+  z-index: 10;
+}
   .modal-card h3{margin:0 0 6px; font-size:28px; color:var(--green-deep);}
   .modal-card p.hint{color:#8a8272; margin:0 0 20px; font-size:14px;}
   .field{margin-bottom:16px;}
@@ -1049,7 +1056,6 @@ body.dark-mode .item-card.sold-out::after {
 </style>
 </head>
 <body>
-<!-- شريط تنبيه غلق المطعم -->
 <div id="restaurantClosedBanner" style="display: none; background-color: #c33a28; color: white; text-align: center; padding: 10px; font-weight: bold; position: sticky; top: 0; z-index: 1000;">
   🔴 المطعم مقفول حالياً، مينفعش تكمل الأوردر دلوقتي. جرب تاني بعد شوية.
 </div>
@@ -1106,7 +1112,6 @@ body.dark-mode .item-card.sold-out::after {
   </div>
 </header>
 
-<!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
   <div class="mm-top">
 <div class="brand"><img src="logo.jpeg" alt="SAVOR"></div>
@@ -1122,14 +1127,11 @@ body.dark-mode .item-card.sold-out::after {
   </div>
 </div>
 
-<!-- HERO -->
 <section class="hero" id="top">
-  <!-- كود الفيديو -->
   <video class="hero-video" autoplay loop muted playsinline>
     <source src="savorvideo.mp4" type="video/mp4">
   </video>
   
-  <!-- طبقة التدرج اللوني فوق الفيديو لتوضيح الكلام -->
   <div class="hero-overlay"></div>
   <div class="container hero-inner">
     <span class="eyebrow">🔥 SAVOR — Slow Sip, Soft Moments</span>
@@ -1160,15 +1162,12 @@ body.dark-mode .item-card.sold-out::after {
 <!-- CATEGORY QUICK NAV -->
 <div class="catnav-wrap">
   <div class="container" style="display: flex; align-items: center; padding: 0 10px; gap: 5px;">
-    <!-- السهم اليمين (للبداية) -->
     <button id="scrollRightBtn" class="scroll-arrow" aria-label="السابق">
       <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
     </button>
     
-    <!-- شريط الأقسام -->
     <div class="catnav" id="catNav"></div>
 
-    <!-- السهم الشمال (للنهاية) -->
     <button id="scrollLeftBtn" class="scroll-arrow" aria-label="التالي">
       <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
     </button>
@@ -1292,7 +1291,6 @@ body.dark-mode .item-card.sold-out::after {
 <div class="bottom-bar">
       <span>© 2026 SAVOR. جميع الحقوق محفوظة.</span>
       
-      <!-- حقوق المطور مع تأثير التوهج -->
       <style>
         @keyframes devGlow {
           0% { text-shadow: 0 0 4px rgba(226, 165, 48, 0.4); }
@@ -1325,7 +1323,6 @@ body.dark-mode .item-card.sold-out::after {
 
 </footer>
 
-<!-- FLOATING BUTTONS -->
 <div class="fab-stack">
   <a class="fab wa" href="https://wa.me/201067841756?text=%D8%A7%D9%87%D9%84%D8%A7%20SAVOR%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A7%D8%B9%D9%85%D9%84%20%D8%A7%D9%88%D8%B1%D8%AF%D8%B1" target="_blank" rel="noopener" aria-label="راسلنا على واتساب">
     <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
@@ -1339,7 +1336,6 @@ body.dark-mode .item-card.sold-out::after {
   </button>
 </div>
 
-<!-- STICKY MOBILE CART -->
 <div class="sticky-cart" id="stickyCart">
   <div class="sc-info">
     <small>السلة</small>
@@ -1482,7 +1478,6 @@ body.dark-mode .item-card.sold-out::after {
   </div>
 </div>
 
-<!-- 1. استدعاء مكتبات فايربيز (لازم تكون بره كود الجافاسكريبت) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
