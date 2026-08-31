@@ -17,16 +17,7 @@
     user-select: none;
     -webkit-user-select: none; /* لدعم سفاري وآيفون */
 }
-.pm-qty-stepper button, .qty-stepper button {
-    cursor: pointer;
-    touch-action: none !important; /* بيمنع أي تعليق ناتج عن محاولة المتصفح للسحب */
-    -webkit-tap-highlight-color: transparent !important;
-    outline: none;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    transition: background 0.1s ease;
-    position: relative; /* ضروري لتوسيع مساحة اللمس */
-}
+
 
 .pm-qty-stepper button::before, .qty-stepper button::before {
     content: "";
@@ -47,17 +38,37 @@
     touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
     outline: none;
-    transition: background 0.1s;
-    transform: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    transition: background 0.1s ease, transform 0.1s;
+    position: relative;
 }
-.pm-qty-stepper button:active, .qty-stepper button:active {
-    background: #cce8dd !important; 
-    transform: none !important; 
+.btn {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 10px; 
+  padding: 16px 30px; 
+  border-radius: var(--arch);
+  font-weight: 800; 
+  font-size: 16px; 
+  border: none; 
+  transition: transform .22s, box-shadow .22s, background .22s;
+  
+  /* الإضافات الجديدة لحل مشاكل الـ Touch */
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
+/* تأثير الاستجابة الفورية عند اللمس (Feedback) */
+.btn:active {
+  transform: scale(0.96) !important;
+}
 .pm-qty-stepper button:active, .qty-stepper button:active {
     background: #cce8dd !important; 
-    transform: none !important; 
+    transform: scale(0.92) !important; 
 }
 
 .pm-qty-stepper { width: 130px !important; padding: 6px !important; }
@@ -2180,7 +2191,7 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
     status: 'new', 
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
-    window.open(`https://wa.me/201067841756?text=${encodeURIComponent(msg)}`, '_blank');
+window.location.href = `https://wa.me/201067841756?text=${encodeURIComponent(msg)}`;
     cart = []; 
     currentDiscountValue = 0; 
     if(document.getElementById('cartCouponInput')) document.getElementById('cartCouponInput').value = ''; 
@@ -2190,8 +2201,7 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
     btn.innerHTML = 'إرسال الطلب على واتساب'; 
     btn.disabled = false;
   }).catch(err => {
-    window.open(`https://wa.me/201067841756?text=${encodeURIComponent(msg)}`, '_blank');
-    btn.innerHTML = 'إرسال الطلب على واتساب'; 
+window.location.href = `https://wa.me/201067841756?text=${encodeURIComponent(msg)}`;    btn.innerHTML = 'إرسال الطلب على واتساب'; 
     btn.disabled = false;
   });
 });
