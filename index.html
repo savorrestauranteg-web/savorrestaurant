@@ -973,10 +973,13 @@ transform: none !important;
   .field input:focus, .field textarea:focus{outline:2px solid var(--gold); border-color:var(--gold);}
   .modal-close{position:absolute; top:14px; left:14px; width:34px; height:34px; border-radius:50%; background:var(--cream-2); display:flex; align-items:center; justify-content:center; color:var(--ink);}
   .modal-card{position:relative;}
-
+.btn svg {
+    pointer-events: none;
+}
   .toast{
     position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); z-index:99;
     background:var(--green-deep); color:var(--cream); padding:13px 24px; border-radius:999px; font-weight:700;
+    pointer-events: none; /* السطر ده هو اللي هيحل المشكلة */
     font-size:14px; opacity:0; transition:all .3s; box-shadow:var(--shadow); display:flex; align-items:center; gap:8px;
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
@@ -2205,7 +2208,7 @@ localStorage.setItem('savor_custName', name);
   if(validDiscount >= subTotal) { validDiscount = subTotal; }
   const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
 
-  let msg = `مرحبا SAVOR، عايز أعمل طلب:\n\n`;
+  let msg = `مرحبا SAVOR، ممكن أطلب أوردر :\n\n`;
   cart.forEach(item=>{ msg += `• ${item.name}${item.size?' ('+item.size+')':''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; });
   
   msg += `\nالمجموع الفرعي: ${subTotal} ج.م`;
