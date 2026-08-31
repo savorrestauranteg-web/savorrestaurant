@@ -32,6 +32,27 @@
     content: "";
     position: absolute;
     top: -12px; left: -12px; right: -12px; bottom: -12px;
+}.pm-qty-stepper, .qty-stepper, .pm-qty-stepper span, .qty-stepper span {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    touch-action: manipulation !important;
+}
+.pm-qty-stepper span, .qty-stepper span {
+    width: 32px !important; 
+    text-align: center;
+    display: inline-block;
+}
+.pm-qty-stepper button, .qty-stepper button {
+    cursor: pointer;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none;
+    transition: background 0.1s;
+    transform: none !important;
+}
+.pm-qty-stepper button:active, .qty-stepper button:active {
+    background: #cce8dd !important; 
+    transform: none !important; 
 }
 
 .pm-qty-stepper button:active, .qty-stepper button:active {
@@ -1878,12 +1899,10 @@ function updatePmTotal() {
   document.getElementById('pmTotalBtn').textContent = `${basePrice * activePmQty} ج.م`;
 }
 
-document.getElementById('pmQtyMinus').addEventListener('pointerdown', (e) => {
-  e.preventDefault();
+document.getElementById('pmQtyMinus').addEventListener('click', () => {
   if (activePmQty > 1) { activePmQty--; document.getElementById('pmQtyVal').textContent = activePmQty; updatePmTotal(); }
 });
-document.getElementById('pmQtyPlus').addEventListener('pointerdown', (e) => {
-  e.preventDefault();
+document.getElementById('pmQtyPlus').addEventListener('click', () => {
   activePmQty++; document.getElementById('pmQtyVal').textContent = activePmQty; updatePmTotal();
 });
 
@@ -1992,9 +2011,9 @@ function renderCart(){
       <div class="cart-row">
         <button class="cr-remove" onclick="removeFromCart(${idx})">✕</button>
    <div class="qty-stepper">
-  <button type="button" onpointerdown="event.preventDefault(); changeCartQty(${idx},1)">+</button>
+  <button type="button" onclick="changeCartQty(${idx},1)">+</button>
   <span class="qty-val">${item.qty}</span>
-  <button type="button" onpointerdown="event.preventDefault(); changeCartQty(${idx},-1)">−</button>
+  <button type="button" onclick="changeCartQty(${idx},-1)">−</button>
 </div>
         <div class="cr-info" style="text-align:left;">
           <div class="cr-name">${item.name}</div>
