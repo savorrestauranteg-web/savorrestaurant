@@ -13,70 +13,116 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* تنسيقات كروت اختيار نوع الطلب */
-.order-type-selector {
+
+  /* 🌟 تنسيق كروت الخطوة الأولى 🌟 */
+.big-order-types {
   display: flex;
+  flex-direction: row; /* إجبار إنهم يكونوا جنب بعض دايماً */
+  justify-content: space-between;
   gap: 10px;
-  margin-bottom: 24px;
-  margin-top: 10px;
+  width: 100%;
 }
-
-.ot-card {
+.big-ot-card {
   flex: 1;
+  width: 33.33%;
+  background: var(--cream-2);
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 5px;
   cursor: pointer;
-}
-
-.ot-card input[type="radio"] {
-  display: none;
-}
-
-.ot-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 8px;
-  background: var(--cream-2);
-  border: 2px solid var(--line);
-  border-radius: 16px;
+  gap: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0.7;
+  overflow: hidden;
+  position: relative;
 }
-
-.ot-icon {
-  font-size: 24px;
-  transition: transform 0.3s;
-}
-
-.ot-text {
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--ink);
-}
-
-.ot-card input[type="radio"]:checked + .ot-content {
+.big-ot-card:hover {
   border-color: var(--gold);
-  background: rgba(1, 128, 85, 0.08); 
-  opacity: 1;
-  box-shadow: 0 4px 15px rgba(1, 128, 85, 0.15);
-  transform: translateY(-2px);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(1, 128, 85, 0.15);
 }
-
-.ot-card input[type="radio"]:checked + .ot-content .ot-icon {
-  transform: scale(1.2);
-}
-
-body.dark-mode .ot-content {
+body.dark-mode .big-ot-card {
   background: #1a1a1a;
   border-color: #333;
 }
-body.dark-mode .ot-text {
-  color: #fff;
-}
-body.dark-mode .ot-card input[type="radio"]:checked + .ot-content {
-  background: rgba(1, 128, 85, 0.2);
+body.dark-mode .big-ot-card:hover {
   border-color: var(--gold);
+}
+.bot-icon-wrap {
+  font-size: 40px; 
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bot-icon {
+  display: inline-block;
+  transform-origin: center bottom;
+}
+.bot-text {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--ink);
+}
+body.dark-mode .bot-text { color: #fff; }
+
+/* 🌟 الأنميشنز الكرييتف 🌟 */
+.big-ot-card.animating-delivery .delivery-icon {
+  animation: rideAway 0.7s forwards ease-in-out;
+}
+@keyframes rideAway {
+  0% { transform: translateX(0) rotate(0); }
+  30% { transform: translateX(10px) rotate(15deg); }
+  100% { transform: translateX(-150px) rotate(15deg); opacity: 0; }
+}
+
+.big-ot-card.animating-takeaway .takeaway-icon {
+  animation: grabBag 0.7s forwards ease-in-out;
+}
+@keyframes grabBag {
+  0% { transform: scale(1) translateY(0); }
+  40% { transform: scale(1.15) translateY(-12px); }
+  100% { transform: scale(0.5) translateY(-50px); opacity: 0; }
+}
+
+.big-ot-card.animating-dinein .dinein-icon {
+  animation: servePlate 0.7s forwards ease-in-out;
+}
+@keyframes servePlate {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3) rotate(15deg); }
+  70% { transform: scale(1.3) rotate(-15deg); }
+  100% { transform: scale(1) rotate(0); opacity: 0; }
+}
+
+/* 🌟 تنسيق زرار الرجوع الشيك 🌟 */
+.back-btn {
+  background: rgba(1, 128, 85, 0.1);
+  color: var(--gold);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+.back-btn:hover {
+  background: var(--gold);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+body.dark-mode .back-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .back-btn:hover {
+  background: var(--gold);
+  color: var(--green-deep);
 }
 #menuScrollTopBtn {
   position: fixed;
@@ -1629,51 +1675,59 @@ body.dark-mode .field textarea::placeholder {
     </div> </div>
 </div>
 
-<!-- CHECKOUT MODAL -->
 <div class="modal" id="checkoutModal">
-  <div class="modal-card">
+  <div class="modal-card" id="checkoutModalCard" style="transition: all 0.3s ease;">
     <button class="modal-close" id="modalCloseBtn" aria-label="إغلاق">
       <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6.4 5L5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg>
     </button>
-    <h3>بيانات الطلب</h3>
     
-    <div class="order-type-selector">
-      <label class="ot-card">
-        <input type="radio" name="orderType" value="دليفري" checked>
-        <div class="ot-content">
-          <span class="ot-icon">🛵</span>
-          <span class="ot-text">دليفري</span>
+    <div id="step1-OrderType">
+      <h3 style="text-align: center; margin-bottom: 24px;">هتستلم طلبك إزاي؟</h3>
+      <div class="big-order-types">
+        
+        <div class="big-ot-card" data-type="دليفري">
+          <div class="bot-icon-wrap"><span class="bot-icon delivery-icon">🛵</span></div>
+          <span class="bot-text">دليفري</span>
         </div>
-      </label>
-      <label class="ot-card">
-        <input type="radio" name="orderType" value="تيك أواي">
-        <div class="ot-content">
-          <span class="ot-icon">🛍️</span>
-          <span class="ot-text">تيك أواي</span>
+        
+        <div class="big-ot-card" data-type="تيك أواي">
+          <div class="bot-icon-wrap"><span class="bot-icon takeaway-icon">🛍️</span></div>
+          <span class="bot-text">تيك أواي</span>
         </div>
-      </label>
-      <label class="ot-card">
-        <input type="radio" name="orderType" value="صالة">
-        <div class="ot-content">
-          <span class="ot-icon">🍽️</span>
-          <span class="ot-text">صالة</span>
+        
+        <div class="big-ot-card" data-type="صالة">
+          <div class="bot-icon-wrap"><span class="bot-icon dinein-icon">🍽️</span></div>
+          <span class="bot-text">صالة</span>
         </div>
-      </label>
+        
+      </div>
     </div>
 
-    <div class="field"><label for="custName">الاسم</label><input id="custName" type="text" placeholder="اسمك بالكامل"></div>
-    <div class="field" id="phoneField"><label for="custPhone">رقم الموبايل</label><input id="custPhone" type="tel" placeholder="01xxxxxxxxx"></div>
+<div id="step2-OrderForm" style="display: none; opacity: 0; transition: opacity 0.4s ease;">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
     
-    <div class="field" id="addressField"><label for="custAddress">العنوان بالتفصيل</label><textarea id="custAddress" rows="2" placeholder="الحي، الشارع، رقم العمارة/الدور"></textarea></div>
-    
-    <div class="field" id="tableField" style="display: none;"><label for="custTable">رقم الترابيزة</label><input id="custTable" type="number" placeholder="أدخل رقم الترابيزة"></div>
-    
-    <div class="field"><label for="custNotes">ملاحظات (اختياري)</label><textarea id="custNotes" rows="2" placeholder="مثال : هحاسب ڤودافون كاش، بدون اتصال..."></textarea></div>
-    
-    <button class="btn btn-whatsapp btn-block" id="sendOrderBtn">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
-      إرسال الطلب على واتساب
+    <button id="backToStep1" class="back-btn" aria-label="رجوع">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- السهم متجه لليمين عشان ده عربي RTL (رجوع) -->
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
     </button>
+    
+    <h3 style="margin: 0;">بيانات <span id="selectedTypeText" style="color: var(--gold);">الطلب</span></h3>
+  </div>
+      <input type="hidden" id="finalOrderType" value="دليفري">
+      
+      <div class="field"><label for="custName">الاسم</label><input id="custName" type="text" placeholder="اسمك بالكامل"></div>
+      <div class="field" id="phoneField"><label for="custPhone">رقم الموبايل</label><input id="custPhone" type="tel" placeholder="01xxxxxxxxx"></div>
+      <div class="field" id="addressField"><label for="custAddress">العنوان بالتفصيل</label><textarea id="custAddress" rows="2" placeholder="الحي، الشارع، رقم العمارة/الدور"></textarea></div>
+      <div class="field" id="tableField" style="display: none;"><label for="custTable">رقم الترابيزة</label><input id="custTable" type="number" placeholder="أدخل رقم الترابيزة"></div>
+      <div class="field"><label for="custNotes">ملاحظات (اختياري)</label><textarea id="custNotes" rows="2" placeholder="مثال : هحاسب ڤودافون كاش..."></textarea></div>
+      
+      <button class="btn btn-whatsapp btn-block" id="sendOrderBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+        إرسال الطلب على واتساب
+      </button>
+    </div>
   </div>
 </div>
 
@@ -2368,24 +2422,104 @@ function openCheckoutModal(){
   checkoutModal.classList.add('show'); 
   overlayBg.classList.add('show');
 }
-function closeCheckoutModal(){ checkoutModal.classList.remove('show'); overlayBg.classList.remove('show'); }
 document.getElementById('checkoutBtn').addEventListener('click', openCheckoutModal);
 document.getElementById('modalCloseBtn').addEventListener('click', closeCheckoutModal);
 
-// إرسال الطلب وحفظه
-// إرسال الطلب وحفظه
+/* ================== منطق النافذة الحركية (Step 1 & Step 2) ================== */
+const step1 = document.getElementById('step1-OrderType');
+const step2 = document.getElementById('step2-OrderForm');
+const backBtn = document.getElementById('backToStep1');
+const typeText = document.getElementById('selectedTypeText');
+const finalTypeInput = document.getElementById('finalOrderType');
+
+// لما العميل يدوس على كارت من الكروت
+document.querySelectorAll('.big-ot-card').forEach(card => {
+  card.addEventListener('click', function(e) {
+    // لمنع العميل يدوس مرتين ورا بعض ويبوظ الأنيميشن
+    if(this.classList.contains('is-animating')) return;
+    
+    const type = this.dataset.type;
+    finalTypeInput.value = type;
+
+    // نقفل الكروت مؤقتاً عشان الأنيميشن ياخد وقته
+    document.querySelectorAll('.big-ot-card').forEach(c => c.classList.add('is-animating'));
+
+    // تشغيل الأنيميشن المناسب
+    if (type === 'دليفري') this.classList.add('animating-delivery');
+    else if (type === 'تيك أواي') this.classList.add('animating-takeaway');
+    else if (type === 'صالة') this.classList.add('animating-dinein');
+
+    // تأخير النقل للخطوة التانية 750 مللي ثانية (عشان الأنيميشن يكمل براحته)
+    setTimeout(() => {
+      step1.style.display = 'none';
+      step2.style.display = 'block';
+      
+      // ريفريش خفيف عشان تأثير الظهور
+      requestAnimationFrame(() => {
+        step2.style.opacity = '1';
+      });
+
+      // تظهير الخانات حسب الاختيار
+      typeText.textContent = type;
+      const addressField = document.getElementById('addressField');
+      const tableField = document.getElementById('tableField');
+      const phoneField = document.getElementById('phoneField');
+
+      if (type === 'دليفري') {
+        addressField.style.display = 'block'; tableField.style.display = 'none'; phoneField.style.display = 'block';
+      } else if (type === 'تيك أواي') {
+        addressField.style.display = 'none'; tableField.style.display = 'none'; phoneField.style.display = 'block';
+      } else if (type === 'صالة') {
+        addressField.style.display = 'none'; tableField.style.display = 'block'; phoneField.style.display = 'none';
+      }
+
+      // تنظيف الكلاسات عشان لو داس "رجوع" يشتغل معاه تاني
+      this.classList.remove('animating-delivery', 'animating-takeaway', 'animating-dinein');
+      document.querySelectorAll('.big-ot-card').forEach(c => c.classList.remove('is-animating'));
+      
+    }, 750); // نفس مدة الـ CSS (0.7s) + شعرة صغيرة
+  });
+});
+
+// زرار الرجوع للخطوة الأولى
+backBtn.addEventListener('click', () => {
+  step2.style.opacity = '0';
+  setTimeout(() => {
+    step2.style.display = 'none';
+    step1.style.display = 'block';
+  }, 400);
+});
+
+// تصفير النافذة لما تتقفل عشان تفتح دايماً على الخطوة الأولى
+function resetCheckoutModal() {
+  step2.style.opacity = '0';
+  step2.style.display = 'none';
+  step1.style.display = 'block';
+}
+
+// تعديل الدالة القديمة بتاعة إغلاق النافذة
+function closeCheckoutModal(){ 
+  checkoutModal.classList.remove('show'); 
+  overlayBg.classList.remove('show'); 
+  setTimeout(resetCheckoutModal, 300); // بيرست النافذة وهي بتختفي
+}
+
+
+/* ================== إرسال الطلب لواتساب (محدث) ================== */
 document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const address = document.getElementById('custAddress').value.trim();
+  const table = document.getElementById('custTable') ? document.getElementById('custTable').value.trim() : '';
   const notes = document.getElementById('custNotes').value.trim();
   const couponCode = document.getElementById('cartCouponInput') ? document.getElementById('cartCouponInput').value.trim().toUpperCase() : '';
-  
-  localStorage.setItem('savor_custName', name);
-  localStorage.setItem('savor_custPhone', phone);
-  localStorage.setItem('savor_custAddress', address);
+  const orderType = finalTypeInput.value; // بيقرا النوع اللي اتسجل في الخطوة الأولى
 
-  if(!name || !phone || !address){ showToast('من فضلك اكتب الاسم، الموبايل والعنوان 📝'); return; }
+  // تحقق من البيانات
+  if(!name){ showToast('من فضلك اكتب الاسم 📝'); return; }
+  if(orderType === 'دليفري' && (!phone || !address)){ showToast('من فضلك اكتب الموبايل والعنوان 📝'); return; }
+  if(orderType === 'تيك أواي' && !phone){ showToast('من فضلك اكتب الموبايل للتواصل 📝'); return; }
+  if(orderType === 'صالة' && !table){ showToast('من فضلك اكتب رقم الترابيزة 📝'); return; }
 
   const btn = document.getElementById('sendOrderBtn');
   btn.innerHTML = 'جاري إرسال الطلب...';
@@ -2396,60 +2530,40 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(validDiscount >= subTotal) { validDiscount = subTotal; }
   const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
 
-  // 1. بناء رسالة الواتساب مع تضمين بيانات العميل، المنتجات، ملاحظات المنتجات، والملاحظات العامة
-  let msg = `مرحبا SAVOR، عندي أوردر جديد:\n\n`;
+  // تجهيز الرسالة
+  let msg = `مرحبا SAVOR، عندي أوردر جديد:\n`;
+  msg += `📍 نوع الطلب: *${orderType}*\n\n`;
   
   cart.forEach(item => { 
     msg += `• ${item.name}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; 
-    if(item.notes) {
-      msg += `   └ ملاحظة المنتج: ${item.notes}\n`; 
-    }
+    if(item.notes) msg += `   └ ملاحظة: ${item.notes}\n`; 
   });
   
   msg += `\n-------------------\n`;
   msg += `المجموع الفرعي: ${subTotal} ج.م\n`;
-  if(validDiscount > 0) {
-      msg += `الخصم: -${validDiscount} ج.م (كوبون: ${couponCode})\n`;
-  }
-  msg += `الإجمالي النهائي: ${finalTotal} ج.م\n`;
+  if(validDiscount > 0) msg += `الخصم: -${validDiscount} ج.م (كوبون: ${couponCode})\n`;
+  msg += `الإجمالي النهائي: *${finalTotal} ج.م*\n`;
   msg += `-------------------\n\n`;
   msg += `👤 الاسم: ${name}\n`;
-  msg += `📱 الموبايل: ${phone}\n`;
-  msg += `📍 العنوان: ${address}\n`;
-  if(notes) {
-    msg += `📝 ملاحظات التوصيل: ${notes}\n`;
-  }
+  if(orderType === 'دليفري' || orderType === 'تيك أواي') msg += `📱 الموبايل: ${phone}\n`;
+  if(orderType === 'دليفري') msg += `🏠 العنوان: ${address}\n`;
+  if(orderType === 'صالة') msg += `🍽️ رقم الترابيزة: ${table}\n`;
+  if(notes) msg += `📝 ملاحظات إضافية: ${notes}\n`;
 
-  // 2. حفظ الطلب في فايربيز (للوحة التحكم) ثم التحويل للواتساب في خطوتين لضمان عدم الضياع
+  // حفظ في فايربيز والتوجه لواتساب
   db.collection('orders').add({
-    customerName: name, 
-    phone: phone, 
-    address: address, 
-    notes: notes,
+    orderType: orderType,
+    customerName: name, phone: phone, address: address, table: table, notes: notes,
     couponCode: validDiscount > 0 ? couponCode : "",
     discount: validDiscount,
     items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [ملاحظة: '+i.notes+']' : ''}`).join('، '),
-    total: finalTotal,
-    status: 'new', 
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    cart = []; 
-    currentDiscountValue = 0; 
-    if(document.getElementById('cartCouponInput')) document.getElementById('cartCouponInput').value = ''; 
-    saveCart(); 
-    renderCart(); 
-    closeCheckoutModal();
-    btn.innerHTML = 'إرسال الطلب على واتساب'; 
-    btn.disabled = false;
-    
-    // الانتقال للواتساب بالرسالة الكاملة
+    total: finalTotal, status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    cart = []; currentDiscountValue = 0; saveCart(); renderCart(); closeCheckoutModal();
+    btn.innerHTML = 'إرسال الطلب على واتساب'; btn.disabled = false;
     window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
-  })
-  .catch(err => {
-    // حتى لو حدث خطأ في قاعدة البيانات، يتم فتح الواتساب بالطلب أيضاً لضمان راحة العميل
-    btn.innerHTML = 'إرسال الطلب على واتساب'; 
-    btn.disabled = false;
+  }).catch(err => {
+    btn.innerHTML = 'إرسال الطلب على واتساب'; btn.disabled = false;
     window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
   });
 });
