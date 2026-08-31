@@ -17,8 +17,18 @@
     user-select: none;
     -webkit-user-select: none; /* لدعم سفاري وآيفون */
 }
-
-
+.hero-inner p.lead {
+  margin-bottom: 20px !important; 
+}
+.trust-strip {
+  margin-top: 10px !important;
+  justify-content: flex-start !important; 
+}
+body.dark-mode #pmItemNotes {
+  border-color: #333333;
+  color: #ffffff;
+  background: #1a1a1a;
+}
 .pm-qty-stepper, .qty-stepper, .pm-qty-stepper span, .qty-stepper span {
     user-select: none !important;
     -webkit-user-select: none !important;
@@ -1194,8 +1204,8 @@ body.dark-mode .item-card.sold-out::after {
 
     <div class="trust-strip">
       <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M3 13h1v6a1 1 0 001 1h1v-3h12v3h1a1 1 0 001-1v-6h1l-2-7H5l-2 7z"/></svg> توصيل أسرع</div>
-            <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M3 13h1v6a1 1 0 001 1h1v-3h12v3h1a1 1 0 001-1v-6h1l-2-7H5l-2 7z"/></svg> طلبك أسهل</div>
-      <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.6 8 12 8 12s8-6.4 8-12c0-4.4-3.6-8-8-8z"/></svg>مرسي مطروح</div>
+      <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M3 13h1v6a1 1 0 001 1h1v-3h12v3h1a1 1 0 001-1v-6h1l-2-7H5l-2 7z"/></svg> طلبك أسهل</div>
+      <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.6 8 12 8 12s8-6.4 8-12c0-4.4-3.6-8-8-8 z"/></svg> مرسي مطروح</div>
     </div>
   </div>
 </section>
@@ -1454,7 +1464,10 @@ body.dark-mode .item-card.sold-out::after {
         <div class="pm-sizes" id="pmSizesList">
           </div>
       </div>
-
+<div class="field" style="margin-bottom: 16px;">
+  <label for="pmItemNotes" style="font-weight: 700; font-size: 14px; margin-bottom: 7px; color: var(--green-deep);">ملاحظات المنتج (اختياري)</label>
+  <textarea id="pmItemNotes" rows="2" placeholder="مثال: بدون طماطم، صوص زيادة..." style="width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 14px; font-family: inherit; font-size: 14px; background: var(--paper); color: var(--ink); resize: none;"></textarea>
+</div>
       <div class="pm-action-bar">
       <div class="pm-qty-stepper">
   <button type="button" id="pmQtyMinus">−</button>
@@ -1853,7 +1866,7 @@ function openProductModal(catIdx, itemIdx) {
   activePmCat = MENU[catIdx];
   activePmItem = activePmCat.items[itemIdx];
   activePmQty = 1;
-
+document.getElementById('pmItemNotes').value = '';
   document.getElementById('pmImage').src = activePmItem.image || 'assets/logo.jpg';
   document.getElementById('pmTitle').textContent = activePmItem.name;
   document.getElementById('pmQtyVal').textContent = activePmQty;
@@ -1961,10 +1974,12 @@ document.getElementById('pmShareBtn').addEventListener('click', async () => {
 
 document.getElementById('pmAddToCartBtn').addEventListener('click', () => {
   const price = activePmItem.sizes ? activePmItem.sizes[activePmSize] : activePmItem.price;
+  const itemNotes = document.getElementById('pmItemNotes').value.trim(); 
   addToCart({
     cat: activePmCat.nameAr, name: activePmItem.name,
     size: activePmSize ? (SIZE_LABELS[activePmSize] || activePmSize) : null,
-    price: price, qty: activePmQty
+    price: price, qty: activePmQty,
+    notes: itemNotes 
   });
   document.getElementById('productModal').classList.remove('show');
   document.getElementById('overlayBg').classList.remove('show');
@@ -2042,17 +2057,19 @@ function renderCart(){
     currentDiscountValue = 0; 
     if(document.getElementById('cartCouponInput')) document.getElementById('cartCouponInput').value = '';
     if(document.getElementById('couponMsg')) document.getElementById('couponMsg').textContent = '';
-  } else {
+} else {
     body.innerHTML = cart.map((item,idx)=>`
       <div class="cart-row">
         <button class="cr-remove" onclick="removeFromCart(${idx})">✕</button>
-   <div class="qty-stepper">
-  <button type="button" onclick="changeCartQty(${idx},1)">+</button>
-  <span class="qty-val">${item.qty}</span>
-  <button type="button" onclick="changeCartQty(${idx},-1)">−</button>
-</div>
+        <div class="qty-stepper">
+          <button type="button" onclick="changeCartQty(${idx},1)">+</button>
+          <span class="qty-val">${item.qty}</span>
+          <button type="button" onclick="changeCartQty(${idx},-1)">−</button>
+        </div>
         <div class="cr-info" style="text-align:left;">
           <div class="cr-name">${item.name}</div>
+          <div class="cr-size">${item.size ? 'الحجم: ' + item.size : ''}</div>
+          ${item.notes ? `<div style="font-size: 11px; color: var(--tomato); margin-top: 2px;">ملاحظة: ${item.notes}</div>` : ''}
           <div class="cr-price">${item.qty} × ${item.price} ج.م = ${item.price*item.qty} ج.م</div>
         </div>
       </div>`).join('');
@@ -2197,15 +2214,11 @@ localStorage.setItem('savor_custName', name);
   if(validDiscount >= subTotal) { validDiscount = subTotal; }
   const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
 
-  let msg = `مرحبا SAVOR، ممكن أطلب أوردر :\n\n`;
-  cart.forEach(item=>{ msg += `• ${item.name}${item.size?' ('+item.size+')':''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; });
-  
-  msg += `\nالمجموع الفرعي: ${subTotal} ج.م`;
-  if(validDiscount > 0) {
-      msg += `\nالخصم: -${validDiscount} ج.م (كوبون: ${couponCode})`;
-  }
-  msg += `\nالإجمالي النهائي: ${finalTotal} ج.م\n\nالاسم: ${name}\nرقم الموبايل: ${phone}\nالعنوان: ${address}\n`;
-  if(notes) msg += `ملاحظات: ${notes}\n`;
+let msg = `مرحبا SAVOR، ممكن أطلب أوردر :\n\n`;
+  cart.forEach(item=>{ 
+    msg += `• ${item.name}${item.size?' ('+item.size+')':''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; 
+    if(item.notes) msg + `   └ ملاحظة: ${item.notes}\n`; // إضافة ملاحظة المنتج للرسالة
+  });
 
   db.collection('orders').add({
     customerName: name, 
@@ -2214,8 +2227,7 @@ localStorage.setItem('savor_custName', name);
     notes: notes,
     couponCode: validDiscount > 0 ? couponCode : "",
     discount: validDiscount,
-    items: cart.map(i => `${i.name} ${i.size?'('+i.size+')':''} x${i.qty}`).join('، '),
-    total: finalTotal,
+items: cart.map(i => `${i.name} ${i.size?'('+i.size+')':''} x${i.qty} ${i.notes ? '[ملاحظة: '+i.notes+']' : ''}`).join('، '),    total: finalTotal,
     status: 'new', 
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
