@@ -13,6 +13,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  .pm-qty-stepper {
+    user-select: none;
+    -webkit-user-select: none; /* لدعم سفاري وآيفون */
+}
+.pm-qty-stepper button {
+    touch-action: manipulation;
+}
+@media (hover: hover) {
+    .pm-qty-stepper button:hover {
+        /* أي تأثير إضافي هنا */
+    }
+}
   .fab-stack {
   transition: opacity 0.3s ease, pointer-events 0s !important;
 }
