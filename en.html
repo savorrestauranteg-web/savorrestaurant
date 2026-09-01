@@ -59,14 +59,14 @@
     background:var(--green); border-bottom:1px solid var(--line-light);
     box-shadow:0 10px 26px -18px rgba(0,0,0,.5);
   }
-  .nav-wrap {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 12px 0 !important; 
-    width: 100%;
-    gap: 10px;
-  }
+ .nav-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 20px !important; 
+  width: 100%;
+  gap: 15px;
+}
   nav.links {
     display: flex;
     gap: 30px;
@@ -530,15 +530,47 @@
   }
 
   @media (max-width: 520px) {
-    .nav-actions { gap: 6px !important; }
-    .icon-btn { width: 34px !important; height: 34px !important; }
-    .icon-btn svg { width: 16px !important; height: 16px !important; }
-    .lang-pill { height: 34px !important; }
-    .lang-pill a { padding: 0 8px !important; font-size: 12px !important; gap: 4px !important; }
-    .brand img { height: 36px !important; }
+    .nav-wrap {
+    padding: 12px 16px !important; 
+    gap: 8px !important;
+  }
+  header.site .nav-wrap {
+    padding: 10px 18px !important;
+    gap: 6px !important;
+  }
+  header.site .icon-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  header.site .icon-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+  header.site .lang-pill {
+    height: 32px !important;
+  }
+  header.site .lang-pill a {
+    padding: 0 6px !important;
+    font-size: 11px !important;
+    gap: 3px !important;
+  }
+  header.site .brand img {
+    height: 34px !important;
+  }
+    .nav-actions { 
+    gap: 5px !important; 
+  }
+    .icon-btn { width: 32px !important; height: 32px !important; }
+  .icon-btn svg { width: 15px !important; height: 15px !important; }
+  
+  .lang-pill { height: 32px !important; }
+  .lang-pill a { padding: 0 6px !important; font-size: 11px !important; gap: 3px !important; }
+  
+  .brand img { height: 32px !important; }
     .hero{min-height:94vh;}
-    .hero-inner{padding:60px 0 40px;}
-    .trust-strip{gap:10px;}
+.hero-inner {
+  padding: 60px 20px 40px !important;
+}    .trust-strip{gap:10px;}
     .trust-chip{font-size:12.5px; padding:9px 14px;}
   }
 </style>
