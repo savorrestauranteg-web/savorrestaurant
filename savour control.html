@@ -171,45 +171,51 @@
           <button onclick="saveItemsOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-4 rounded-xl font-bold text-lg transition shadow-md">💾 حفظ ترتيب المنتجات</button>
         </div>
 
-        <!-- فورم إضافة منتج جديد متقدمة -->
-        <div id="menu-add-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-amber-200">
-          <h3 class="text-xl font-bold mb-6" style="color: #0c3d30;">تفاصيل المنتج الجديد</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label class="block text-sm font-bold mb-2">القسم</label>
-              <select id="newItemCategory" class="w-full p-3 rounded-xl border border-slate-300">
-                <option value="beefburger">برجر لحمة</option>
-                <option value="chickencrispy">تشيكن كرسبي</option>
-                <option value="tortillapotato">تورتيلا بطاطس</option>
-                <option value="drinks">مشروبات</option>
-                <option value="fries">بطاطس</option>
-                <option value="chickenpasta">مكرونة تشيكن كرسبي</option>
-                <option value="tortillachicken">تورتيلا تشيكن كرسبي</option>
-                <option value="tortillabeef">تورتيلا لحمة</option>
-                <option value="additions">إضافات</option>
-              </select>
-            </div>
-            <div><label class="block text-sm font-bold mb-2">اسم المنتج</label><input type="text" id="newItemName" class="w-full p-3 rounded-xl border border-slate-300"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">المكونات / الوصف (اختياري)</label><textarea id="newItemDesc" rows="2" class="w-full p-3 rounded-xl border border-slate-300"></textarea></div>
-            
-            <div class="md:col-span-2 p-4 bg-slate-100 rounded-xl">
-              <label class="block text-sm font-bold mb-4">التسعير والأحجام (اكتب السعر قدام الحجم المطلوب، أو استخدم السعر الثابت)</label>
-<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-  <div><small>سعر ثابت</small><input type="number" id="priceFixed" class="w-full p-2 border rounded"></div>
-  <div><small>سمول (S)</small><input type="number" id="priceS" class="w-full p-2 border rounded"></div>
-  <div><small>لارج (L)</small><input type="number" id="priceL" class="w-full p-2 border rounded"></div>
-  <div><small>دابل (D)</small><input type="number" id="priceD" class="w-full p-2 border rounded"></div>
-  <div><small>اكس لارج (XL)</small><input type="number" id="priceXL" class="w-full p-2 border rounded"></div>
+   <div id="menu-add-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-amber-200">
+  <h3 class="text-xl font-bold mb-6" style="color: #0c3d30;">تفاصيل المنتج الجديد</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <label class="block text-sm font-bold mb-2">القسم</label>
+      <select id="newItemCategory" class="w-full p-3 rounded-xl border border-slate-300">
+        <option value="beefburger">برجر لحمة</option>
+        <option value="chickencrispy">تشيكن كرسبي</option>
+        <option value="tortillapotato">تورتيلا بطاطس</option>
+        <option value="drinks">مشروبات</option>
+        <option value="fries">بطاطس</option>
+        <option value="chickenpasta">مكرونة تشيكن كرسبي</option>
+        <option value="tortillachicken">تورتيلا تشيكن كرسبي</option>
+        <option value="tortillabeef">تورتيلا لحمة</option>
+        <option value="additions">إضافات</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-bold mb-2">اسم المنتج (عربي)</label>
+      <input type="text" id="newItemName" class="w-full p-3 rounded-xl border border-slate-300">
+    </div>
+    <div>
+      <label class="block text-sm font-bold mb-2">اسم المنتج (انجليزي - اختياري)</label>
+      <input type="text" id="newItemNameEn" placeholder="Example: Beef Burger" class="w-full p-3 rounded-xl border border-slate-300" dir="ltr">
+    </div>
+    <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">المكونات / الوصف (اختياري)</label><textarea id="newItemDesc" rows="2" class="w-full p-3 rounded-xl border border-slate-300"></textarea></div>
+    
+    <div class="md:col-span-2 p-4 bg-slate-100 rounded-xl">
+      <label class="block text-sm font-bold mb-4">التسعير والأحجام (اكتب السعر قدام الحجم المطلوب، أو استخدم السعر الثابت)</label>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div><small>سعر ثابت</small><input type="number" id="priceFixed" class="w-full p-2 border rounded"></div>
+        <div><small>سمول (S)</small><input type="number" id="priceS" class="w-full p-2 border rounded"></div>
+        <div><small>لارج (L)</small><input type="number" id="priceL" class="w-full p-2 border rounded"></div>
+        <div><small>دابل (D)</small><input type="number" id="priceD" class="w-full p-2 border rounded"></div>
+        <div><small>اكس لارج (XL)</small><input type="number" id="priceXL" class="w-full p-2 border rounded"></div>
+      </div>
+    </div>
+    
+    <div class="md:col-span-2">
+      <label class="block text-sm font-bold mb-2">صورة المنتج</label>
+      <input type="file" id="newItemImage" accept="image/*" class="w-full p-2 border rounded-xl">
+    </div>
+  </div>
+  <button onclick="addNewItem()" id="saveItemBtn" class="w-full text-white py-4 rounded-xl font-bold" style="background-color: #e2a530; color: #0c3d30;">💾 حفظ المنتج وإضافته للمنيو</button>
 </div>
-        
-            
-            <div class="md:col-span-2">
-              <label class="block text-sm font-bold mb-2">صورة المنتج</label>
-              <input type="file" id="newItemImage" accept="image/*" class="w-full p-2 border rounded-xl">
-            </div>
-          </div>
-          <button onclick="addNewItem()" id="saveItemBtn" class="w-full text-white py-4 rounded-xl font-bold" style="background-color: #e2a530; color: #0c3d30;">💾 حفظ المنتج وإضافته للمنيو</button>
-        </div>
       </section>
 
       <!-- قسم الكوبونات -->
