@@ -1617,6 +1617,7 @@ body.dark-mode .field textarea::placeholder {
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
         <div>
           <h3 class="pm-title" id="pmTitle" style="margin-bottom: 4px;">اسم المنتج</h3>
+          <p id="pmDescription" style="font-size: 14px; color: #8a8272; margin-top: 0; margin-bottom: 12px; line-height: 1.6;"></p>
           <div class="pm-vendor">ساڤور</div>
         </div>
         <button id="pmShareBtn" style="background: var(--cream-2); border: 1px solid var(--line); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--green-deep); cursor: pointer; transition: 0.2s;" aria-label="مشاركة">
@@ -2005,8 +2006,9 @@ function renderItemCard(cat, item){
 
   return `
 <div class="${cardClass}" onclick="${clickAction}" style="--delay: ${delay}s;">      ${item.badge ? `<span class="badge">⭐ ${item.badge}</span>` : ''}
-      <img src="${imgSrc}" alt="${item.name}" loading="lazy">
+<img src="${imgSrc}" alt="${item.name}" loading="lazy">
       <div class="item-name">${item.name}</div>
+      ${item.description ? `<div style="font-size: 13px; color: #8a8272; margin-top: -6px; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${item.description}</div>` : ''}
       <div class="item-foot" style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: auto;">
         <div class="price-tag" style="color: #8a8272; margin: 0;"> السعر  <span style="color: var(--tomato);">${startPrice}</span> <small>ج.م</small></div>
         <button type="button" class="add-btn" style="flex: unset; padding: 8px 14px; font-size: 13px;" onclick="event.stopPropagation(); ${clickAction}">
@@ -2075,6 +2077,13 @@ function openProductModal(catIdx, itemIdx) {
 document.getElementById('pmItemNotes').value = '';
   document.getElementById('pmImage').src = activePmItem.image || 'assets/logo.jpg';
   document.getElementById('pmTitle').textContent = activePmItem.name;
+  const descEl = document.getElementById('pmDescription');
+  if (activePmItem.description) {
+    descEl.textContent = activePmItem.description;
+    descEl.style.display = 'block';
+  } else {
+    descEl.style.display = 'none';
+  }
   document.getElementById('pmQtyVal').textContent = activePmQty;
   
   let validSizes = [];
