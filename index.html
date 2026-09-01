@@ -800,9 +800,9 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  position: relative !important; /* مهم جداً عشان التوسيط يشتغل */
   padding: 12px 20px;
   width: 100%;
+  gap: 20px; /* مسافة أمان بتضمن إن مفيش حاجة تلزق في التانية */
 }
   .brand{display:flex; align-items:center; gap:10px;}
   .brand img{height:44px; width:auto; border-radius:8px;}
@@ -812,11 +812,10 @@ nav.links {
   display: flex;
   gap: 30px;
   align-items: center;
-  position: absolute !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important; /* ده اللي بيجيبها في السنتر بالمللي */
-  z-index: 2;
-}  nav.links a{color:var(--cream); font-weight:700; font-size:15px; position:relative; padding:6px 2px;}
+  justify-content: center;
+  flex: 1; 
+}
+ nav.links a{color:var(--cream); font-weight:700; font-size:15px; position:relative; padding:6px 2px;}
   nav.links a::after{content:"";position:absolute; right:0; bottom:-2px; width:0; height:2px; background:var(--gold); transition:width .25s;}
   nav.links a:hover::after{width:100%;}
 .nav-actions {
@@ -824,10 +823,9 @@ nav.links {
   align-items: center;
   gap: 12px;
   flex-shrink: 0; 
-  z-index: 5;
 }
 .brand {
-  z-index: 5;
+  flex-shrink: 0;
 }
   .icon-btn{
     display:flex; align-items:center; justify-content:center;
