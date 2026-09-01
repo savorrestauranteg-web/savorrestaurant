@@ -2510,7 +2510,7 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(validDiscount >= subTotal) { validDiscount = subTotal; }
   const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
 
-  let msg = `مرحبا SAVOR، عندي أوردر جديد:\n`;
+  let msg = `مرحبا SAVOR، ممكن أطلب أوردر:\n`;
   msg += `📍 نوع الطلب: *${orderType}*\n\n`;
   
   cart.forEach(item => { 

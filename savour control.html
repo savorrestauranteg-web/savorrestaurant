@@ -117,10 +117,11 @@
           </div>
 
            <table class="w-full text-right border-collapse">
-            <thead>
+       <thead>
               <tr class="border-b bg-slate-100 text-slate-700 text-sm">
                 <th class="p-3">الصورة</th>
                 <th class="p-3">اسم المنتج</th>
+                <th class="p-3">المكونات</th>
                 <th class="p-3">السعر / الأسعار (ج.م)</th>
                 <th class="p-3">تغيير الصورة</th>
                 <th class="p-3">الحالة</th>
@@ -177,14 +178,14 @@
             
             <div class="md:col-span-2 p-4 bg-slate-100 rounded-xl">
               <label class="block text-sm font-bold mb-4">التسعير والأحجام (اكتب السعر قدام الحجم المطلوب، أو استخدم السعر الثابت)</label>
-              <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div><small>سعر ثابت</small><input type="number" id="priceFixed" class="w-full p-2 border rounded"></div>
-                <div><small>صغير (S)</small><input type="number" id="priceS" class="w-full p-2 border rounded"></div>
-                <div><small>كبير (L)</small><input type="number" id="priceL" class="w-full p-2 border rounded"></div>
-                <div><small>دبل (D)</small><input type="number" id="priceD" class="w-full p-2 border rounded"></div>
-                <div><small>اكس لارج (XL)</small><input type="number" id="priceXL" class="w-full p-2 border rounded"></div>
-              </div>
-            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+  <div><small>سعر ثابت</small><input type="number" id="priceFixed" class="w-full p-2 border rounded"></div>
+  <div class="flex flex-col gap-1"><input type="text" id="sizeName1" placeholder="اسم الحجم 1 (مثال: وسط)" class="p-1 border rounded text-xs"><input type="number" id="sizePrice1" placeholder="السعر" class="p-2 border rounded"></div>
+  <div class="flex flex-col gap-1"><input type="text" id="sizeName2" placeholder="اسم الحجم 2" class="p-1 border rounded text-xs"><input type="number" id="sizePrice2" placeholder="السعر" class="p-2 border rounded"></div>
+  <div class="flex flex-col gap-1"><input type="text" id="sizeName3" placeholder="اسم الحجم 3" class="p-1 border rounded text-xs"><input type="number" id="sizePrice3" placeholder="السعر" class="p-2 border rounded"></div>
+  <div class="flex flex-col gap-1"><input type="text" id="sizeName4" placeholder="اسم الحجم 4" class="p-1 border rounded text-xs"><input type="number" id="sizePrice4" placeholder="السعر" class="p-2 border rounded"></div>
+</div>
+        
             
             <div class="md:col-span-2">
               <label class="block text-sm font-bold mb-2">صورة المنتج</label>
@@ -518,19 +519,29 @@ if (doc.id === 'categoriesData' || doc.id === 'categoriesOrder' || doc.id === 's
       
       data.forEach(item => {
         const imgSrc = item.image || 'https://placehold.co/100x100?text=Savor';
-        let priceFieldHTML = item.sizes ? `
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div><span class="text-slate-500">S:</span> <input type="number" id="price_s_${item.id}" value="${item.sizes.S || ''}" class="w-full p-1 border rounded"></div>
-            <div><span class="text-slate-500">L:</span> <input type="number" id="price_l_${item.id}" value="${item.sizes.L || ''}" class="w-full p-1 border rounded"></div>
-            <div><span class="text-slate-500">D:</span> <input type="number" id="price_d_${item.id}" value="${item.sizes.D || ''}" class="w-full p-1 border rounded"></div>
-            <div><span class="text-slate-500">XL:</span> <input type="number" id="price_xl_${item.id}" value="${item.sizes.XL || ''}" class="w-full p-1 border rounded"></div>
-          </div>
-        ` : `<div><input type="number" id="price_fixed_${item.id}" value="${item.price || 0}" class="w-full p-2 border rounded text-sm"></div>`;
+        let priceFieldHTML = '';
+        if (item.sizes && Object.keys(item.sizes).length > 0) {
+          let sizesInputs = '';
+          let sizeIndex = 0;
+          for (const [sizeName, sizePrice] of Object.entries(item.sizes)) {
+            sizesInputs += `
+              <div class="mb-1 flex gap-1">
+                <input type="text" id="edit_size_name_${item.id}_${sizeIndex}" value="${sizeName}" class="w-1/2 p-1 border rounded text-xs bg-slate-50">
+                <input type="number" id="edit_size_price_${item.id}_${sizeIndex}" value="${sizePrice}" class="w-1/2 p-1 border rounded text-xs">
+              </div>`;
+            sizeIndex++;
+          }
+          sizesInputs += `<input type="hidden" id="sizes_count_${item.id}" value="${sizeIndex}">`;
+          priceFieldHTML = `<div class="flex flex-col">${sizesInputs}</div>`;
+        } else {
+          priceFieldHTML = `<div><input type="number" id="price_fixed_${item.id}" value="${item.price || 0}" class="w-full p-2 border rounded text-sm"></div>`;
+        }
 
-        tbody.innerHTML += `
+       tbody.innerHTML += `
           <tr class="border-b">
             <td class="p-3"><img src="${imgSrc}" class="w-12 h-12 rounded object-cover"></td>
             <td class="p-3"><input type="text" id="name_${item.id}" value="${item.name}" class="w-full p-2 border rounded font-bold text-sm"></td>
+            <td class="p-3"><textarea id="desc_${item.id}" rows="2" class="w-full p-2 border rounded text-xs placeholder-slate-400" placeholder="اكتب المكونات هنا...">${item.description || ''}</textarea></td>
             <td class="p-3 w-48">${priceFieldHTML}</td>
             <td class="p-3"><input type="file" id="file_${item.id}" class="text-xs w-full" onchange="uploadImageToImgBB('${item.id}')"></td>
             <td class="p-3">
@@ -754,29 +765,30 @@ fetchCategories();  }
       });
     }
 
-    // --- تحديث بيانات المنتج الحالي (الاسم والسعر) ---
     function updateExistingItem(itemId, hasSizes) {
-      const newName = document.getElementById(`name_${itemId}`).value.trim();
+     const newName = document.getElementById(`name_${itemId}`).value.trim();
+      const newDesc = document.getElementById(`desc_${itemId}`).value.trim(); 
       if (!newName) return alert("اسم المنتج لا يمكن أن يكون فارغاً");
 
-      let updateData = { name: newName };
+  let updateData = { 
+        name: newName,
+        description: newDesc 
+      };
 
       if (hasSizes) {
         let sizes = {};
-        const sVal = document.getElementById(`price_s_${itemId}`).value;
-        const lVal = document.getElementById(`price_l_${itemId}`).value;
-        const dVal = document.getElementById(`price_d_${itemId}`).value;
-        const xlVal = document.getElementById(`price_xl_${itemId}`).value;
-
-      if (sVal && Number(sVal) > 0) sizes.S = Number(sVal);
-        if (lVal && Number(lVal) > 0) sizes.L = Number(lVal);
-        if (dVal && Number(dVal) > 0) sizes.D = Number(dVal);
-        if (xlVal && Number(xlVal) > 0) sizes.XL = Number(xlVal);
-
+        const countElement = document.getElementById(`sizes_count_${itemId}`);
+        if (countElement) {
+          const count = parseInt(countElement.value);
+          for (let i = 0; i < count; i++) {
+            const sName = document.getElementById(`edit_size_name_${itemId}_${i}`).value.trim();
+            const sPrice = document.getElementById(`edit_size_price_${itemId}_${i}`).value;
+            if (sName && sPrice) {
+              sizes[sName] = Number(sPrice);
+            }
+          }
+        }
         updateData.sizes = sizes;
-      } else {
-        const fixedVal = document.getElementById(`price_fixed_${itemId}`).value;
-        updateData.price = Number(fixedVal);
       }
 
       db.collection("menu").doc(itemId).update(updateData)
@@ -810,11 +822,13 @@ fetchCategories();  }
       
       let sizes = {};
       let price = document.getElementById('priceFixed').value;
-      if(document.getElementById('priceS').value) sizes.S = Number(document.getElementById('priceS').value);
-      if(document.getElementById('priceL').value) sizes.L = Number(document.getElementById('priceL').value);
-      if(document.getElementById('priceD').value) sizes.D = Number(document.getElementById('priceD').value);
-      if(document.getElementById('priceXL').value) sizes.XL = Number(document.getElementById('priceXL').value);
-
+      for (let i = 1; i <= 4; i++) {
+        let sName = document.getElementById('sizeName' + i).value.trim();
+        let sPrice = document.getElementById('sizePrice' + i).value;
+        if (sName && sPrice) {
+          sizes[sName] = Number(sPrice);
+        }
+      }
       if(!name) return alert("اكتب اسم المنتج");
 
       let imageUrl = '';
