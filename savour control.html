@@ -271,7 +271,6 @@
     const db = firebase.firestore();
 
 function fetchRestaurantStatus() {
-      // غيرنا المسار لـ menu و status
       db.collection("menu").doc("status").onSnapshot(doc => {
         const isOpen = doc.exists ? (doc.data().isOpen !== false) : true;
         const btn = document.getElementById('restaurantStatusBtn');
@@ -891,50 +890,72 @@ function switchMenuSubTab(tabName) {
       if(data.success) db.collection('menu').doc(itemId).update({ image: data.data.display_url });
     }
 
-    async function addNewItem() {
-      const btn = document.getElementById('saveItemBtn');
-      btn.innerText = "جاري الحفظ والرفع...";
-      
-      const category = document.getElementById('newItemCategory').value;
-      const name = document.getElementById('newItemName').value;
-      const desc = document.getElementById('newItemDesc').value;
-      const imageFile = document.getElementById('newItemImage').files[0];
-      
-      let sizes = {};
-      let price = document.getElementById('priceFixed').value;
-      for (let i = 1; i <= 4; i++) {
-        let sName = document.getElementById('sizeName' + i).value.trim();
-        let sPrice = document.getElementById('sizePrice' + i).value;
-        if (sName && sPrice) {
-          sizes[sName] = Number(sPrice);
-        }
-      }
-      if(!name) return alert("اكتب اسم المنتج");
+   async function addNewItem() {
+  const btn = document.getElementById('saveItemBtn');
+  btn.innerText = "جاري الحفظ والرفع...";
+  
+  const category = document.getElementById('newItemCategory').value;
+  const name = document.getElementById('newItemName').value;
+  const desc = document.getElementById('newItemDesc').value;
+  const imageFile = document.getElementById('newItemImage').files[0];
+  
+  // إصلاح تعليق الزر في حالة عدم كتابة اسم المنتج
+  if(!name) {
+    alert("اكتب اسم المنتج");
+    btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
+    return;
+  }
 
-      let imageUrl = '';
-      if(imageFile) {
-        const formData = new FormData(); formData.append('image', imageFile);
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
-        const data = await res.json();
-        if(data.success) imageUrl = data.data.display_url;
-      }
+  // قراءة الأحجام والأسعار بناءً على الـ HTML الفعلي
+  let sizes = {};
+  let price = document.getElementById('priceFixed').value;
+  
+  const pS = document.getElementById('priceS').value;
+  const pL = document.getElementById('priceL').value;
+  const pD = document.getElementById('priceD').value;
+  const pXL = document.getElementById('priceXL').value;
 
-      const itemData = {
-        name: name,
-        category: category,
-        description: desc,
-        status: 'available',
-        image: imageUrl
-      };
-      
-      if(Object.keys(sizes).length > 0) itemData.sizes = sizes;
-      else if(price) itemData.price = Number(price);
+  if (pS && Number(pS) > 0) sizes.S = Number(pS);
+  if (pL && Number(pL) > 0) sizes.L = Number(pL);
+  if (pD && Number(pD) > 0) sizes.D = Number(pD);
+  if (pXL && Number(pXL) > 0) sizes.XL = Number(pXL);
 
-      await db.collection("menu").add(itemData);
-      alert("تم إضافة المنتج بنجاح للموقع!");
-      btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
-      switchMenuSubTab('control');
-    }
+  let imageUrl = '';
+  if(imageFile) {
+    const formData = new FormData(); 
+    formData.append('image', imageFile);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
+    const data = await res.json();
+    if(data.success) imageUrl = data.data.display_url;
+  }
+
+  const itemData = {
+    name: name,
+    category: category,
+    description: desc,
+    status: 'available',
+    image: imageUrl
+  };
+  
+  if(Object.keys(sizes).length > 0) itemData.sizes = sizes;
+  else if(price) itemData.price = Number(price);
+
+  await db.collection("menu").add(itemData);
+  alert("تم إضافة المنتج بنجاح للموقع!");
+  btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
+  
+  // تفريغ الحقول بعد الإضافة (اختياري لراحة الاستخدام)
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemDesc').value = '';
+  document.getElementById('priceFixed').value = '';
+  document.getElementById('priceS').value = '';
+  document.getElementById('priceL').value = '';
+  document.getElementById('priceD').value = '';
+  document.getElementById('priceXL').value = '';
+  document.getElementById('newItemImage').value = '';
+
+  switchMenuSubTab('control');
+}
 
     function fetchCoupons() {
       db.collection("coupons").onSnapshot(snap => {
