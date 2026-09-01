@@ -1866,7 +1866,9 @@ db.collection("menu").onSnapshot(snapshot => {
     const category = MENU.find(c => c.id === item.category);
     if(category) category.items.push(item);
   });
-
+  MENU.forEach(cat => {
+    cat.items.sort((a, b) => (a.order || 999) - (b.order || 999));
+  });
   renderCatNav();
   renderMenuToHTML();
 

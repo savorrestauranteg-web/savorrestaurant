@@ -97,11 +97,12 @@
       <!-- قسم إدارة المنيو -->
       <section id="sec-menu" class="hidden">
         <h2 class="text-3xl font-bold mb-6" style="color: #0c3d30;">إدارة المنيو 🍔</h2>
-        
-        <div class="flex gap-6 mb-6 border-b border-slate-300">
+<div class="flex gap-6 mb-6 border-b border-slate-300 overflow-x-auto whitespace-nowrap">
           <button onclick="switchMenuSubTab('control')" id="subtab-control" class="pb-3 px-2 menu-tab-active">📋 التحكم في الأصناف</button>
           <button onclick="switchMenuSubTab('add')" id="subtab-add" class="pb-3 px-2 menu-tab-inactive">➕ إضافة منتج جديد</button>
-<button onclick="switchMenuSubTab('categories')" id="subtab-categories" class="pb-3 px-2 menu-tab-inactive">📂 إدارة الأقسام</button>        </div>
+          <button onclick="switchMenuSubTab('categories')" id="subtab-categories" class="pb-3 px-2 menu-tab-inactive">📂 إدارة الأقسام</button>
+          <button onclick="switchMenuSubTab('reorder')" id="subtab-reorder" class="pb-3 px-2 menu-tab-inactive">↕️ ترتيب المنتجات</button>
+        </div>
 
         <!-- جدول المنتجات وشريط البحث -->
         <div id="menu-control-section" class="block glass-panel rounded-2xl overflow-hidden p-4">
@@ -153,6 +154,21 @@
 
           <ul id="categoriesListUI" class="space-y-3"></ul>
           <button onclick="saveCategories()" class="w-full mt-6 bg-amber-600 hover:bg-amber-700 text-white py-4 rounded-xl font-bold text-lg transition">💾 حفظ التعديلات والترتيب</button>
+        </div>
+<!-- قسم ترتيب المنتجات -->
+        <div id="menu-reorder-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-slate-100">
+          <h3 class="text-xl font-bold mb-4" style="color: #0c3d30;">ترتيب المنتجات داخل القسم</h3>
+          <p class="text-slate-500 text-sm mb-6">اختار القسم، وبعدين رتب المنتجات بتاعته باستخدام الأسهم، ولما تخلص دوس حفظ الترتيب.</p>
+          
+          <div class="mb-6">
+            <select id="reorderCategorySelect" onchange="loadCategoryItemsForReorder()" class="w-full md:w-1/2 p-3 rounded-xl border border-slate-300 font-bold bg-slate-50 outline-none">
+              <option value="">-- اختر القسم أولاً --</option>
+            </select>
+          </div>
+
+          <ul id="reorderItemsListUI" class="space-y-3 mb-6"></ul>
+          
+          <button onclick="saveItemsOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-4 rounded-xl font-bold text-lg transition shadow-md">💾 حفظ ترتيب المنتجات</button>
         </div>
 
         <!-- فورم إضافة منتج جديد متقدمة -->
@@ -596,157 +612,232 @@ let priceFieldHTML = item.sizes ? `
     }
 
 function switchMenuSubTab(tabName) {
-  document.getElementById('menu-control-section').classList.add('hidden');
-  document.getElementById('menu-add-section').classList.add('hidden');
-  document.getElementById('menu-categories-section').classList.add('hidden'); 
-  
-  document.getElementById('menu-' + tabName + '-section').classList.remove('hidden');
-  
-  document.getElementById('subtab-control').className = "pb-3 px-2 " + (tabName==='control' ? 'menu-tab-active' : 'menu-tab-inactive');
-  document.getElementById('subtab-add').className = "pb-3 px-2 " + (tabName==='add' ? 'menu-tab-active' : 'menu-tab-inactive');
-  document.getElementById('subtab-categories').className = "pb-3 px-2 " + (tabName==='categories' ? 'menu-tab-active' : 'menu-tab-inactive'); 
-}
-// الأقسام الافتراضية كبداية للمطعم
-const DEFAULT_CATEGORIES = [
-  { id:'drinks', nameAr:'مشروبات', icon:'🥤', banner:'assets/drinks.jpg' },
-  { id:'fries', nameAr:'باكت بطاطس', icon:'🍟', banner:'assets/fries.jpg' },
-  { id:'beefburger', nameAr:'برجر لحمة', icon:'🍔', banner:'assets/beefburger.jpg' },
-  { id:'tortillapotato', nameAr:'تورتيلا بطاطس', icon:'🌯', banner:'assets/tortillapotato.jpg' },
-  { id:'chickencrispy', nameAr:'تشيكن كرسبي', icon:'🍗', banner:'assets/chickencrispy.jpg' },
-  { id:'chickenpasta', nameAr:'مكرونة تشيكن كرسبي', icon:'🍝', banner:'assets/chickenpasta.jpg' },
-  { id:'tortillachicken', nameAr:'تورتيلا تشيكن كرسبي', icon:'🌯', banner:'assets/tortillachicken.jpg' },
-  { id:'tortillabeef', nameAr:'تورتيلا لحمة', icon:'🌯', banner:'assets/tortillabeef.jpg' },
-  { id:'additions', nameAr:'إضافات', icon:'➕', banner:'assets/additions.jpg' }
-];
-let appCategories = [];
+      document.getElementById('menu-control-section').classList.add('hidden');
+      document.getElementById('menu-add-section').classList.add('hidden');
+      document.getElementById('menu-categories-section').classList.add('hidden'); 
+      document.getElementById('menu-reorder-section').classList.add('hidden'); 
+      
+      document.getElementById('menu-' + tabName + '-section').classList.remove('hidden');
+      
+      document.getElementById('subtab-control').className = "pb-3 px-2 " + (tabName==='control' ? 'menu-tab-active' : 'menu-tab-inactive');
+      document.getElementById('subtab-add').className = "pb-3 px-2 " + (tabName==='add' ? 'menu-tab-active' : 'menu-tab-inactive');
+      document.getElementById('subtab-categories').className = "pb-3 px-2 " + (tabName==='categories' ? 'menu-tab-active' : 'menu-tab-inactive'); 
+      document.getElementById('subtab-reorder').className = "pb-3 px-2 " + (tabName==='reorder' ? 'menu-tab-active' : 'menu-tab-inactive'); 
 
-function fetchCategories() {
-  db.collection("menu").doc("categoriesData").onSnapshot(doc => {
-    if(doc.exists && doc.data().list) {
-      appCategories = doc.data().list;
-    } else {
-      appCategories = [...DEFAULT_CATEGORIES];
-      db.collection("menu").doc("categoriesData").set({ list: appCategories }); // تفعيلها لأول مرة
+      if(tabName === 'reorder') populateReorderCategories();
     }
-    renderCategoriesUI();
-    populateCategoryDropdown(); // بيحدث قائمة "اختر القسم" في إضافة منتج
-  });
-}
 
-function renderCategoriesUI() {
-  const list = document.getElementById('categoriesListUI');
-  list.innerHTML = '';
-  appCategories.forEach((cat, index) => {
-    list.innerHTML += `
-      <li class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition flex flex-col gap-3">
-        <div class="flex justify-between items-center gap-3">
-          <div class="flex gap-2 items-center flex-1">
-            <span class="text-2xl w-8 text-center">${cat.icon}</span>
-            <input type="text" id="catName_${index}" value="${cat.nameAr}" placeholder="الاسم عربي" class="p-2 border rounded-lg font-bold text-sm w-1/3 focus:border-amber-400">
-            <input type="text" id="catNameEn_${index}" value="${cat.nameEn || ''}" placeholder="الاسم انجليزي" class="p-2 border rounded-lg font-bold text-sm w-1/3 text-left focus:border-amber-400">
-          </div>
-          <div class="flex gap-2">
-            <button onclick="moveCatObj(${index}, -1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
-            <button onclick="moveCatObj(${index}, 1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold" ${index === appCategories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
-            <button onclick="deleteCategory(${index})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg font-bold transition" title="حذف القسم">🗑️</button>
-          </div>
-        </div>
-        <div>
-          <input type="text" id="catBanner_${index}" value="${cat.banner || 'assets/beefburger.jpg'}" placeholder="رابط صورة الخلفية" class="w-full p-2 border rounded-lg text-sm text-slate-500 focus:border-amber-400" dir="ltr">
-        </div>
-      </li>
-    `;
-  });
-}
-function moveCatObj(index, dir) {
-  if (index + dir < 0 || index + dir >= appCategories.length) return;
-  saveInputsToMemory(); // نحفظ التعديلات قبل ما نحرك عشان متضيعش
-  const temp = appCategories[index];
-  appCategories[index] = appCategories[index + dir];
-  appCategories[index + dir] = temp;
-  renderCategoriesUI();
-}
-function deleteCategory(index) {
-  const catName = appCategories[index].nameAr;
-  
-  // رسالة تأكيد قبل الحذف عشان ميتمسحش بالغلط
-  if (confirm(`هل أنت متأكد من حذف قسم "${catName}" نهائياً؟\n\n(ملحوظة: لو القسم ده جواه منتجات، المنتجات دي هتختفي من الموقع لحد ما تضيفها من جديد في قسم تاني)`)) {
-    
-    // مسح القسم من المصفوفة
-    appCategories.splice(index, 1);
-    
-    // حفظ التعديلات في قاعدة البيانات وتحديث اللوحة والموقع
-    saveCategories(); 
-  }
-}
-function saveInputsToMemory() {
-  appCategories.forEach((cat, index) => {
-    const nameInput = document.getElementById(`catName_${index}`);
-    const nameEnInput = document.getElementById(`catNameEn_${index}`);
-    const bannerInput = document.getElementById(`catBanner_${index}`);
-    
-    if(nameInput) cat.nameAr = nameInput.value;
-    if(nameEnInput) cat.nameEn = nameEnInput.value;
-    if(bannerInput) cat.banner = bannerInput.value;
-  });
-}
-function saveCategories() {
-  saveInputsToMemory();
-  db.collection("menu").doc("categoriesData").set({ list: appCategories })
-    .then(() => alert("✅ تم حفظ الأقسام والترتيب بنجاح!"))
-    .catch(err => alert("❌ حدث خطأ: " + err.message));
-}
+    // --- أكواد ترتيب المنتجات الجديدة ---
+    let currentReorderItems = [];
 
-function addNewCategory() {
-  const nameAr = document.getElementById('newCatNameAr').value.trim();
-  const nameEn = document.getElementById('newCatNameEn').value.trim();
-  const id = document.getElementById('newCatId').value.trim().toLowerCase().replace(/\s+/g, '');
-  const icon = document.getElementById('newCatIcon').value.trim() || '🍔';
-  const banner = document.getElementById('newCatBanner').value.trim() || 'assets/beefburger.jpg';
-  
-  if(!nameAr || !id) return alert("الرجاء كتابة اسم القسم (عربي) والمعرف الإنجليزي!");
-  if(appCategories.find(c => c.id === id)) return alert("المعرف الإنجليزي ده موجود قبل كدا، اكتب واحد غيره.");
+    function populateReorderCategories() {
+      const select = document.getElementById('reorderCategorySelect');
+      select.innerHTML = '<option value="">-- اختر القسم أولاً --</option>';
+      appCategories.forEach(cat => {
+        select.innerHTML += `<option value="${cat.id}">${cat.nameAr}</option>`;
+      });
+      document.getElementById('reorderItemsListUI').innerHTML = '';
+    }
 
-  appCategories.push({
-    id: id,
-    nameAr: nameAr,
-    nameEn: nameEn,
-    icon: icon,
-    banner: banner
-  });
-  
-  document.getElementById('newCatNameAr').value = '';
-  document.getElementById('newCatNameEn').value = '';
-  document.getElementById('newCatId').value = '';
-  document.getElementById('newCatIcon').value = '';
-  document.getElementById('newCatBanner').value = 'assets/beefburger.jpg';
-  
-  saveCategories(); // حفظ وتحديث تلقائي
-}
+    function loadCategoryItemsForReorder() {
+      const catId = document.getElementById('reorderCategorySelect').value;
+      const listUI = document.getElementById('reorderItemsListUI');
+      if (!catId) { listUI.innerHTML = ''; return; }
 
-// الدالة السحرية اللي بتحدث فورم "إضافة منتج"
-function populateCategoryDropdown() {
-  const select = document.getElementById('newItemCategory');
-  if(!select) return;
-  select.innerHTML = '';
-  appCategories.forEach(cat => {
-    select.innerHTML += `<option value="${cat.id}">${cat.nameAr}</option>`;
-  });
-}
-auth.onAuthStateChanged(user => {
-  if(user) {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('dashboardScreen').classList.remove('hidden');
-    document.getElementById('dashboardScreen').classList.add('flex');
-    
-    switchTab('overview'); // <== ضيف السطر ده عشان يفتح النظرة العامة أول حاجة
-    
-    fetchMenu(); 
-    fetchCoupons();
-    fetchOrders(); 
-    fetchRestaurantStatus(); 
-fetchCategories();  }
-});
+      // تصفية المنتجات حسب القسم المختار وترتيبها
+      currentReorderItems = allMenuItems.filter(item => item.category === catId);
+      currentReorderItems.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+      renderReorderItemsUI();
+    }
+
+    function renderReorderItemsUI() {
+      const listUI = document.getElementById('reorderItemsListUI');
+      listUI.innerHTML = '';
+      if(currentReorderItems.length === 0) {
+        listUI.innerHTML = '<div class="p-4 text-center text-slate-500 font-bold">لا يوجد منتجات في هذا القسم</div>';
+        return;
+      }
+
+      currentReorderItems.forEach((item, index) => {
+        listUI.innerHTML += `
+          <li class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center gap-3 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-slate-400 w-6">${index + 1}-</span>
+              <img src="${item.image || 'https://placehold.co/100x100?text=Savor'}" class="w-10 h-10 rounded object-cover border">
+              <span class="font-bold text-slate-800">${item.name}</span>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="moveReorderItem(${index}, -1)" class="bg-slate-100 hover:bg-amber-100 text-slate-700 px-3 py-2 rounded-lg font-bold transition" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+              <button onclick="moveReorderItem(${index}, 1)" class="bg-slate-100 hover:bg-amber-100 text-slate-700 px-3 py-2 rounded-lg font-bold transition" ${index === currentReorderItems.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
+            </div>
+          </li>
+        `;
+      });
+    }
+
+   function moveReorderItem(index, dir) {
+      if (index + dir < 0 || index + dir >= currentReorderItems.length) return;
+      const temp = currentReorderItems[index];
+      currentReorderItems[index] = currentReorderItems[index + dir];
+      currentReorderItems[index + dir] = temp;
+      renderReorderItemsUI();
+    }
+
+    function saveItemsOrder() {
+      if(currentReorderItems.length === 0) return alert("لا يوجد منتجات لحفظ ترتيبها!");
+      
+      let promises = [];
+      currentReorderItems.forEach((item, index) => {
+        promises.push(db.collection("menu").doc(item.id).update({ order: index + 1 }));
+      });
+
+      Promise.all(promises).then(() => {
+        alert("✅ تم حفظ ترتيب المنتجات بنجاح! سيظهر الترتيب الجديد في الموقع فوراً.");
+      }).catch(err => {
+        alert("❌ حدث خطأ أثناء الحفظ: " + err.message);
+      });
+    }
+
+    // ==========================================
+    // --- إرجاع دوال إدارة الأقسام اللي اتمسحت ---
+    // ==========================================
+
+    function fetchCategories() {
+      db.collection("menu").doc("categoriesData").onSnapshot(doc => {
+        // لو الأقسام فاضية، هيرجع يحمل الأقسام الافتراضية عشان مفيش حاجة تختفي
+        if(doc.exists && doc.data().list && doc.data().list.length > 0) {
+          appCategories = doc.data().list;
+        } else {
+          appCategories = [...DEFAULT_CATEGORIES];
+          db.collection("menu").doc("categoriesData").set({ list: appCategories });
+        }
+        renderCategoriesUI();
+        populateCategoryDropdown();
+        if (typeof populateReorderCategories === 'function') {
+          populateReorderCategories();
+        }
+      });
+    }
+
+    function renderCategoriesUI() {
+      const list = document.getElementById('categoriesListUI');
+      if(!list) return;
+      list.innerHTML = '';
+      appCategories.forEach((cat, index) => {
+        list.innerHTML += `
+          <li class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition flex flex-col gap-3">
+            <div class="flex justify-between items-center gap-3">
+              <div class="flex gap-2 items-center flex-1">
+                <span class="text-2xl w-8 text-center">${cat.icon}</span>
+                <input type="text" id="catName_${index}" value="${cat.nameAr}" placeholder="الاسم عربي" class="p-2 border rounded-lg font-bold text-sm w-1/3 focus:border-amber-400">
+                <input type="text" id="catNameEn_${index}" value="${cat.nameEn || ''}" placeholder="الاسم انجليزي" class="p-2 border rounded-lg font-bold text-sm w-1/3 text-left focus:border-amber-400">
+              </div>
+              <div class="flex gap-2">
+                <button onclick="moveCatObj(${index}, -1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+                <button onclick="moveCatObj(${index}, 1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold" ${index === appCategories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
+                <button onclick="deleteCategory(${index})" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg font-bold transition" title="حذف القسم">🗑️</button>
+              </div>
+            </div>
+            <div>
+              <input type="text" id="catBanner_${index}" value="${cat.banner || 'assets/beefburger.jpg'}" placeholder="رابط صورة الخلفية" class="w-full p-2 border rounded-lg text-sm text-slate-500 focus:border-amber-400" dir="ltr">
+            </div>
+          </li>
+        `;
+      });
+    }
+
+    function moveCatObj(index, dir) {
+      if (index + dir < 0 || index + dir >= appCategories.length) return;
+      saveInputsToMemory();
+      const temp = appCategories[index];
+      appCategories[index] = appCategories[index + dir];
+      appCategories[index + dir] = temp;
+      renderCategoriesUI();
+    }
+
+    function deleteCategory(index) {
+      const catName = appCategories[index].nameAr;
+      if (confirm(`هل أنت متأكد من حذف قسم "${catName}" نهائياً؟\n\n(ملحوظة: لو القسم ده جواه منتجات، المنتجات دي هتختفي من الموقع لحد ما تضيفها من جديد في قسم تاني)`)) {
+        appCategories.splice(index, 1);
+        saveCategories(); 
+      }
+    }
+
+    function saveInputsToMemory() {
+      appCategories.forEach((cat, index) => {
+        const nameInput = document.getElementById(`catName_${index}`);
+        const nameEnInput = document.getElementById(`catNameEn_${index}`);
+        const bannerInput = document.getElementById(`catBanner_${index}`);
+        
+        if(nameInput) cat.nameAr = nameInput.value;
+        if(nameEnInput) cat.nameEn = nameEnInput.value;
+        if(bannerInput) cat.banner = bannerInput.value;
+      });
+    }
+
+    function saveCategories() {
+      saveInputsToMemory();
+      db.collection("menu").doc("categoriesData").set({ list: appCategories })
+        .then(() => {
+           alert("✅ تم حفظ الأقسام والترتيب بنجاح!");
+           populateCategoryDropdown();
+           if(typeof populateReorderCategories === 'function') populateReorderCategories();
+        })
+        .catch(err => alert("❌ حدث خطأ: " + err.message));
+    }
+
+    function addNewCategory() {
+      const nameAr = document.getElementById('newCatNameAr').value.trim();
+      const nameEn = document.getElementById('newCatNameEn').value.trim();
+      const id = document.getElementById('newCatId').value.trim().toLowerCase().replace(/\s+/g, '');
+      const icon = document.getElementById('newCatIcon').value.trim() || '🍔';
+      const banner = document.getElementById('newCatBanner').value.trim() || 'assets/beefburger.jpg';
+      
+      if(!nameAr || !id) return alert("الرجاء كتابة اسم القسم (عربي) والمعرف الإنجليزي!");
+      if(appCategories.find(c => c.id === id)) return alert("المعرف الإنجليزي ده موجود قبل كدا، اكتب واحد غيره.");
+
+      appCategories.push({
+        id: id,
+        nameAr: nameAr,
+        nameEn: nameEn,
+        icon: icon,
+        banner: banner
+      });
+      
+      document.getElementById('newCatNameAr').value = '';
+      document.getElementById('newCatNameEn').value = '';
+      document.getElementById('newCatId').value = '';
+      document.getElementById('newCatIcon').value = '';
+      document.getElementById('newCatBanner').value = 'assets/beefburger.jpg';
+      
+      saveCategories(); 
+    }
+
+    function populateCategoryDropdown() {
+      const select = document.getElementById('newItemCategory');
+      if(!select) return;
+      select.innerHTML = '';
+      appCategories.forEach(cat => {
+        select.innerHTML += `<option value="${cat.id}">${cat.nameAr}</option>`;
+      });
+    }
+
+    auth.onAuthStateChanged(user => {
+      if(user) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.remove('hidden');
+        document.getElementById('dashboardScreen').classList.add('flex');
+        
+        switchTab('overview'); 
+        
+        fetchMenu(); 
+        fetchCoupons();
+        fetchOrders(); 
+        fetchRestaurantStatus(); 
+        fetchCategories();  
+      }
+    });
 
     function login() {
       const email = document.getElementById('email').value;
