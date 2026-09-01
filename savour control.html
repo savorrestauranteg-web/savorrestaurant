@@ -178,12 +178,12 @@
             
             <div class="md:col-span-2 p-4 bg-slate-100 rounded-xl">
               <label class="block text-sm font-bold mb-4">التسعير والأحجام (اكتب السعر قدام الحجم المطلوب، أو استخدم السعر الثابت)</label>
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
   <div><small>سعر ثابت</small><input type="number" id="priceFixed" class="w-full p-2 border rounded"></div>
-  <div class="flex flex-col gap-1"><input type="text" id="sizeName1" placeholder="اسم الحجم 1 (مثال: وسط)" class="p-1 border rounded text-xs"><input type="number" id="sizePrice1" placeholder="السعر" class="p-2 border rounded"></div>
-  <div class="flex flex-col gap-1"><input type="text" id="sizeName2" placeholder="اسم الحجم 2" class="p-1 border rounded text-xs"><input type="number" id="sizePrice2" placeholder="السعر" class="p-2 border rounded"></div>
-  <div class="flex flex-col gap-1"><input type="text" id="sizeName3" placeholder="اسم الحجم 3" class="p-1 border rounded text-xs"><input type="number" id="sizePrice3" placeholder="السعر" class="p-2 border rounded"></div>
-  <div class="flex flex-col gap-1"><input type="text" id="sizeName4" placeholder="اسم الحجم 4" class="p-1 border rounded text-xs"><input type="number" id="sizePrice4" placeholder="السعر" class="p-2 border rounded"></div>
+  <div><small>سمول (S)</small><input type="number" id="priceS" class="w-full p-2 border rounded"></div>
+  <div><small>لارج (L)</small><input type="number" id="priceL" class="w-full p-2 border rounded"></div>
+  <div><small>دابل (D)</small><input type="number" id="priceD" class="w-full p-2 border rounded"></div>
+  <div><small>اكس لارج (XL)</small><input type="number" id="priceXL" class="w-full p-2 border rounded"></div>
 </div>
         
             
@@ -519,23 +519,14 @@ if (doc.id === 'categoriesData' || doc.id === 'categoriesOrder' || doc.id === 's
       
       data.forEach(item => {
         const imgSrc = item.image || 'https://placehold.co/100x100?text=Savor';
-        let priceFieldHTML = '';
-        if (item.sizes && Object.keys(item.sizes).length > 0) {
-          let sizesInputs = '';
-          let sizeIndex = 0;
-          for (const [sizeName, sizePrice] of Object.entries(item.sizes)) {
-            sizesInputs += `
-              <div class="mb-1 flex gap-1">
-                <input type="text" id="edit_size_name_${item.id}_${sizeIndex}" value="${sizeName}" class="w-1/2 p-1 border rounded text-xs bg-slate-50">
-                <input type="number" id="edit_size_price_${item.id}_${sizeIndex}" value="${sizePrice}" class="w-1/2 p-1 border rounded text-xs">
-              </div>`;
-            sizeIndex++;
-          }
-          sizesInputs += `<input type="hidden" id="sizes_count_${item.id}" value="${sizeIndex}">`;
-          priceFieldHTML = `<div class="flex flex-col">${sizesInputs}</div>`;
-        } else {
-          priceFieldHTML = `<div><input type="number" id="price_fixed_${item.id}" value="${item.price || 0}" class="w-full p-2 border rounded text-sm"></div>`;
-        }
+let priceFieldHTML = item.sizes ? `
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div><span class="text-slate-500">سمول:</span> <input type="number" id="price_s_${item.id}" value="${item.sizes.S || ''}" class="w-full p-1 border rounded"></div>
+            <div><span class="text-slate-500">لارج:</span> <input type="number" id="price_l_${item.id}" value="${item.sizes.L || ''}" class="w-full p-1 border rounded"></div>
+            <div><span class="text-slate-500">دابل:</span> <input type="number" id="price_d_${item.id}" value="${item.sizes.D || ''}" class="w-full p-1 border rounded"></div>
+            <div><span class="text-slate-500">اكس لارج:</span> <input type="number" id="price_xl_${item.id}" value="${item.sizes.XL || ''}" class="w-full p-1 border rounded"></div>
+          </div>
+        ` : `<div><input type="number" id="price_fixed_${item.id}" value="${item.price || 0}" class="w-full p-2 border rounded text-sm"></div>`;
 
        tbody.innerHTML += `
           <tr class="border-b">
@@ -775,22 +766,20 @@ fetchCategories();  }
         description: newDesc 
       };
 
-      if (hasSizes) {
+     if (hasSizes) {
         let sizes = {};
-        const countElement = document.getElementById(`sizes_count_${itemId}`);
-        if (countElement) {
-          const count = parseInt(countElement.value);
-          for (let i = 0; i < count; i++) {
-            const sName = document.getElementById(`edit_size_name_${itemId}_${i}`).value.trim();
-            const sPrice = document.getElementById(`edit_size_price_${itemId}_${i}`).value;
-            if (sName && sPrice) {
-              sizes[sName] = Number(sPrice);
-            }
-          }
-        }
+        const sVal = document.getElementById(`price_s_${itemId}`).value;
+        const lVal = document.getElementById(`price_l_${itemId}`).value;
+        const dVal = document.getElementById(`price_d_${itemId}`).value;
+        const xlVal = document.getElementById(`price_xl_${itemId}`).value;
+
+        if (sVal && Number(sVal) > 0) sizes.S = Number(sVal);
+        if (lVal && Number(lVal) > 0) sizes.L = Number(lVal);
+        if (dVal && Number(dVal) > 0) sizes.D = Number(dVal);
+        if (xlVal && Number(xlVal) > 0) sizes.XL = Number(xlVal);
+
         updateData.sizes = sizes;
       }
-
       db.collection("menu").doc(itemId).update(updateData)
         .then(() => alert("✅ تم تحديث المنتج بنجاح!"))
         .catch(err => alert("❌ حدث خطأ أثناء التحديث: " + err.message));
