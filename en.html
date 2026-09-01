@@ -25,7 +25,7 @@
 }
 html, body {
   max-width: 100% !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
 }
 .btn-gold, #checkoutBtn {
   color: #ffffff !important;
@@ -42,12 +42,41 @@ body.dark-mode .total-row b {
   color: #ffffff !important;
 }
 header.site {
-  position: sticky; 
-  top: 0; 
-  z-index: 55;
-  background: var(--green); 
-  border-bottom: 1px solid var(--line-light);
-  box-shadow: 0 10px 26px -18px rgba(0,0,0,.5);
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 1000 !important;
+  background: var(--green) !important;
+}
+body {
+  padding-top: 68px !important;
+  overflow-x: clip !important;
+}
+.catnav button {
+  transition: all 0.25s ease !important;
+}
+
+.catnav button:hover {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+}
+
+body.dark-mode .catnav button:hover {
+  border-color: var(--gold) !important;
+  color: #ffffff !important;
+}
+
+.catnav button.active {
+  background: var(--green) !important;
+  color: var(--cream) !important;
+  border-color: var(--green) !important;
+}
+
+body.dark-mode .catnav button.active {
+  background: var(--gold) !important;
+  color: var(--green-deep) !important;
+  border-color: var(--gold) !important;
 }
 body.dark-mode {
   --paper: #121212 !important;
@@ -831,8 +860,15 @@ nav.links {
     .topbar { display: none; }
     nav.links { display: none !important; } 
     .burger-toggle { display: flex; }
-    .catnav-wrap { top: 68px !important; }
-    .sticky-cart { display: flex; }
+.catnav-wrap {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 68px !important; 
+  z-index: 50 !important;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 8px 18px -16px rgba(0,0,0,.4);
+}    .sticky-cart { display: flex; }
     .fab.top { display: none !important; }
     .fab-stack { bottom: 90px !important; }
   }
@@ -1474,6 +1510,11 @@ const catObserver = new IntersectionObserver((entries) => {
     }
   });
 }, { rootMargin: '-40% 0px -50% 0px' });
+
+// تفعيل المراقب على الأقسام بعد تحميلها
+setTimeout(() => {
+  document.querySelectorAll('.category-block').forEach(s => catObserver.observe(s));
+}, 50);
 
 function renderItemCard(cat, item){
   const imgSrc = item.image && item.image !== '' ? item.image : 'assets/logo.jpg'; 
