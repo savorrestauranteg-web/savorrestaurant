@@ -73,8 +73,20 @@ body.dark-mode .lang-pill a:not(.active) {
   color: #ffffff;
 }
 
-/* تظبيط الحجم في شاشات الموبايل الصغيرة عشان مياخدش مساحة كبيرة */
 @media (max-width: 520px) {
+  @media (max-width: 520px) {
+  /* تصغير المسافات والأزرار الدائرية عشان الشاشة تكفي */
+  .nav-actions { gap: 6px !important; }
+  .icon-btn { width: 34px !important; height: 34px !important; }
+  .icon-btn svg { width: 16px !important; height: 16px !important; }
+  
+  /* تصغير زرار اللغة */
+  .lang-pill { height: 34px !important; }
+  .lang-pill a { padding: 0 8px !important; font-size: 12px !important; gap: 4px !important; }
+  
+  /* تصغير اللوجو سنة بسيطة */
+  .brand img { height: 36px !important; }
+}
   .lang-pill a {
     padding: 0 8px;
     font-size: 13px;
