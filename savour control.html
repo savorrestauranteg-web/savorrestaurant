@@ -538,7 +538,7 @@ if (doc.id === 'categoriesData' || doc.id === 'categoriesOrder' || doc.id === 's
       renderMenuTableHTML(filtered);
     }
 
- function renderMenuTableHTML(data) {
+function renderMenuTableHTML(data) {
       const tbody = document.getElementById('menuTableBody');
       tbody.innerHTML = '';
       if(data.length === 0) {
@@ -563,10 +563,15 @@ if (doc.id === 'categoriesData' || doc.id === 'categoriesOrder' || doc.id === 's
             <td class="p-3">
               <div class="text-xs text-slate-500 mb-1">عربي:</div>
               <input type="text" id="name_${item.id}" value="${item.name}" class="w-full p-2 border rounded font-bold text-sm mb-2">
-              <div class="text-xs text-slate-500 mb-1">English:</div>
+              <div class="text-xs text-slate-500 mb-1">English Name:</div>
               <input type="text" id="nameEn_${item.id}" value="${item.nameEn || ''}" placeholder="English Name" class="w-full p-2 border rounded text-xs" dir="ltr">
             </td>
-            <td class="p-3"><textarea id="desc_${item.id}" rows="2" class="w-full p-2 border rounded text-xs placeholder-slate-400" placeholder="اكتب المكونات هنا...">${item.description || ''}</textarea></td>
+            <td class="p-3">
+              <div class="text-xs text-slate-500 mb-1">عربي:</div>
+              <textarea id="desc_${item.id}" rows="2" class="w-full p-2 border rounded text-xs placeholder-slate-400 mb-2" placeholder="المكونات...">${item.description || ''}</textarea>
+              <div class="text-xs text-slate-500 mb-1">English Description:</div>
+              <textarea id="descEn_${item.id}" rows="2" class="w-full p-2 border rounded text-xs placeholder-slate-400" placeholder="Ingredients..." dir="ltr">${item.descriptionEn || ''}</textarea>
+            </td>
             <td class="p-3 w-48">${priceFieldHTML}</td>
             <td class="p-3"><input type="file" id="file_${item.id}" class="text-xs w-full" onchange="uploadImageToImgBB('${item.id}')"></td>
             <td class="p-3">
@@ -865,16 +870,18 @@ function switchMenuSubTab(tabName) {
       });
     }
 
-    function updateExistingItem(itemId, hasSizes) {
+function updateExistingItem(itemId, hasSizes) {
       const newName = document.getElementById(`name_${itemId}`).value.trim();
       const newNameEn = document.getElementById(`nameEn_${itemId}`).value.trim();
       const newDesc = document.getElementById(`desc_${itemId}`).value.trim(); 
+      const newDescEn = document.getElementById(`descEn_${itemId}`).value.trim(); 
       if (!newName) return alert("اسم المنتج لا يمكن أن يكون فارغاً");
 
       let updateData = { 
         name: newName,
         nameEn: newNameEn,
-        description: newDesc 
+        description: newDesc,
+        descriptionEn: newDescEn
       };
 
       if (hasSizes) {
@@ -904,6 +911,7 @@ function switchMenuSubTab(tabName) {
       const name = document.getElementById('newItemName').value.trim();
       const nameEn = document.getElementById('newItemNameEn').value.trim();
       const desc = document.getElementById('newItemDesc').value.trim();
+      const descEn = document.getElementById('newItemDescEn').value.trim();
       const imageFile = document.getElementById('newItemImage').files[0];
       
       if(!name) {
@@ -939,6 +947,7 @@ function switchMenuSubTab(tabName) {
         nameEn: nameEn,
         category: category,
         description: desc,
+        descriptionEn: descEn,
         status: 'available',
         image: imageUrl
       };
@@ -954,6 +963,7 @@ function switchMenuSubTab(tabName) {
       document.getElementById('newItemName').value = '';
       document.getElementById('newItemNameEn').value = '';
       document.getElementById('newItemDesc').value = '';
+      document.getElementById('newItemDescEn').value = '';
       document.getElementById('priceFixed').value = '';
       document.getElementById('priceS').value = '';
       document.getElementById('priceL').value = '';
@@ -963,7 +973,6 @@ function switchMenuSubTab(tabName) {
 
       switchMenuSubTab('control');
     }
-
     function fetchCoupons() {
       db.collection("coupons").onSnapshot(snap => {
         const tbody = document.getElementById('couponsTableBody');
