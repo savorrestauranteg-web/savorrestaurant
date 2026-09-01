@@ -409,7 +409,11 @@ body.dark-mode .bill-divider {
 }
 @media (max-width: 900px) {
   .topbar { display: none; }
-  nav.links { display: none; }
+  nav.links { display: none !important; } 
+  .burger-toggle { display: flex; }
+  .catnav-wrap { top: 68px; }
+  .sticky-cart { display: flex; }
+}
   .burger-toggle { display: flex; }
   
   /* التعديل هنا: 68 بيكسل هو ارتفاع الهيدر تقريباً عشان يلزق تحته مباشرة */
@@ -795,7 +799,8 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
 .nav-wrap {
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important; /* بيوزع الـ 3 أجزاء على أول وآخر وفي نص الشاشة */
+  justify-content: space-between !important;
+  position: relative !important; /* مهم جداً عشان التوسيط يشتغل */
   padding: 12px 20px;
   width: 100%;
 }
@@ -803,11 +808,27 @@ body.dark-mode .hero-ctas .btn-whatsapp svg {
   .brand img{height:44px; width:auto; border-radius:8px;}
   .brand .word{font-family:'Lalezar',sans-serif; font-size:26px; color:var(--cream); line-height:1;}
   .brand .word span{color:var(--gold-2);}
-  nav.links{display:flex; gap:30px; align-items:center;}
-  nav.links a{color:var(--cream); font-weight:700; font-size:15px; position:relative; padding:6px 2px;}
+nav.links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important; /* ده اللي بيجيبها في السنتر بالمللي */
+  z-index: 2;
+}  nav.links a{color:var(--cream); font-weight:700; font-size:15px; position:relative; padding:6px 2px;}
   nav.links a::after{content:"";position:absolute; right:0; bottom:-2px; width:0; height:2px; background:var(--gold); transition:width .25s;}
   nav.links a:hover::after{width:100%;}
-  .nav-actions{display:flex; align-items:center; gap:12px;}
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0; 
+  z-index: 5;
+}
+.brand {
+  z-index: 5;
+}
   .icon-btn{
     display:flex; align-items:center; justify-content:center;
     width:42px; height:42px; border-radius:50%;
