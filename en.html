@@ -14,6 +14,172 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style> 
+body.dark-mode {
+  --paper: #121212 !important;
+  --ink: #f1f1f1 !important;
+  --cream: #1e1e1e !important;
+  --cream-2: #1e1e1e !important;
+  --line: rgba(255, 255, 255, 0.15) !important;
+}
+body.dark-mode .hero h1,
+body.dark-mode .hero h1 .accent,
+body.dark-mode .hero p.lead,
+body.dark-mode .trust-chip,
+body.dark-mode nav.links a,
+body.dark-mode .menu-intro h2,
+body.dark-mode .menu-intro p,
+body.dark-mode .menu-intro .kicker,
+body.dark-mode .item-name,
+body.dark-mode .cat-banner-content h3,
+body.dark-mode .cat-banner-content .en,
+body.dark-mode header.site nav.links a {
+  color: #ffffff !important;
+}
+body.dark-mode .pm-img-wrap {
+  background: #1a1a1a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.dark-mode .cr-name,
+body.dark-mode .cr-size,
+body.dark-mode .cr-price,
+body.dark-mode .toast {
+  color: #ffffff !important;
+}
+body.dark-mode .qty-stepper,
+body.dark-mode .qty-stepper button,
+body.dark-mode .qty-stepper span,
+body.dark-mode .cr-remove,
+body.dark-mode .total-row,
+body.dark-mode .total-row b {
+  color: #ffffff !important;
+}
+
+body.dark-mode .qty-stepper {
+  background: #1a1a1a !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+.btn-gold,
+#checkoutBtn {
+  color: #ffffff !important;
+}
+
+.btn-gold svg,
+#checkoutBtn svg {
+  fill: #ffffff !important;
+}
+body.dark-mode .qty-stepper button {
+  background: #252525 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .cr-remove {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+body.dark-mode .btn,
+body.dark-mode .add-btn,
+body.dark-mode .pm-add-btn,
+body.dark-mode .pm-add-btn span {
+  color: #ffffff !important;
+}
+body.dark-mode .icon-btn,
+body.dark-mode .lang-pill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .icon-btn svg {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .lang-pill a {
+  color: #ffffff !important;
+}
+
+body.dark-mode .lang-pill a.active {
+  background: var(--gold) !important;
+  color: var(--green-deep) !important;
+}
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode h5, 
+body.dark-mode h6,
+body.dark-mode .why-card h3,
+body.dark-mode .why-card p,
+body.dark-mode .why-head h2,
+body.dark-mode .why-head .kicker,
+body.dark-mode .contact-card h2,
+body.dark-mode .contact-card p.sub,
+body.dark-mode .contact-line,
+body.dark-mode footer.site h4,
+body.dark-mode footer.site p,
+body.dark-mode footer.site ul a,
+body.dark-mode .price-tag,
+body.dark-mode .price-tag span,
+body.dark-mode .price-tag small {
+  color: #ffffff !important;
+}
+
+body.dark-mode .why-card p {
+  color: #d7d0bb !important; 
+}
+
+body.dark-mode .contact-card {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .trust-chip svg {
+  fill: #ffffff !important;
+}
+
+body.dark-mode .hero p.lead {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .menu-intro p {
+  color: #cccccc !important;
+}
+body.dark-mode header.site {
+  background: #0b221d !important;
+}
+
+body.dark-mode .item-card, 
+body.dark-mode .modal-card, 
+body.dark-mode .drawer, 
+body.dark-mode .catnav button {
+  background: #1a1a1a !important;
+  color: #f1f1f1 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .item-name, 
+body.dark-mode .pm-title, 
+body.dark-mode .total-row,
+body.dark-mode .field label,
+body.dark-mode .drawer-head h3 {
+  color: #ffffff !important;
+}
+
+body.dark-mode .field input, 
+body.dark-mode .field textarea,
+body.dark-mode .coupon-box input {
+  background: #252525 !important;
+  color: #ffffff !important;
+  border-color: rgb(253, 253, 253) !important;
+}
+
+body.dark-mode .catnav-wrap {
+  background: #121212 !important;
+}
+
+body.dark-mode .contact {
+  background: #121212 !important;
+}
 .back-btn {
   background: rgba(1, 128, 85, 0.1); color: var(--gold); border: none; width: 40px; height: 40px;
   border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;
@@ -1780,6 +1946,22 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
 function showToast(text){
   const toast = document.getElementById('toast'); toast.textContent = text; toast.classList.add('show');
   clearTimeout(window._toastTimer); window._toastTimer = setTimeout(()=>toast.classList.remove('show'), 2200);
+}
+const darkModeBtn = document.getElementById('darkModeBtn');
+if (darkModeBtn) {
+  // التحقق من حالة الوضع المظلم المحفوظة مسبقاً
+  if (localStorage.getItem('savor_dark_mode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+  }
+
+  darkModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    if (document.body.classList.contains('dark-mode')) {
+      localStorage.setItem('savor_dark_mode', 'enabled');
+    } else {
+      localStorage.setItem('savor_dark_mode', 'disabled');
+    }
+  });
 }
 </script>
 </body>
