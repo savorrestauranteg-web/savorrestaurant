@@ -142,7 +142,7 @@
           <div class="flex flex-col gap-3 mb-8 p-5 bg-slate-50 rounded-xl border border-slate-200">
             <div class="flex flex-col md:flex-row gap-3">
               <input type="text" id="newCatNameAr" placeholder="اسم القسم (عربي)" class="flex-1 p-3 border rounded-xl">
-              <input type="text" id="newCatNameEn" placeholder="اسم القسم (انجليزي - اختياري)" class="flex-1 p-3 border rounded-xl">
+              <input type="text" id="newCatNameEn" placeholder="اسم القسم (انجليزي )" class="flex-1 p-3 border rounded-xl">
               <input type="text" id="newCatId" placeholder="معرف بالانجليزي (بدون مسافات، مثال: pizzas)" class="flex-1 p-3 border rounded-xl">
               <input type="text" id="newCatIcon" placeholder="إيموجي 🍕" class="w-24 p-3 border rounded-xl text-center">
             </div>
@@ -171,7 +171,8 @@
           <button onclick="saveItemsOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-4 rounded-xl font-bold text-lg transition shadow-md">💾 حفظ ترتيب المنتجات</button>
         </div>
 
-   <div id="menu-add-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-amber-200">
+  <!-- فورم إضافة منتج جديد متقدمة -->
+<div id="menu-add-section" class="hidden glass-panel p-8 rounded-2xl border-2 border-amber-200">
   <h3 class="text-xl font-bold mb-6" style="color: #0c3d30;">تفاصيل المنتج الجديد</h3>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
     <div>
@@ -193,10 +194,17 @@
       <input type="text" id="newItemName" class="w-full p-3 rounded-xl border border-slate-300">
     </div>
     <div>
-      <label class="block text-sm font-bold mb-2">اسم المنتج (انجليزي - اختياري)</label>
+      <label class="block text-sm font-bold mb-2">اسم المنتج (انجليزي)</label>
       <input type="text" id="newItemNameEn" placeholder="Example: Beef Burger" class="w-full p-3 rounded-xl border border-slate-300" dir="ltr">
     </div>
-    <div class="md:col-span-2"><label class="block text-sm font-bold mb-2">المكونات / الوصف (اختياري)</label><textarea id="newItemDesc" rows="2" class="w-full p-3 rounded-xl border border-slate-300"></textarea></div>
+    <div>
+      <label class="block text-sm font-bold mb-2">المكونات / الوصف (عربي)</label>
+      <textarea id="newItemDesc" rows="2" class="w-full p-3 rounded-xl border border-slate-300" placeholder="مثال: لحم بييف، صوص..."></textarea>
+    </div>
+    <div>
+      <label class="block text-sm font-bold mb-2">المكونات / الوصف (انجليزي - اختياري)</label>
+      <textarea id="newItemDescEn" rows="2" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Example: Beef, sauce..." dir="ltr"></textarea>
+    </div>
     
     <div class="md:col-span-2 p-4 bg-slate-100 rounded-xl">
       <label class="block text-sm font-bold mb-4">التسعير والأحجام (اكتب السعر قدام الحجم المطلوب، أو استخدم السعر الثابت)</label>
@@ -530,17 +538,17 @@ if (doc.id === 'categoriesData' || doc.id === 'categoriesOrder' || doc.id === 's
       renderMenuTableHTML(filtered);
     }
 
-    function renderMenuTableHTML(data) {
+ function renderMenuTableHTML(data) {
       const tbody = document.getElementById('menuTableBody');
       tbody.innerHTML = '';
       if(data.length === 0) {
-         tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-bold">لا يوجد منتجات بهذا الاسم.</td></tr>`;
+         tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-bold">لا يوجد منتجات بهذا الاسم.</td></tr>`;
          return;
       }
       
       data.forEach(item => {
         const imgSrc = item.image || 'https://placehold.co/100x100?text=Savor';
-let priceFieldHTML = item.sizes ? `
+        let priceFieldHTML = item.sizes ? `
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div><span class="text-slate-500">سمول:</span> <input type="number" id="price_s_${item.id}" value="${item.sizes.S || ''}" class="w-full p-1 border rounded"></div>
             <div><span class="text-slate-500">لارج:</span> <input type="number" id="price_l_${item.id}" value="${item.sizes.L || ''}" class="w-full p-1 border rounded"></div>
@@ -552,7 +560,12 @@ let priceFieldHTML = item.sizes ? `
        tbody.innerHTML += `
           <tr class="border-b">
             <td class="p-3"><img src="${imgSrc}" class="w-12 h-12 rounded object-cover"></td>
-            <td class="p-3"><input type="text" id="name_${item.id}" value="${item.name}" class="w-full p-2 border rounded font-bold text-sm"></td>
+            <td class="p-3">
+              <div class="text-xs text-slate-500 mb-1">عربي:</div>
+              <input type="text" id="name_${item.id}" value="${item.name}" class="w-full p-2 border rounded font-bold text-sm mb-2">
+              <div class="text-xs text-slate-500 mb-1">English:</div>
+              <input type="text" id="nameEn_${item.id}" value="${item.nameEn || ''}" placeholder="English Name" class="w-full p-2 border rounded text-xs" dir="ltr">
+            </td>
             <td class="p-3"><textarea id="desc_${item.id}" rows="2" class="w-full p-2 border rounded text-xs placeholder-slate-400" placeholder="اكتب المكونات هنا...">${item.description || ''}</textarea></td>
             <td class="p-3 w-48">${priceFieldHTML}</td>
             <td class="p-3"><input type="file" id="file_${item.id}" class="text-xs w-full" onchange="uploadImageToImgBB('${item.id}')"></td>
@@ -853,16 +866,18 @@ function switchMenuSubTab(tabName) {
     }
 
     function updateExistingItem(itemId, hasSizes) {
-     const newName = document.getElementById(`name_${itemId}`).value.trim();
+      const newName = document.getElementById(`name_${itemId}`).value.trim();
+      const newNameEn = document.getElementById(`nameEn_${itemId}`).value.trim();
       const newDesc = document.getElementById(`desc_${itemId}`).value.trim(); 
       if (!newName) return alert("اسم المنتج لا يمكن أن يكون فارغاً");
 
-  let updateData = { 
+      let updateData = { 
         name: newName,
+        nameEn: newNameEn,
         description: newDesc 
       };
 
-     if (hasSizes) {
+      if (hasSizes) {
         let sizes = {};
         const sVal = document.getElementById(`price_s_${itemId}`).value;
         const lVal = document.getElementById(`price_l_${itemId}`).value;
@@ -881,87 +896,73 @@ function switchMenuSubTab(tabName) {
         .catch(err => alert("❌ حدث خطأ أثناء التحديث: " + err.message));
     }
 
-    function deleteMenuItem(itemId) {
-      if (confirm("هل أنت متأكد من حذف هذا المنتج نهائياً من المنيو؟")) {
-        db.collection("menu").doc(itemId).delete();
+    async function addNewItem() {
+      const btn = document.getElementById('saveItemBtn');
+      btn.innerText = "جاري الحفظ والرفع...";
+      
+      const category = document.getElementById('newItemCategory').value;
+      const name = document.getElementById('newItemName').value.trim();
+      const nameEn = document.getElementById('newItemNameEn').value.trim();
+      const desc = document.getElementById('newItemDesc').value.trim();
+      const imageFile = document.getElementById('newItemImage').files[0];
+      
+      if(!name) {
+        alert("اكتب اسم المنتج بالعربي");
+        btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
+        return;
       }
+
+      let sizes = {};
+      let price = document.getElementById('priceFixed').value;
+      
+      const pS = document.getElementById('priceS').value;
+      const pL = document.getElementById('priceL').value;
+      const pD = document.getElementById('priceD').value;
+      const pXL = document.getElementById('priceXL').value;
+
+      if (pS && Number(pS) > 0) sizes.S = Number(pS);
+      if (pL && Number(pL) > 0) sizes.L = Number(pL);
+      if (pD && Number(pD) > 0) sizes.D = Number(pD);
+      if (pXL && Number(pXL) > 0) sizes.XL = Number(pXL);
+
+      let imageUrl = '';
+      if(imageFile) {
+        const formData = new FormData(); 
+        formData.append('image', imageFile);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
+        const data = await res.json();
+        if(data.success) imageUrl = data.data.display_url;
+      }
+
+      const itemData = {
+        name: name,
+        nameEn: nameEn,
+        category: category,
+        description: desc,
+        status: 'available',
+        image: imageUrl
+      };
+      
+      if(Object.keys(sizes).length > 0) itemData.sizes = sizes;
+      else if(price) itemData.price = Number(price);
+
+      await db.collection("menu").add(itemData);
+      alert("تم إضافة المنتج بنجاح للموقع!");
+      btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
+      
+      // تفريغ الحقول
+      document.getElementById('newItemName').value = '';
+      document.getElementById('newItemNameEn').value = '';
+      document.getElementById('newItemDesc').value = '';
+      document.getElementById('priceFixed').value = '';
+      document.getElementById('priceS').value = '';
+      document.getElementById('priceL').value = '';
+      document.getElementById('priceD').value = '';
+      document.getElementById('priceXL').value = '';
+      document.getElementById('newItemImage').value = '';
+
+      switchMenuSubTab('control');
     }
-
-    async function uploadImageToImgBB(itemId) {
-      const file = document.getElementById(`file_${itemId}`).files[0];
-      if(!file) return;
-      const formData = new FormData(); formData.append('image', file);
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
-      const data = await res.json();
-      if(data.success) db.collection('menu').doc(itemId).update({ image: data.data.display_url });
-    }
-
-   async function addNewItem() {
-  const btn = document.getElementById('saveItemBtn');
-  btn.innerText = "جاري الحفظ والرفع...";
-  
-  const category = document.getElementById('newItemCategory').value;
-  const name = document.getElementById('newItemName').value;
-  const desc = document.getElementById('newItemDesc').value;
-  const imageFile = document.getElementById('newItemImage').files[0];
-  
-  // إصلاح تعليق الزر في حالة عدم كتابة اسم المنتج
-  if(!name) {
-    alert("اكتب اسم المنتج");
-    btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
-    return;
-  }
-
-  // قراءة الأحجام والأسعار بناءً على الـ HTML الفعلي
-  let sizes = {};
-  let price = document.getElementById('priceFixed').value;
-  
-  const pS = document.getElementById('priceS').value;
-  const pL = document.getElementById('priceL').value;
-  const pD = document.getElementById('priceD').value;
-  const pXL = document.getElementById('priceXL').value;
-
-  if (pS && Number(pS) > 0) sizes.S = Number(pS);
-  if (pL && Number(pL) > 0) sizes.L = Number(pL);
-  if (pD && Number(pD) > 0) sizes.D = Number(pD);
-  if (pXL && Number(pXL) > 0) sizes.XL = Number(pXL);
-
-  let imageUrl = '';
-  if(imageFile) {
-    const formData = new FormData(); 
-    formData.append('image', imageFile);
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:formData });
-    const data = await res.json();
-    if(data.success) imageUrl = data.data.display_url;
-  }
-
-  const itemData = {
-    name: name,
-    category: category,
-    description: desc,
-    status: 'available',
-    image: imageUrl
-  };
-  
-  if(Object.keys(sizes).length > 0) itemData.sizes = sizes;
-  else if(price) itemData.price = Number(price);
-
-  await db.collection("menu").add(itemData);
-  alert("تم إضافة المنتج بنجاح للموقع!");
-  btn.innerText = "💾 حفظ المنتج وإضافته للمنيو";
-  
-  // تفريغ الحقول بعد الإضافة (اختياري لراحة الاستخدام)
-  document.getElementById('newItemName').value = '';
-  document.getElementById('newItemDesc').value = '';
-  document.getElementById('priceFixed').value = '';
-  document.getElementById('priceS').value = '';
-  document.getElementById('priceL').value = '';
-  document.getElementById('priceD').value = '';
-  document.getElementById('priceXL').value = '';
-  document.getElementById('newItemImage').value = '';
-
-  switchMenuSubTab('control');
-}
 
     function fetchCoupons() {
       db.collection("coupons").onSnapshot(snap => {
