@@ -13,7 +13,67 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@300;400;500;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style> 
-/* 🌟 تنسيق كروت الخطوة الأولى (تم حل مشكلة الرص) 🌟 */
+/* تنسيق زرار الـ Switch للغات */
+.lang-pill {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line-light);
+  border-radius: 999px; /* عشان يكون دائري من الأطراف زي باقي الأزرار */
+  overflow: hidden;
+  height: 42px; /* نفس طول الأزرار التانية بالظبط */
+}
+
+.lang-pill a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 100%;
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cream);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.lang-pill a.active {
+  background: var(--gold);
+  color: var(--green-deep);
+  pointer-events: none; /* عشان ميضغطش على اللغة اللي هو فاتحها أصلاً */
+}
+
+.lang-pill a:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.lang-pill span {
+  font-size: 16px; /* تكبير الإيموجي بتاع العلم شوية */
+}
+
+/* تظبيط الألوان في الوضع الليلي (Dark Mode) */
+body.dark-mode .lang-pill {
+  border-color: #333333;
+}
+body.dark-mode .lang-pill a.active {
+  background: var(--gold);
+  color: var(--green-deep);
+}
+body.dark-mode .lang-pill a:not(.active) {
+  color: #ffffff;
+}
+
+/* تظبيط الحجم في شاشات الموبايل الصغيرة عشان مياخدش مساحة كبيرة */
+@media (max-width: 520px) {
+  .lang-pill a {
+    padding: 0 8px;
+    font-size: 13px;
+    gap: 4px;
+  }
+  .lang-pill span {
+    font-size: 14px;
+  }
+}
 .big-order-types {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
@@ -1306,6 +1366,10 @@ body.dark-mode .field textarea::placeholder {
       <a href="#location">تواصل معنا</a>
     </nav>
     <div class="nav-actions">
+      <div class="lang-pill">
+  <a href="#" class="active" id="langAr">AR <span>🇪🇬</span></a>
+  <a href="en.html" id="langEn">EN <span>🇺🇸</span></a>
+</div>
       <a class="icon-btn" href="https://wa.me/201067841756" target="_blank" rel="noopener" title="واتساب" aria-label="واتساب">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3zm4.6-6.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
       </a>
