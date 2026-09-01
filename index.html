@@ -1937,65 +1937,85 @@ const DEFAULT_MENU = [
 ];
 
 let MENU = [];
+let isMenuFirstLoad = true; 
 
-/* ================== جلب البيانات من فايربيز (الأقسام + المنتجات) ================== */
-/* ================== جلب البيانات من فايربيز (الأقسام + المنتجات) ================== */
-let isMenuFirstLoad = true; // متغير عشان نفتح اللينك مرة واحدة بس أول ما الموقع يفتح
+function fetchMenuData() {
+  const cachedMenu = localStorage.getItem('savor_menu_cache');
+  const cacheTimestamp = localStorage.getItem('savor_menu_time');
+  const now = new Date().getTime();
 
-db.collection("menu").get().then(snapshot => {
-  let fetchedCategories = [];
-  let fetchedProducts = [];
-  let legacyOrder = [];
-  snapshot.forEach(doc => {
-    if (doc.id === 'categoriesData') {
-      fetchedCategories = doc.data().list || [];
-    } else if (doc.id === 'categoriesOrder') {
-      legacyOrder = doc.data().order || []; 
-    } else if (doc.id === 'status') {
-      return; 
-    } else {
-      fetchedProducts.push(doc.data()); 
-    }
-  });
-
-  if (fetchedCategories.length > 0) {
-    MENU = fetchedCategories.map(cat => ({...cat, items: []}));
-  } else {
-    MENU = DEFAULT_MENU.map(cat => ({...cat, items: []}));
-    if(legacyOrder.length > 0) {
-      MENU.sort((a,b) => {
-        let idxA = legacyOrder.indexOf(a.id);
-        let idxB = legacyOrder.indexOf(b.id);
-        if(idxA === -1) idxA = 999;
-        if(idxB === -1) idxB = 999;
-        return idxA - idxB;
-      });
-    }
+  // التحقق من الذاكرة المؤقتة (أقل من 12 ساعة)
+  if (cachedMenu && cacheTimestamp && now - cacheTimestamp < 12 * 60 * 60 * 1000) {
+    MENU = JSON.parse(cachedMenu);
+    renderCatNav();
+    renderMenuToHTML();
+    handleSharedLink();
+    return;
   }
 
-  fetchedProducts.forEach(item => {
-    const category = MENU.find(c => c.id === item.category);
-    if(category) category.items.push(item);
-  });
-  MENU.forEach(cat => {
-    cat.items.sort((a, b) => (a.order || 999) - (b.order || 999));
-  });
-  renderCatNav();
-  renderMenuToHTML();
+  // الجلب من قاعدة البيانات في حالة عدم وجود نسخة محفوظة
+  db.collection("menu").get().then(snapshot => {
+    let fetchedCategories = [];
+    let fetchedProducts = [];
+    let legacyOrder = [];
+    
+    snapshot.forEach(doc => {
+      if (doc.id === 'categoriesData') {
+        fetchedCategories = doc.data().list || [];
+      } else if (doc.id === 'categoriesOrder') {
+        legacyOrder = doc.data().order || []; 
+      } else if (doc.id === 'status') {
+        return; 
+      } else {
+        fetchedProducts.push(doc.data()); 
+      }
+    });
 
-  // الكود الجديد لفتح المنتج بعد التأكد 100% إن المنيو اتحمل من قاعدة البيانات
+    if (fetchedCategories.length > 0) {
+      MENU = fetchedCategories.map(cat => ({...cat, items: []}));
+    } else {
+      MENU = DEFAULT_MENU.map(cat => ({...cat, items: []}));
+      if(legacyOrder.length > 0) {
+        MENU.sort((a,b) => {
+          let idxA = legacyOrder.indexOf(a.id);
+          let idxB = legacyOrder.indexOf(b.id);
+          return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+        });
+      }
+    }
+
+    fetchedProducts.forEach(item => {
+      const category = MENU.find(c => c.id === item.category);
+      if(category) category.items.push(item);
+    });
+
+    MENU.forEach(cat => {
+      cat.items.sort((a, b) => (a.order || 999) - (b.order || 999));
+    });
+
+    // حفظ المنيو في ذاكرة المتصفح
+    localStorage.setItem('savor_menu_cache', JSON.stringify(MENU));
+    localStorage.setItem('savor_menu_time', now.toString());
+
+    renderCatNav();
+    renderMenuToHTML();
+    handleSharedLink();
+  });
+}
+
+// دالة فتح الرابط المشترك
+function handleSharedLink() {
   if (isMenuFirstLoad) {
     const urlParams = new URLSearchParams(window.location.search);
-    const shortId = urlParams.get('p'); // اللينك بقى اسمه p وواخد كود قصير
+    const shortId = urlParams.get('p'); 
 
     if (shortId) {
       try {
-        // بنفك التشفير بتاع الكود القصير عشان نرجع اسم المنتج الأصلي
         const sharedItemName = decodeURIComponent(escape(atob(shortId)));
         let itemFound = false;
         for (let c = 0; c < MENU.length; c++) {
           for (let i = 0; i < MENU[c].items.length; i++) {
-            if (MENU[c].items[i].name === sharedItemName) {
+            if (MENU[c].items[i].name === sharedItemName || MENU[c].items[i].nameEn === sharedItemName) {
               openProductModal(c, i);
               itemFound = true;
               break;
@@ -2004,13 +2024,15 @@ db.collection("menu").get().then(snapshot => {
           if (itemFound) break;
         }
       } catch(e) {
-        console.log('رابط غير صالح');
+        console.log('Invalid Link');
       }
     }
     isMenuFirstLoad = false;
   }
-});
-/* ================== أزرار التنقل العلوية والأسهم ================== */
+}
+
+// تشغيل الدالة لبدء تحميل المنيو
+fetchMenuData();
 function renderCatNav() {
   const catNav = document.getElementById('catNav');
   if(!catNav) return;

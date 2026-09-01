@@ -651,9 +651,9 @@ nav.links {
     display:flex; align-items:center; box-shadow:var(--shadow);
     background-size:cover; background-position:center;
   }
-  .cat-banner .overlay{
-    position:absolute; inset:0; background:linear-gradient(90deg, rgba(8,41,33,.92) 30%, rgba(124, 151, 144, 0.35) 85%);
-  }
+.cat-banner .overlay{
+  position:absolute; inset:0; background:linear-gradient(90deg, rgba(8,41,33,.92) 30%, rgba(124, 151, 144, 0.35) 85%);
+}
   .cat-banner-content{position:relative; z-index:2; padding:28px 34px; color:var(--cream);}
   .cat-banner-content .ic{font-size:34px; margin-bottom:6px; display:block;}
   .cat-banner-content h3{font-size:clamp(26px,3.4vw,38px); margin:0 0 4px;}
@@ -1389,47 +1389,72 @@ const DEFAULT_MENU = [
 let MENU = [];
 let isMenuFirstLoad = true; 
 
-db.collection("menu").get().then(snapshot => {
-  let fetchedCategories = [];
-  let fetchedProducts = [];
-  let legacyOrder = [];
-  snapshot.forEach(doc => {
-    if (doc.id === 'categoriesData') {
-      fetchedCategories = doc.data().list || [];
-    } else if (doc.id === 'categoriesOrder') {
-      legacyOrder = doc.data().order || []; 
-    } else if (doc.id === 'status') {
-      return; 
-    } else {
-      fetchedProducts.push(doc.data()); 
-    }
-  });
+function fetchMenuData() {
+  const cachedMenu = localStorage.getItem('savor_menu_cache');
+  const cacheTimestamp = localStorage.getItem('savor_menu_time');
+  const now = new Date().getTime();
 
-  if (fetchedCategories.length > 0) {
-    MENU = fetchedCategories.map(cat => ({...cat, items: []}));
-  } else {
-    MENU = DEFAULT_MENU.map(cat => ({...cat, items: []}));
-    if(legacyOrder.length > 0) {
-      MENU.sort((a,b) => {
-        let idxA = legacyOrder.indexOf(a.id);
-        let idxB = legacyOrder.indexOf(b.id);
-        if(idxA === -1) idxA = 999;
-        if(idxB === -1) idxB = 999;
-        return idxA - idxB;
-      });
-    }
+  // التحقق من الذاكرة المؤقتة (أقل من 12 ساعة)
+  if (cachedMenu && cacheTimestamp && now - cacheTimestamp < 12 * 60 * 60 * 1000) {
+    MENU = JSON.parse(cachedMenu);
+    renderCatNav();
+    renderMenuToHTML();
+    handleSharedLink();
+    return;
   }
 
-  fetchedProducts.forEach(item => {
-    const category = MENU.find(c => c.id === item.category);
-    if(category) category.items.push(item);
-  });
-  MENU.forEach(cat => {
-    cat.items.sort((a, b) => (a.order || 999) - (b.order || 999));
-  });
-  renderCatNav();
-  renderMenuToHTML();
+  // الجلب من قاعدة البيانات في حالة عدم وجود نسخة محفوظة
+  db.collection("menu").get().then(snapshot => {
+    let fetchedCategories = [];
+    let fetchedProducts = [];
+    let legacyOrder = [];
+    
+    snapshot.forEach(doc => {
+      if (doc.id === 'categoriesData') {
+        fetchedCategories = doc.data().list || [];
+      } else if (doc.id === 'categoriesOrder') {
+        legacyOrder = doc.data().order || []; 
+      } else if (doc.id === 'status') {
+        return; 
+      } else {
+        fetchedProducts.push(doc.data()); 
+      }
+    });
 
+    if (fetchedCategories.length > 0) {
+      MENU = fetchedCategories.map(cat => ({...cat, items: []}));
+    } else {
+      MENU = DEFAULT_MENU.map(cat => ({...cat, items: []}));
+      if(legacyOrder.length > 0) {
+        MENU.sort((a,b) => {
+          let idxA = legacyOrder.indexOf(a.id);
+          let idxB = legacyOrder.indexOf(b.id);
+          return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+        });
+      }
+    }
+
+    fetchedProducts.forEach(item => {
+      const category = MENU.find(c => c.id === item.category);
+      if(category) category.items.push(item);
+    });
+
+    MENU.forEach(cat => {
+      cat.items.sort((a, b) => (a.order || 999) - (b.order || 999));
+    });
+
+    // حفظ المنيو في ذاكرة المتصفح
+    localStorage.setItem('savor_menu_cache', JSON.stringify(MENU));
+    localStorage.setItem('savor_menu_time', now.toString());
+
+    renderCatNav();
+    renderMenuToHTML();
+    handleSharedLink();
+  });
+}
+
+// دالة فتح الرابط المشترك
+function handleSharedLink() {
   if (isMenuFirstLoad) {
     const urlParams = new URLSearchParams(window.location.search);
     const shortId = urlParams.get('p'); 
@@ -1440,7 +1465,7 @@ db.collection("menu").get().then(snapshot => {
         let itemFound = false;
         for (let c = 0; c < MENU.length; c++) {
           for (let i = 0; i < MENU[c].items.length; i++) {
-            if (MENU[c].items[i].name === sharedItemName) {
+            if (MENU[c].items[i].name === sharedItemName || MENU[c].items[i].nameEn === sharedItemName) {
               openProductModal(c, i);
               itemFound = true;
               break;
@@ -1454,7 +1479,10 @@ db.collection("menu").get().then(snapshot => {
     }
     isMenuFirstLoad = false;
   }
-});
+}
+
+// تشغيل الدالة لبدء تحميل المنيو
+fetchMenuData();
 
 function renderCatNav() {
   const catNav = document.getElementById('catNav');
@@ -1561,18 +1589,17 @@ function renderMenuToHTML() {
     section.id = 'cat-'+cat.id;
     const catDisplayName = cat.nameEn || cat.nameAr;
 
-    section.innerHTML = `
-      <div class="container">
-        <div class="cat-banner" style="background-image:url('${cat.banner}'); text-align:left;">
-          <div class="overlay" style="background:linear-gradient(270deg, rgba(8,41,33,.92) 30%, rgba(124, 151, 144, 0.35) 85%);"></div>
-          <div class="cat-banner-content">
-            <span class="ic">${cat.icon}</span><h3>${catDisplayName}</h3><span class="en"></span>
-          </div>
-        </div>
-        <div class="items-grid">
-          ${cat.items.map(item => renderItemCard(cat, item)).join('')}
-        </div>
-      </div>`;
+section.innerHTML = `
+  <div class="container">
+    <div class="cat-banner" style="background-image:url('${cat.banner}'); text-align:left;">
+<div class="overlay" style="background:linear-gradient(90deg, rgba(8,41,33,.92) 30%, rgba(124, 151, 144, 0.35) 85%);"></div>      <div class="cat-banner-content">
+        <span class="ic">${cat.icon}</span><h3>${catDisplayName}</h3><span class="en"></span>
+      </div>
+    </div>
+    <div class="items-grid">
+      ${cat.items.map(item => renderItemCard(cat, item)).join('')}
+    </div>
+  </div>`;
     menuMount.appendChild(section);
   });
   
