@@ -59,35 +59,35 @@
     background:var(--green); border-bottom:1px solid var(--line-light);
     box-shadow:0 10px 26px -18px rgba(0,0,0,.5);
   }
- .nav-wrap {
+.nav-wrap {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 12px 20px !important; 
+  padding: 12px 20px !important;
   width: 100%;
-  gap: 15px;
+  gap: 20px;
 }
-  nav.links {
-    display: flex;
-    gap: 30px;
-    align-items: center;
-    justify-content: center;
-    flex: 1; 
-  }
+
+nav.links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  flex: 1; 
+}
   nav.links a{color:var(--cream); font-weight:700; font-size:15px; position:relative; padding:6px 2px;}
   nav.links a::after{content:"";position:absolute; left:0; bottom:-2px; width:0; height:2px; background:var(--gold); transition:width .25s;}
   nav.links a:hover::after{width:100%;}
   
-  .nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 1; 
-  }
-  .brand {
-    display:flex; align-items:center; gap:10px;
-    flex-shrink: 0;
-  }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0; 
+}
+ .brand {
+  flex-shrink: 0;
+}
   .brand img{height:44px; width:auto; border-radius:8px;}
 
   /* Language Pill */
@@ -581,7 +581,6 @@
   🔴 The restaurant is currently closed, you cannot complete an order now. Please try again later.
 </div>
 
-<!-- HEADER -->
 <header class="site">
   <div class="container nav-wrap">
     <a href="#top" class="brand">
@@ -594,7 +593,6 @@
       <a href="#location">Contact Us</a>
     </nav>
     <div class="nav-actions">
-      <!-- زرار اللغة بالإنجليزي (الإنجليزي مفعل والعربي بيحولك) -->
       <div class="lang-pill">
         <a href="#" class="active">
           <img src="https://flagcdn.com/w20/us.png" alt="USA"> EN
@@ -604,7 +602,7 @@
         </a>
       </div>
       <a class="icon-btn" href="https://wa.me/201067841756" target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3zm4.6-6.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3zm4.6-6.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
       </a>
       <button class="icon-btn" id="darkModeBtn" aria-label="Dark Mode">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.5c-5.2 0-9.5-4.3-9.5-9.5 0-4.3 2.8-8 6.8-9.1.5-.1 1 .3.9.8-.4 1.5-.4 3.1.2 4.6 1.1 2.9 3.5 5 6.5 5.6 1.5.3 3 .1 4.4-.4.5-.2 1 .3.8.8-1.1 4-4.8 6.8-9.1 6.8z"/></svg>
@@ -644,8 +642,14 @@
   <div class="container hero-inner">
     <img src="savorar.png" alt="SAVOR Logo" style="height: 200px; width: auto; border-radius: 12px; margin-bottom: 22px; animation: fadeUp .7s ease both;">    
     <h1>Hungry? <span class="accent">SAVOR</span> delivers<br>to your door</h1>
-    <p class="lead">From generation to generation... Time tells its story.<br>And we chose to tell ours our way.<br><br>Savor... a taste that keeps up with time, and stays in memory.<br><br>Burger • Tortilla • Pasta • Fries • Drinks<br>Full menu... in two clicks, delivered hot and fresh to your place</p>
-
+<p class="lead">
+  From generation to generation... Time tells its story. And we chose to tell ours our way.
+Savor... a taste that keeps up with time, and stays in memory.
+Burger • Tortilla • Pasta • Fries • Drinks
+Full menu... in two clicks, delivered hot and fresh to your place
+  Burger • Tortilla • Pasta • Fries • Drinks<br>
+  Full menu... in two clicks, delivered hot and fresh to your place
+</p>
     <div class="trust-strip">
       <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M3 13h1v6a1 1 0 001 1h1v-3h12v3h1a1 1 0 001-1v-6h1l-2-7H5l-2 7z"/></svg> Fast Delivery</div>
       <div class="trust-chip"><svg viewBox="0 0 24 24"><path d="M3 13h1v6a1 1 0 001 1h1v-3h12v3h1a1 1 0 001-1v-6h1l-2-7H5l-2 7z"/></svg> Easy Ordering</div>
