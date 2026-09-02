@@ -2003,13 +2003,14 @@ function fetchMenuData() {
   });
 }
 
-// دالة فتح الرابط المشترك
 function handleSharedLink() {
   if (isMenuFirstLoad) {
     const urlParams = new URLSearchParams(window.location.search);
-    const shortId = urlParams.get('p'); 
+    let shortId = urlParams.get('p'); 
 
     if (shortId) {
+      shortId = shortId.replace(/ /g, '+'); 
+      
       try {
         const sharedItemName = decodeURIComponent(escape(atob(shortId)));
         let itemFound = false;
@@ -2030,7 +2031,6 @@ function handleSharedLink() {
     isMenuFirstLoad = false;
   }
 }
-
 // تشغيل الدالة لبدء تحميل المنيو
 fetchMenuData();
 function renderCatNav() {
@@ -2240,8 +2240,9 @@ document.getElementById('pmItemNotes').value = '';
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlayBg').classList.add('show');
   
-  // تشفير اسم المنتج عشان اللينك يكون قصير ونظيف
-  const shortId = btoa(unescape(encodeURIComponent(activePmItem.name)));
+  const rawBase64 = btoa(unescape(encodeURIComponent(activePmItem.name)));
+  const shortId = encodeURIComponent(rawBase64); 
+
   const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?p=' + shortId;
   window.history.pushState({ path: newUrl }, '', newUrl);
 }
