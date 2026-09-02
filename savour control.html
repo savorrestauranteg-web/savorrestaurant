@@ -31,8 +31,9 @@
     
     <!-- القائمة الجانبية -->
     <aside class="w-full md:w-72 glass-panel flex flex-col border-l border-slate-200">
-      <div class="p-8 border-b border-slate-200">
-        <h1 class="text-3xl font-black" style="color: #0c3d30;">SAVOR</h1>
+      <div class="p-8 border-b border-slate-200 flex justify-center">
+        <!-- تم استبدال الكلمة بصورة اللوجو مع تظبيط العرض -->
+        <img src="logo.jpeg" alt="SAVOR Logo" class="max-w-[140px] h-auto">
       </div>
    <nav class="flex-1 px-4 py-6 space-y-3">
         <button onclick="switchTab('overview')" id="nav-overview" class="w-full text-right p-4 rounded-xl nav-active flex items-center gap-3">📊 نظرة عامة على الأداء</button>
@@ -330,17 +331,25 @@ function fetchRestaurantStatus() {
       ring(1100, 250);
     }
 
-    function sendWhatsApp(phone, name, orderNum, status) {
+function sendWhatsApp(phone, name, orderNum, status) {
       let formattedPhone = phone.startsWith('01') ? '+2' + phone : phone;
-      let msg = `أهلاً بك يا ${name}\nبخصوص طلبك رقم (${orderNum}).\n\n`;
+      
+      // جهزنا الرسالة كنص عادي الأول
+      let rawMsg = `أهلاً بك يا ${name}\nبخصوص طلبك رقم (${orderNum}).\n\n`;
+      
+      // استخدام Unicode escapes عشان نضمن إن المتصفح يقراها صح 100% وميطلعش الرمز الغريب
       if (status === 'new') {
-        msg += "حالة الطلب: استلمنا طلبك بنجاح وجاري تجهيزه الآن 🍳";
+        rawMsg += "حالة الطلب: استلمنا طلبك بنجاح وجاري تجهيزه الآن \u{1F373}"; // إيموجي المقلاة 🍳
       } else if (status === 'shipped') {
-        msg += "حالة الطلب: طلبك خرج مع المندوب وفي الطريق إليك 🛵";
+        rawMsg += "حالة الطلب: طلبك خرج مع المندوب وفي الطريق إليك \u{1F6F5}"; // إيموجي السكوتر 🛵
       } else if (status === 'delivered') {
-        msg += "حالة الطلب: تم توصيل الطلب بنجاح، نتمنى لك وجبة شهية! 🔥";
+        rawMsg += "حالة الطلب: تم توصيل الطلب بنجاح، نتمنى لك وجبة شهية! \u{1F525}"; // إيموجي النار 🔥
       }
-      window.open(`https://wa.me/${formattedPhone.replace('+', '')}?text=${encodeURIComponent(msg)}`, '_blank');
+
+      // عملنا تشفير للنص بالكامل بعد ما اتأكدنا من الإيموجيز
+      let finalUrl = `https://wa.me/${formattedPhone.replace('+', '')}?text=${encodeURIComponent(rawMsg)}`;
+      
+      window.open(finalUrl, '_blank');
     }
 
     let isFirstOrdersLoad = true;
@@ -349,7 +358,7 @@ function fetchRestaurantStatus() {
     let allMenuItems = [];
     let salesChartInstance = null;
   /* ================== نظام الطلبات والإحصائيات ================== */
-    function fetchOrders() {
+  function fetchOrders() {
       db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
         if (!isFirstOrdersLoad) {
           snapshot.docChanges().forEach(change => {
@@ -367,7 +376,6 @@ function fetchRestaurantStatus() {
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        // تجهيز بيانات آخر 7 أيام للرسم البياني
         const last7Days = [...Array(7)].map((_, i) => {
           const d = new Date(todayStart);
           d.setDate(d.getDate() - i);
@@ -379,7 +387,6 @@ function fetchRestaurantStatus() {
           const order = { id: doc.id, ...doc.data() };
           allOrders.push(order);
 
-          // حساب الإحصائيات
           let orderDate = order.timestamp ? (order.timestamp.toDate ? order.timestamp.toDate() : new Date(order.timestamp)) : new Date();
           
           if(order.status === 'new') newOrdersCount++;
@@ -389,7 +396,6 @@ function fetchRestaurantStatus() {
             if(orderDate >= todayStart) {
                todaySales += parseFloat(order.total) || 0;
             }
-            // بيانات الرسم البياني
             for(let i=0; i<7; i++) {
               if (orderDate.toDateString() === last7Days[i].toDateString()) {
                 dailySales[i] += parseFloat(order.total) || 0;
@@ -397,14 +403,31 @@ function fetchRestaurantStatus() {
             }
           }
         });
-// تحديث أرقام النظرة العامة
+
+        // ================= إضافة حساب التسلسل اليومي =================
+        // هنحسب العداد هنا بعد ما كل الطلبات اتجمعت في allOrders
+        let chronologicalOrders = [...allOrders].reverse();
+        let dailyCounters = {}; 
+
+        chronologicalOrders.forEach(order => {
+          let orderDate = order.timestamp ? (order.timestamp.toDate ? order.timestamp.toDate() : new Date(order.timestamp)) : new Date();
+          let dateString = orderDate.toLocaleDateString('en-GB'); 
+          
+          if (!dailyCounters[dateString]) {
+            dailyCounters[dateString] = 1; 
+          }
+          order.dailyNumber = dailyCounters[dateString]++;
+        });
+        
+        // بعد ما حسبنا الـ dailyNumber بنعكس allOrders تاني عشان الأحدث يظهر الأول
+        allOrders = chronologicalOrders.reverse();
+        // =============================================================
+
         document.getElementById('statTodaySales').innerText = todaySales + ' ج.م';
         document.getElementById('statNewOrders').innerText = newOrdersCount;
         document.getElementById('statMonthOrders').innerText = monthOrdersCount;
-// تحديث الرسم البياني
         updateChart(last7Days.map(d => d.toLocaleDateString('ar-EG', {weekday: 'short', month: 'numeric', day: 'numeric'})), dailySales);
 
-        // تفعيل الفلتر وعرض الجدول
         filterOrders(); 
       });
     }
@@ -468,7 +491,7 @@ function updateChart(labels, data) {
       filterOrders();
     }
 
-    function renderOrdersTableHTML(data) {
+   function renderOrdersTableHTML(data) {
       const tbody = document.getElementById('ordersTableBody');
       tbody.innerHTML = ''; 
       if (data.length === 0) {
@@ -482,10 +505,15 @@ function updateChart(labels, data) {
           const dateObj = order.timestamp.toDate ? order.timestamp.toDate() : new Date(order.timestamp);
           dateStr = dateObj.toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
-        const orderNum = order.orderNumber || order.id.substring(0, 6);
+        
+        // هنا هنتأكد إن الـ dailyNumber موجود، ولو لسبب ما مش موجود (حصل لاج مثلاً)، هيعرض الـ ID كبديل مؤقت
+        const displayOrderNum = order.dailyNumber || order.id.substring(0, 6);
+        
+        const safeAddress = (order.address || 'بدون عنوان').replace(/'/g, "\\'");
+
         tbody.innerHTML += `
           <tr class="border-b hover:bg-slate-100 transition duration-150">
-            <td class="p-4 font-bold text-orange-600">#${orderNum}</td>
+            <td class="p-4 font-bold text-orange-600">#${displayOrderNum}</td>
             <td class="p-4">
               <div class="font-bold">${order.customerName || 'بدون اسم'}</div>
               <div class="text-sm text-slate-500" dir="ltr">${order.phone || ''}</div>
@@ -500,16 +528,17 @@ function updateChart(labels, data) {
               </select>
             </td>
             <td class="p-4 flex justify-center gap-2">
-              <button onclick="viewDetails('${order.items}', '${order.address}', '${order.notes}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm" title="التفاصيل">📄</button>
-              <button onclick="printOrder('${orderNum}', '${order.customerName}', '${order.phone}', '${order.items}', '${order.total}')" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm" title="طباعة الفاتورة">🖨️</button>
-              <button onclick="sendWhatsApp('${order.phone || ''}', '${order.customerName || ''}', '${orderNum}', '${order.status}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm" title="مراسلة واتساب">💬</button>
+              <button onclick="viewDetails('${order.items}', '${safeAddress}', '${order.notes}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm" title="التفاصيل">📄</button>
+              
+              <button onclick="printOrder('${order.id.substring(0, 6)}', '${displayOrderNum}', '${order.customerName}', '${order.phone}', '${safeAddress}', '${order.items}', '${order.total}')" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm" title="طباعة الفاتورة">🖨️</button>
+              
+              <button onclick="sendWhatsApp('${order.phone || ''}', '${order.customerName || ''}', '${displayOrderNum}', '${order.status}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm" title="مراسلة واتساب">💬</button>
               <button onclick="deleteOrder('${order.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm" title="حذف الطلب">🗑️</button>
             </td>
           </tr>
         `;
       });
     }
-
     /* ================== نظام المنيو والبحث ================== */
     function fetchMenu() {
       db.collection("menu").onSnapshot(snapshot => {
@@ -602,16 +631,20 @@ function renderMenuTableHTML(data) {
       alert(`تفاصيل الطلب:\n${items}\n\nالعنوان:\n${address}\n\nملاحظات:\n${notes || 'لا يوجد'}`);
     }
 
-    function printOrder(orderNum, name, phone, items, total) {
+    function printOrder(orderNum, dailyNum, name, phone, address, items, total) {
       const win = window.open('', '_blank', 'width=400,height=600');
       win.document.write(`
         <html dir="rtl">
         <body style="font-family: Tahoma; padding: 20px;">
-          <h2 style="text-align: center;">SAVOR</h2>
+          <div style="text-align: center; margin-bottom: 15px;">
+            <!-- تأكد إن اسم صورة اللوجو صحيح وموجودة في ملفاتك -->
+            <img src="savorarabic.jpeg" alt="SAVOR" style="max-width: 120px; height: auto;">
+          </div>
           <hr>
-          <p><b>رقم الطلب:</b> #${orderNum}</p>
+          <p><b>Order #:</b> ${dailyNum}</p>
           <p><b>العميل:</b> ${name}</p>
           <p><b>الموبايل:</b> ${phone}</p>
+          <p><b>العنوان:</b> ${address}</p>
           <hr>
           <h3>الأصناف:</h3>
           <p style="line-height: 1.8;">${items}</p>
@@ -623,7 +656,6 @@ function renderMenuTableHTML(data) {
       `);
       win.document.close();
     }
-
     function switchTab(tabName) {
       document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
       document.getElementById('sec-' + tabName).classList.remove('hidden');
