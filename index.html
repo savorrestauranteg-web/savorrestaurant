@@ -2011,27 +2011,44 @@ function handleSharedLink() {
     if (shortId) {
       shortId = shortId.replace(/ /g, '+'); 
       
+      let sharedItemName = "";
       try {
-        const sharedItemName = decodeURIComponent(escape(atob(shortId)));
+        // الطريقة الجديدة الآمنة للحروف العربية
+        sharedItemName = decodeURIComponent(atob(shortId));
+      } catch(e1) {
+        try {
+          // لدعم أي لينكات قديمة اتعملها شير قبل التعديل
+          sharedItemName = decodeURIComponent(escape(atob(shortId)));
+        } catch(e2) {
+          console.log('Invalid Link Decoding');
+        }
+      }
+
+      if (sharedItemName) {
         let itemFound = false;
         for (let c = 0; c < MENU.length; c++) {
           for (let i = 0; i < MENU[c].items.length; i++) {
-            if (MENU[c].items[i].name === sharedItemName || MENU[c].items[i].nameEn === sharedItemName) {
-              openProductModal(c, i);
+            // استخدام trim لتجاهل أي مسافات زائدة في الداتابيز
+            const dbName = MENU[c].items[i].name ? MENU[c].items[i].name.trim() : "";
+            const dbNameEn = MENU[c].items[i].nameEn ? MENU[c].items[i].nameEn.trim() : "";
+            const targetName = sharedItemName.trim();
+            
+            if (dbName === targetName || dbNameEn === targetName) {
+              // تأخير بسيط جداً لضمان عدم تعارض فتح النافذة مع رسم عناصر الصفحة
+              setTimeout(() => {
+                openProductModal(c, i);
+              }, 100);
               itemFound = true;
               break;
             }
           }
           if (itemFound) break;
         }
-      } catch(e) {
-        console.log('Invalid Link');
       }
     }
     isMenuFirstLoad = false;
   }
 }
-// تشغيل الدالة لبدء تحميل المنيو
 fetchMenuData();
 function renderCatNav() {
   const catNav = document.getElementById('catNav');
@@ -2240,11 +2257,16 @@ document.getElementById('pmItemNotes').value = '';
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlayBg').classList.add('show');
   
-  const rawBase64 = btoa(unescape(encodeURIComponent(activePmItem.name)));
+// التشفير الآمن 100% بدون الدوال القديمة
+  const safeName = encodeURIComponent(activePmItem.name);
+  const rawBase64 = btoa(safeName); 
   const shortId = encodeURIComponent(rawBase64); 
 
   const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?p=' + shortId;
-  window.history.pushState({ path: newUrl }, '', newUrl);
+  try {
+    window.history.pushState({ path: newUrl }, '', newUrl);
+  } catch(e) {}
+
 }
 
 function changePmSize(sizeKey) { activePmSize = sizeKey; updatePmTotal(); }
