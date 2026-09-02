@@ -334,22 +334,18 @@ function fetchRestaurantStatus() {
 function sendWhatsApp(phone, name, orderNum, status) {
       let formattedPhone = phone.startsWith('01') ? '+2' + phone : phone;
       
-      // جهزنا الرسالة كنص عادي الأول
-      let rawMsg = `أهلاً بك يا ${name}\nبخصوص طلبك رقم (${orderNum}).\n\n`;
+      let msg = `أهلاً بك يا ${name}\nبخصوص طلبك رقم (${orderNum}).\n\n`;
       
-      // استخدام Unicode escapes عشان نضمن إن المتصفح يقراها صح 100% وميطلعش الرمز الغريب
+      // إزالة الإيموجيز لضمان توافق النص مع جميع الأجهزة والمتصفحات
       if (status === 'new') {
-        rawMsg += "حالة الطلب: استلمنا طلبك بنجاح وجاري تجهيزه الآن \u{1F373}"; // إيموجي المقلاة 🍳
+        msg += "حالة الطلب: استلمنا طلبك بنجاح وجاري تجهيزه الآن."; 
       } else if (status === 'shipped') {
-        rawMsg += "حالة الطلب: طلبك خرج مع المندوب وفي الطريق إليك \u{1F6F5}"; // إيموجي السكوتر 🛵
+        msg += "حالة الطلب: طلبك خرج مع المندوب وفي الطريق إليك."; 
       } else if (status === 'delivered') {
-        rawMsg += "حالة الطلب: تم توصيل الطلب بنجاح، نتمنى لك وجبة شهية! \u{1F525}"; // إيموجي النار 🔥
+        msg += "حالة الطلب: تم توصيل الطلب بنجاح، نتمنى لك وجبة شهية!"; 
       }
 
-      // عملنا تشفير للنص بالكامل بعد ما اتأكدنا من الإيموجيز
-      let finalUrl = `https://wa.me/${formattedPhone.replace('+', '')}?text=${encodeURIComponent(rawMsg)}`;
-      
-      window.open(finalUrl, '_blank');
+      window.open(`https://wa.me/${formattedPhone.replace('+', '')}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     let isFirstOrdersLoad = true;
@@ -631,7 +627,9 @@ function renderMenuTableHTML(data) {
       alert(`تفاصيل الطلب:\n${items}\n\nالعنوان:\n${address}\n\nملاحظات:\n${notes || 'لا يوجد'}`);
     }
 
-    function printOrder(orderNum, dailyNum, name, phone, address, items, total) {
+   function printOrder(orderNum, dailyNum, name, phone, address, items, total) {
+      const formattedItems = items.split('، ').join('<br><br> • ');
+
       const win = window.open('', '_blank', 'width=400,height=600');
       win.document.write(`
         <html dir="rtl">
@@ -647,7 +645,10 @@ function renderMenuTableHTML(data) {
           <p><b>العنوان:</b> ${address}</p>
           <hr>
           <h3>الأصناف:</h3>
-          <p style="line-height: 1.8;">${items}</p>
+          <!-- 2. استخدام الأصناف المنسقة هنا -->
+          <p style="line-height: 1.6; font-size: 16px; margin-top: 10px;">
+            • ${formattedItems}
+          </p>
           <hr>
           <h2>الإجمالي: ${total} ج.م</h2>
           <script>window.onload = function() { window.print(); }<\/script>
@@ -656,6 +657,7 @@ function renderMenuTableHTML(data) {
       `);
       win.document.close();
     }
+    
     function switchTab(tabName) {
       document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
       document.getElementById('sec-' + tabName).classList.remove('hidden');
