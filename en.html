@@ -1459,32 +1459,26 @@ function handleSharedLink() {
     let shortId = urlParams.get('p'); 
 
     if (shortId) {
+      // حماية إضافية لدعم اللينكات المتشيرة من قبل
       shortId = shortId.replace(/ /g, '+'); 
       
       let sharedItemName = "";
       try {
-        // الطريقة الجديدة الآمنة للحروف العربية
-        sharedItemName = decodeURIComponent(atob(shortId));
-      } catch(e1) {
-        try {
-          // لدعم أي لينكات قديمة اتعملها شير قبل التعديل
-          sharedItemName = decodeURIComponent(escape(atob(shortId)));
-        } catch(e2) {
-          console.log('Invalid Link Decoding');
-        }
+        // فك التشفير القصير
+        sharedItemName = decodeURIComponent(escape(atob(shortId)));
+      } catch(e) {
+        console.log('Invalid Link Decoding');
       }
 
       if (sharedItemName) {
         let itemFound = false;
         for (let c = 0; c < MENU.length; c++) {
           for (let i = 0; i < MENU[c].items.length; i++) {
-            // استخدام trim لتجاهل أي مسافات زائدة في الداتابيز
             const dbName = MENU[c].items[i].name ? MENU[c].items[i].name.trim() : "";
             const dbNameEn = MENU[c].items[i].nameEn ? MENU[c].items[i].nameEn.trim() : "";
             const targetName = sharedItemName.trim();
             
             if (dbName === targetName || dbNameEn === targetName) {
-              // تأخير بسيط جداً لضمان عدم تعارض فتح النافذة مع رسم عناصر الصفحة
               setTimeout(() => {
                 openProductModal(c, i);
               }, 100);
@@ -1696,10 +1690,10 @@ function openProductModal(catIdx, itemIdx) {
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlayBg').classList.add('show');
   
-// التشفير الآمن 100% بدون الدوال القديمة
-  const safeName = encodeURIComponent(activePmItem.name);
-  const rawBase64 = btoa(safeName); 
-  const shortId = encodeURIComponent(rawBase64); 
+// التشفير القصير والآمن 100%
+  const utf8Str = unescape(encodeURIComponent(activePmItem.name));
+  const rawBase64 = btoa(utf8Str); 
+  const shortId = encodeURIComponent(rawBase64); // حماية علامة الزائد من الضياع
 
   const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?p=' + shortId;
   try {
