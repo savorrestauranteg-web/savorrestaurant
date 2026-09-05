@@ -3,9 +3,9 @@
 <head>
     <meta property="og:image" content="savor.jpeg">
 <meta name="google-site-verification" content="IEElWIfKv06owi6N11uNfxBCnJGVZdqjAQLvnV1eEXI" />
-  <meta property="og:type" content="website">
+<meta property="og:type" content="website">
 <meta property="og:title" content="Savor Restaurant">
-<meta property="og:description" content="برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة، يوصلك الطلب لحد باب البيت.">
+<meta property="og:description" content="برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة.">
 <meta property="og:image" content="https://savoregy.vercel.app/savor.jpeg">
 <meta property="og:url" content="https://savoregy.vercel.app/">
 <meta charset="UTF-8">
@@ -1854,6 +1854,24 @@ body.dark-mode .field textarea::placeholder {
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script>
+const TELEGRAM_BOT_TOKEN = '8775573638:AAH01L9JerMwWuIZPs2sfTMmpbqf4nRqU4I';
+const TELEGRAM_CHAT_ID = '8540698486';
+
+async function notifyTelegram(orderMsg) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: "🔔 <b>أوردر جديد من الموقع:</b>\n\n" + orderMsg,
+        parse_mode: "HTML"
+      })
+    });
+  } catch (err) {
+    console.error('Telegram error:', err);
+  }
+}
 /* ================== تشغيل نافذة المكالمات ================== */
 const callModal = document.getElementById('callModal');
 const callModalCloseBtn = document.getElementById('callModalCloseBtn');
@@ -2797,20 +2815,16 @@ orderTypeRadios.forEach(radio => {
   });
 });
 
-/* ================== تعديل إرسال الطلب لواتساب ================== */
-// استبدل حدث الضغط على sendOrderBtn الموجود حالياً في ملفك بهذا الكود:
-document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
+/* ================== إرسال الطلب لواتساب وتليجرام ================== */
+document.getElementById('sendOrderBtn').addEventListener('click', async () => {
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const address = document.getElementById('custAddress').value.trim();
   const table = document.getElementById('custTable') ? document.getElementById('custTable').value.trim() : '';
   const notes = document.getElementById('custNotes').value.trim();
   const couponCode = document.getElementById('cartCouponInput') ? document.getElementById('cartCouponInput').value.trim().toUpperCase() : '';
-  
-  // الحصول على نوع الطلب المحدد
-  const orderType = document.querySelector('input[name="orderType"]:checked').value;
+  const orderType = finalTypeInput.value;
 
-  // التحقق من البيانات بناءً على نوع الطلب
   if(!name){ showToast('من فضلك اكتب الاسم 📝'); return; }
   if(orderType === 'دليفري' && (!phone || !address)){ showToast('من فضلك اكتب الموبايل والعنوان 📝'); return; }
   if(orderType === 'تيك أواي' && !phone){ showToast('من فضلك اكتب الموبايل للتواصل 📝'); return; }
@@ -2825,63 +2839,64 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(validDiscount >= subTotal) { validDiscount = subTotal; }
   const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
 
-  // تجهيز رسالة الواتساب
-  let msg = `مرحبا SAVOR، عندي أوردر جديد:\n`;
+  // رسالة الواتساب
+  let msg = `مرحبا SAVOR، ممكن أطلب أوردر:\n`;
   msg += `📍 نوع الطلب: *${orderType}*\n\n`;
-  
   cart.forEach(item => { 
     msg += `• ${item.name}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; 
-    if(item.notes) {
-      msg += `   └ ملاحظة: ${item.notes}\n`; 
-    }
+    if(item.notes) msg += `   └ ملاحظة: ${item.notes}\n`; 
   });
-  
   msg += `\n-------------------\n`;
   msg += `المجموع الفرعي: ${subTotal} ج.م\n`;
-  if(validDiscount > 0) {
-      msg += `الخصم: -${validDiscount} ج.م (كوبون: ${couponCode})\n`;
-  }
+  if(validDiscount > 0) msg += `الخصم: -${validDiscount} ج.م (كوبون: ${couponCode})\n`;
   msg += `الإجمالي النهائي: *${finalTotal} ج.م*\n`;
   msg += `-------------------\n\n`;
   msg += `👤 الاسم: ${name}\n`;
-  
-  // إضافة البيانات بناءً على النوع
   if(orderType === 'دليفري' || orderType === 'تيك أواي') msg += `📱 الموبايل: ${phone}\n`;
   if(orderType === 'دليفري') msg += `🏠 العنوان: ${address}\n`;
   if(orderType === 'صالة') msg += `🍽️ رقم الترابيزة: ${table}\n`;
-  
   if(notes) msg += `📝 ملاحظات إضافية: ${notes}\n`;
 
-  // الحفظ في قاعدة البيانات (كما هو في الكود الخاص بك) ثم التوجيه لواتساب
-  db.collection('orders').add({
-    orderType: orderType,
-    customerName: name, 
-    phone: phone, 
-    address: address,
-    table: table,
-    notes: notes,
-    couponCode: validDiscount > 0 ? couponCode : "",
-    discount: validDiscount,
-    items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [ملاحظة: '+i.notes+']' : ''}`).join('، '),
-    total: finalTotal,
-    status: 'new', 
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    cart = []; 
-    currentDiscountValue = 0; 
-    saveCart(); 
-    renderCart(); 
-    closeCheckoutModal();
-    btn.innerHTML = 'إرسال الطلب على واتساب'; 
-    btn.disabled = false;
-    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
-  })
-  .catch(err => {
-    btn.innerHTML = 'إرسال الطلب على واتساب'; 
-    btn.disabled = false;
-    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
+  // رسالة التليجرام بصيغة HTML لتجنب أي أخطاء بارسينج
+  let tgMsg = `📍 نوع الطلب: <b>${orderType}</b>\n\n`;
+  cart.forEach(item => {
+    tgMsg += `• ${item.name}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} ج.م\n`;
+    if(item.notes) tgMsg += `   └ ملاحظة: ${item.notes}\n`;
   });
+  tgMsg += `\n───────────────────\n`;
+  tgMsg += `المجموع الفرعي: ${subTotal} ج.م\n`;
+  if(validDiscount > 0) tgMsg += `الخصم: -${validDiscount} ج.م (كوبون: ${couponCode})\n`;
+  tgMsg += `الإجمالي النهائي: <b>${finalTotal} ج.م</b>\n`;
+  tgMsg += `───────────────────\n\n`;
+  tgMsg += `👤 الاسم: ${name}\n`;
+  if(orderType === 'دليفري' || orderType === 'تيك أواي') tgMsg += `📱 الموبايل: ${phone}\n`;
+  if(orderType === 'دليفري') tgMsg += `🏠 العنوان: ${address}\n`;
+  if(orderType === 'صالة') tgMsg += `🍽️ رقم الترابيزة: ${table}\n`;
+  if(notes) tgMsg += `📝 ملاحظات إضافية: ${notes}\n`;
+
+  try {
+    await db.collection('orders').add({
+      orderType: orderType, customerName: name, phone: phone, address: address, table: table, notes: notes,
+      couponCode: validDiscount > 0 ? couponCode : "", discount: validDiscount,
+      items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [ملاحظة: '+i.notes+']' : ''}`).join('، '),
+      total: finalTotal, status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {
+    console.error('Database save error:', e);
+  }
+
+  // إرسال التنبيه لتليجرام وانتظار الإرسال
+  await notifyTelegram(tgMsg);
+
+  cart = []; 
+  currentDiscountValue = 0; 
+  saveCart(); 
+  renderCart(); 
+  closeCheckoutModal();
+  btn.innerHTML = 'إرسال الطلب على واتساب'; 
+  btn.disabled = false;
+  
+  window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
 });
 </script>
 </body>

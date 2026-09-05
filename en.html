@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <meta property="og:image" content="savor.jpeg">
+ <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savor Restaurant</title>
+    <meta name="google-site-verification" content="IEElWIfKv06owi6N11uNfxBCnJGVZdqjAQLvnV1eEXI">
+   <meta property="og:type" content="website">
 <meta property="og:title" content="Savor Restaurant">
-<meta property="og:description" content="اطلب الآن من موقعنا الإلكتروني">
-  <meta name="google-site-verification" content="IEElWIfKv06owi6N11uNfxBCnJGVZdqjAQLvnV1eEXI" />
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Savor Restaurant">
-  <meta property="og:description" content="Beef burger, crispy chicken, tortilla, fries and drinks. Order online easily, delivered to your door.">
-  <meta property="og:image" content="https://yourwebsite.com/logo.jpeg"> 
-  <meta property="og:url" content="https://yourwebsite.com/">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Savor Restaurant</title>
+<meta property="og:description" content="برجر لحمة، تشيكن كرسبي، تورتيلا، بطاطس ومشروبات. اطلب أونلاين بسهولة.">
+<meta property="og:image" content="https://savoregy.vercel.app/savor.jpeg">
+<meta property="og:url" content="https://savoregy.vercel.app/">
+     <title>Savor Restaurant</title>
   <meta name="description" content="SAVOR - Beef burger, crispy chicken, tortilla, fries and drinks. Order online easily, delivered to your door.">
   <link rel="icon" href="savor.jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1330,6 +1328,24 @@ nav.links {
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script>
+const TELEGRAM_BOT_TOKEN = '8775573638:AAH01L9JerMwWuIZPs2sfTMmpbqf4nRqU4I';
+const TELEGRAM_CHAT_ID = '8540698486';
+
+async function notifyTelegram(orderMsg) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: "🔔 <b>أوردر جديد من الموقع:</b>\n\n" + orderMsg,
+        parse_mode: "HTML"
+      })
+    });
+  } catch (err) {
+    console.error('Telegram error:', err);
+  }
+}
 const menuScrollTopBtn = document.getElementById('menuScrollTopBtn');
 window.addEventListener('scroll', () => {
   if (!menuScrollTopBtn) return;
@@ -2036,7 +2052,8 @@ function closeCheckoutModal(){
   checkoutModal.classList.remove('show'); overlayBg.classList.remove('show'); setTimeout(resetCheckoutModal, 300);
 }
 
-document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
+/* ================== Send Order to WhatsApp & Telegram ================== */
+document.getElementById('sendOrderBtn').addEventListener('click', async () => {
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const address = document.getElementById('custAddress').value.trim();
@@ -2051,7 +2068,8 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(orderType === 'صالة' && !table){ showToast('Please enter table number 📝'); return; }
 
   const btn = document.getElementById('sendOrderBtn');
-  btn.innerHTML = 'Sending...'; btn.disabled = true;
+  btn.innerHTML = 'Sending...'; 
+  btn.disabled = true;
 
   const subTotal = cartTotal();
   let validDiscount = currentDiscountValue;
@@ -2062,15 +2080,14 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(orderType === "تيك أواي") engOrderType = "Takeaway";
   if(orderType === "صالة") engOrderType = "Dine-in";
 
+  // WhatsApp Message
   let msg = `Hello SAVOR, I'd like to place an order:\n`;
   msg += `📍 Order Type: *${engOrderType}*\n\n`;
-  
   cart.forEach(item => { 
     const itemName = item.nameEn || item.name;
     msg += `• ${itemName}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} EGP\n`; 
     if(item.notes) msg += `   └ Note: ${item.notes}\n`; 
   });
-  
   msg += `\n-------------------\n`;
   msg += `Subtotal: ${subTotal} EGP\n`;
   if(validDiscount > 0) msg += `Discount: -${validDiscount} EGP (Coupon: ${couponCode})\n`;
@@ -2082,19 +2099,55 @@ document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
   if(orderType === 'صالة') msg += `🍽️ Table No: ${table}\n`;
   if(notes) msg += `📝 Additional Notes: ${notes}\n`;
 
-  db.collection('orders').add({
-    orderType: orderType, customerName: name, phone: phone, address: address, table: table, notes: notes,
-    couponCode: validDiscount > 0 ? couponCode : "", discount: validDiscount,
-    items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [Note: '+i.notes+']' : ''}`).join(', '),
-    total: finalTotal, status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    cart = []; currentDiscountValue = 0; saveCart(); renderCart(); closeCheckoutModal();
-    btn.innerHTML = 'Send Order on WhatsApp'; btn.disabled = false;
-    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
-  }).catch(err => {
-    btn.innerHTML = 'Send Order on WhatsApp'; btn.disabled = false;
-    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
+  // Telegram HTML Message
+  let tgMsg = `📍 Order Type: <b>${engOrderType}</b>\n\n`;
+  cart.forEach(item => {
+    const itemName = item.nameEn || item.name;
+    tgMsg += `• ${itemName}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} EGP\n`;
+    if(item.notes) tgMsg += `   └ Note: ${item.notes}\n`;
   });
+  tgMsg += `\n───────────────────\n`;
+  tgMsg += `Subtotal: ${subTotal} EGP\n`;
+  if(validDiscount > 0) tgMsg += `Discount: -${validDiscount} EGP (Coupon: ${couponCode})\n`;
+  tgMsg += `Final Total: <b>${finalTotal} EGP</b>\n`;
+  tgMsg += `───────────────────\n\n`;
+  tgMsg += `👤 Name: ${name}\n`;
+  if(orderType === 'دليفري' || orderType === 'تيك أواي') tgMsg += `📱 Mobile: ${phone}\n`;
+  if(orderType === 'دليفري') tgMsg += `🏠 Address: ${address}\n`;
+  if(orderType === 'صالة') tgMsg += `🍽️ Table No: ${table}\n`;
+  if(notes) tgMsg += `📝 Additional Notes: ${notes}\n`;
+
+  try {
+    await db.collection('orders').add({
+      orderType: orderType, 
+      customerName: name, 
+      phone: phone, 
+      address: address, 
+      table: table, 
+      notes: notes,
+      couponCode: validDiscount > 0 ? couponCode : "", 
+      discount: validDiscount,
+      items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [Note: '+i.notes+']' : ''}`).join(', '),
+      total: finalTotal, 
+      status: 'new', 
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {
+    console.error('Database save error:', e);
+  }
+
+  // Send Telegram Notification and wait
+  await notifyTelegram(tgMsg);
+
+  cart = []; 
+  currentDiscountValue = 0; 
+  saveCart(); 
+  renderCart(); 
+  closeCheckoutModal();
+  btn.innerHTML = 'Send Order on WhatsApp'; 
+  btn.disabled = false;
+  
+  window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
 });
 
 function showToast(text){
