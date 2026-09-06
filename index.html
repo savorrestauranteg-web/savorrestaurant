@@ -2760,7 +2760,13 @@ orderTypeRadios.forEach(radio => {
 });
 
 /* ================== إرسال الطلب لواتساب وتليجرام ================== */
-document.getElementById('sendOrderBtn').addEventListener('click', async () => {
+document.getElementById('sendOrderBtn').addEventListener('click', async function handleOrderSubmit(e) {
+  // منع السلوك الافتراضي وأي تكرار
+  if (e) e.preventDefault();
+  
+  const btn = document.getElementById('sendOrderBtn');
+  if (btn.disabled) return; // حماية إضافية ضد الضغط المتعدد
+
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const address = document.getElementById('custAddress').value.trim();
@@ -2774,9 +2780,10 @@ document.getElementById('sendOrderBtn').addEventListener('click', async () => {
   if(orderType === 'تيك أواي' && !phone){ showToast('من فضلك اكتب الموبايل للتواصل 📝'); return; }
   if(orderType === 'صالة' && !table){ showToast('من فضلك اكتب رقم الترابيزة 📝'); return; }
 
-  const btn = document.getElementById('sendOrderBtn');
+  // تعطيل الزر فوراً
   btn.innerHTML = 'جاري إرسال الطلب...';
   btn.disabled = true;
+  btn.style.pointerEvents = 'none';
 
   const subTotal = cartTotal();
   let validDiscount = currentDiscountValue;
@@ -2801,7 +2808,7 @@ document.getElementById('sendOrderBtn').addEventListener('click', async () => {
   if(orderType === 'صالة') msg += `🍽️ رقم الترابيزة: ${table}\n`;
   if(notes) msg += `📝 ملاحظات إضافية: ${notes}\n`;
 
-  // رسالة التليجرام بصيغة HTML لتجنب أي أخطاء بارسينج
+  // رسالة التليجرام
   let tgMsg = `📍 نوع الطلب: <b>${orderType}</b>\n\n`;
   cart.forEach(item => {
     tgMsg += `• ${item.name}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} ج.م\n`;
@@ -2829,17 +2836,17 @@ document.getElementById('sendOrderBtn').addEventListener('click', async () => {
     console.error('Database save error:', e);
   }
 
-  // إرسال التنبيه لتليجرام وانتظار الإرسال
+  // إرسال تنبيه التليجرام
   await notifyTelegram(tgMsg);
 
+  // تصفري السلة وإغلاق النافذة
   cart = []; 
   currentDiscountValue = 0; 
   saveCart(); 
   renderCart(); 
   closeCheckoutModal();
-  btn.innerHTML = 'إرسال الطلب على واتساب'; 
-  btn.disabled = false;
   
+  // فتح الواتساب
   window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
 });
 </script>

@@ -353,9 +353,12 @@ function sendWhatsApp(phone, name, orderNum, status) {
     let allOrders = [];
     let allMenuItems = [];
     let salesChartInstance = null;
-  /* ================== نظام الطلبات والإحصائيات ================== */
+/* ================== نظام الطلبات والإحصائيات ================== */
   function fetchOrders() {
-      db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+      db.collection("orders").orderBy("timestamp", "desc").onSnapshot({ includeMetadataChanges: true }, snapshot => {
+        // تجاهل التحديثات المحلية المؤقتة قبل تثبيتها على السيرفر
+        if (snapshot.metadata.hasPendingWrites) return;
+
         if (!isFirstOrdersLoad) {
           snapshot.docChanges().forEach(change => {
             if (change.type === 'added') { playOrderBeep(); }
