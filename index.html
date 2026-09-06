@@ -2661,63 +2661,7 @@ function closeCheckoutModal(){
   setTimeout(resetCheckoutModal, 300);
 }
 
-/* ================== إرسال الطلب لواتساب المحدث ================== */
-document.getElementById('sendOrderBtn').addEventListener('click', ()=>{
-  const name = document.getElementById('custName').value.trim();
-  const phone = document.getElementById('custPhone').value.trim();
-  const address = document.getElementById('custAddress').value.trim();
-  const table = document.getElementById('custTable') ? document.getElementById('custTable').value.trim() : '';
-  const notes = document.getElementById('custNotes').value.trim();
-  const couponCode = document.getElementById('cartCouponInput') ? document.getElementById('cartCouponInput').value.trim().toUpperCase() : '';
-  const orderType = finalTypeInput.value;
 
-  if(!name){ showToast('من فضلك اكتب الاسم 📝'); return; }
-  if(orderType === 'دليفري' && (!phone || !address)){ showToast('من فضلك اكتب الموبايل والعنوان 📝'); return; }
-  if(orderType === 'تيك أواي' && !phone){ showToast('من فضلك اكتب الموبايل للتواصل 📝'); return; }
-  if(orderType === 'صالة' && !table){ showToast('من فضلك اكتب رقم الترابيزة 📝'); return; }
-
-  const btn = document.getElementById('sendOrderBtn');
-  btn.innerHTML = 'جاري إرسال الطلب...';
-  btn.disabled = true;
-
-  const subTotal = cartTotal();
-  let validDiscount = currentDiscountValue;
-  if(validDiscount >= subTotal) { validDiscount = subTotal; }
-  const finalTotal = subTotal > 0 ? (subTotal + DELIVERY_FEE - validDiscount) : 0;
-
-  let msg = `مرحبا SAVOR، ممكن أطلب أوردر:\n`;
-  msg += `📍 نوع الطلب: *${orderType}*\n\n`;
-  
-  cart.forEach(item => { 
-    msg += `• ${item.name}${item.size ? ' ('+item.size+')' : ''} × ${item.qty} = ${item.price*item.qty} ج.م\n`; 
-    if(item.notes) msg += `   └ ملاحظة: ${item.notes}\n`; 
-  });
-  
-  msg += `\n-------------------\n`;
-  msg += `المجموع الفرعي: ${subTotal} ج.م\n`;
-  if(validDiscount > 0) msg += `الخصم: -${validDiscount} ج.م (كوبون: ${couponCode})\n`;
-  msg += `الإجمالي النهائي: *${finalTotal} ج.م*\n`;
-  msg += `-------------------\n\n`;
-  msg += `👤 الاسم: ${name}\n`;
-  if(orderType === 'دليفري' || orderType === 'تيك أواي') msg += `📱 الموبايل: ${phone}\n`;
-  if(orderType === 'دليفري') msg += `🏠 العنوان: ${address}\n`;
-  if(orderType === 'صالة') msg += `🍽️ رقم الترابيزة: ${table}\n`;
-  if(notes) msg += `📝 ملاحظات إضافية: ${notes}\n`;
-
-  db.collection('orders').add({
-    orderType: orderType, customerName: name, phone: phone, address: address, table: table, notes: notes,
-    couponCode: validDiscount > 0 ? couponCode : "", discount: validDiscount,
-    items: cart.map(i => `${i.name}${i.size ? '('+i.size+')' : ''} x${i.qty}${i.notes ? ' [ملاحظة: '+i.notes+']' : ''}`).join('، '),
-    total: finalTotal, status: 'new', timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    cart = []; currentDiscountValue = 0; saveCart(); renderCart(); closeCheckoutModal();
-    btn.innerHTML = 'إرسال الطلب على واتساب'; btn.disabled = false;
-    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
-  }).catch(err => {
-    btn.innerHTML = 'إرسال الطلب على واتساب'; btn.disabled = false;
-    window.location.href = `whatsapp://send?phone=201067841756&text=${encodeURIComponent(msg)}`;
-  });
-});
 function showToast(text){
   const toast = document.getElementById('toast'); toast.textContent = text; toast.classList.add('show');
   clearTimeout(window._toastTimer); window._toastTimer = setTimeout(()=>toast.classList.remove('show'), 2200);
