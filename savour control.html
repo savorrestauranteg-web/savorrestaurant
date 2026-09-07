@@ -619,7 +619,17 @@ function renderMenuTableHTML(data) {
     function updateOrderStatus(docId, newStatus) {
       db.collection("orders").doc(docId).update({ status: newStatus });
     }
-
+function deleteMenuItem(docId) {
+  if (confirm("هل أنت متأكد من حذف هذا المنتج نهائياً من المنيو؟")) {
+    db.collection("menu").doc(docId).delete()
+      .then(() => {
+        alert("✅ تم حذف المنتج بنجاح!");
+      })
+      .catch(err => {
+        alert("❌ حدث خطأ أثناء الحذف: " + err.message);
+      });
+  }
+}
     function deleteOrder(docId) {
       if (confirm("هل أنت متأكد من حذف هذا الطلب نهائياً؟")) {
         db.collection("orders").doc(docId).delete();
