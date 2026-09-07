@@ -1437,19 +1437,9 @@ let isMenuFirstLoad = true;
 
 function fetchMenuData() {
   const cachedMenu = localStorage.getItem('savor_menu_cache');
-  const cacheTimestamp = localStorage.getItem('savor_menu_time');
   const now = new Date().getTime();
 
-  // التحقق من الذاكرة المؤقتة (أقل من 12 ساعة)
-  if (cachedMenu && cacheTimestamp && now - cacheTimestamp < 12 * 60 * 60 * 1000) {
-    MENU = JSON.parse(cachedMenu);
-    renderCatNav();
-    renderMenuToHTML();
-    handleSharedLink();
-    return;
-  }
-
-  // الجلب من قاعدة البيانات في حالة عدم وجود نسخة محفوظة
+  // Always read the latest menu so dashboard changes appear online immediately.
   db.collection("menu").get().then(snapshot => {
     let fetchedCategories = [];
     let fetchedProducts = [];
@@ -1496,6 +1486,15 @@ function fetchMenuData() {
     renderCatNav();
     renderMenuToHTML();
     handleSharedLink();
+  }).catch(error => {
+    // Use the last local copy only when Firestore is temporarily unavailable.
+    console.error('Menu loading error:', error);
+    if (cachedMenu) {
+      MENU = JSON.parse(cachedMenu);
+      renderCatNav();
+      renderMenuToHTML();
+      handleSharedLink();
+    }
   });
 }
 
