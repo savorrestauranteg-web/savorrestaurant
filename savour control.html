@@ -944,6 +944,12 @@ function updateExistingItem(itemId, hasSizes) {
         if (xlVal && Number(xlVal) > 0) sizes.XL = Number(xlVal);
 
         updateData.sizes = sizes;
+      } else {
+        const priceValue = document.getElementById(`price_fixed_${itemId}`).value;
+        if (priceValue === '' || Number(priceValue) < 0) {
+          return alert("اكتب سعراً صحيحاً للمنتج");
+        }
+        updateData.price = Number(priceValue);
       }
       db.collection("menu").doc(itemId).update(updateData)
         .then(() => alert("✅ تم تحديث المنتج بنجاح!"))
