@@ -52,7 +52,7 @@
           <span class="text-2xl">📈</span>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div class="glass-panel p-6 rounded-2xl border-r-4 border-slate-700 flex flex-col items-start shadow-sm">
             <span class="text-slate-500 text-sm font-bold mb-2">إجمالي طلبات الشهر</span>
             <span class="text-4xl font-black text-slate-800" id="statMonthOrders">0</span>
@@ -64,6 +64,10 @@
           <div class="glass-panel p-6 rounded-2xl border-r-4 border-green-500 flex flex-col items-start shadow-sm">
             <span class="text-slate-500 text-sm font-bold mb-2">إجمالي مبيعات اليوم (للمكتمل)</span>
             <span class="text-4xl font-black text-green-600" id="statTodaySales">0 ج.م</span>
+          </div>
+          <div class="glass-panel p-6 rounded-2xl border-r-4 border-emerald-700 flex flex-col items-start shadow-sm">
+            <span class="text-slate-500 text-sm font-bold mb-2">إجمالي مبيعات الشهر (للمكتمل)</span>
+            <span class="text-4xl font-black text-emerald-700" id="statMonthSales">0 ج.م</span>
           </div>
         </div>
 
@@ -353,6 +357,28 @@ function sendWhatsApp(phone, name, orderNum, status) {
     let allOrders = [];
     let allMenuItems = [];
     let salesChartInstance = null;
+    let monthlyStatsResetTimer;
+
+    function updateMonthlySalesStat() {
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const monthSales = allOrders.reduce((total, order) => {
+        const orderDate = order.timestamp ? (order.timestamp.toDate ? order.timestamp.toDate() : new Date(order.timestamp)) : new Date();
+        return total + (order.status === 'delivered' && orderDate >= monthStart ? (parseFloat(order.total) || 0) : 0);
+      }, 0);
+
+      document.getElementById('statMonthSales').innerText = monthSales + ' ج.م';
+    }
+
+    function scheduleMonthlyStatsReset() {
+      clearTimeout(monthlyStatsResetTimer);
+      const now = new Date();
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      monthlyStatsResetTimer = setTimeout(() => {
+        updateMonthlySalesStat();
+        scheduleMonthlyStatsReset();
+      }, nextMonth.getTime() - now.getTime());
+    }
 /* ================== نظام الطلبات والإحصائيات ================== */
   function fetchOrders() {
       db.collection("orders").orderBy("timestamp", "desc").onSnapshot({ includeMetadataChanges: true }, snapshot => {
@@ -368,6 +394,7 @@ function sendWhatsApp(phone, name, orderNum, status) {
         allOrders = [];
         
         let todaySales = 0;
+        let monthSales = 0;
         let newOrdersCount = 0;
         let monthOrdersCount = 0;
 
@@ -394,6 +421,9 @@ function sendWhatsApp(phone, name, orderNum, status) {
           if (order.status === 'delivered') {
             if(orderDate >= todayStart) {
                todaySales += parseFloat(order.total) || 0;
+            }
+            if(orderDate >= monthStart) {
+              monthSales += parseFloat(order.total) || 0;
             }
             for(let i=0; i<7; i++) {
               if (orderDate.toDateString() === last7Days[i].toDateString()) {
@@ -423,8 +453,10 @@ function sendWhatsApp(phone, name, orderNum, status) {
         // =============================================================
 
         document.getElementById('statTodaySales').innerText = todaySales + ' ج.م';
+        document.getElementById('statMonthSales').innerText = monthSales + ' ج.م';
         document.getElementById('statNewOrders').innerText = newOrdersCount;
         document.getElementById('statMonthOrders').innerText = monthOrdersCount;
+        scheduleMonthlyStatsReset();
         updateChart(last7Days.map(d => d.toLocaleDateString('ar-EG', {weekday: 'short', month: 'numeric', day: 'numeric'})), dailySales);
 
         filterOrders(); 
