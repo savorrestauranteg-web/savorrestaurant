@@ -2322,13 +2322,11 @@ function closeProductModal() {
 // مستمع لزر الإغلاق (X)
 document.getElementById('pmCloseBtn').addEventListener('click', closeProductModal);
 
-// مستمع لزر المشاركة (بالرسالة الجديدة واللينك القصير)
+// مستمع لزر المشاركة بالرابط فقط
 document.getElementById('pmShareBtn').addEventListener('click', async () => {
   const currentUrl = window.location.href;
-  const shareMsg = `شوف ( ${activePmItem.name} ) من Savor !`; // الرسالة الجديدة
   const shareData = {
     title: 'SAVOR Restaurant',
-    text: shareMsg,
     url: currentUrl
   };
 
@@ -2343,9 +2341,8 @@ document.getElementById('pmShareBtn').addEventListener('click', async () => {
     }
   } else {
     try {
-      // لو العميل فاتح من كمبيوتر أو متصفح مش بيدعم الشير بننسخ الرسالة + اللينك
-      await navigator.clipboard.writeText(shareMsg + "\n" + currentUrl);
-      showToast('تم نسخ رسالة ورابط المنتج بنجاح 🔗');
+      await navigator.clipboard.writeText(currentUrl);
+      showToast('تم نسخ رابط المنتج بنجاح 🔗');
     } catch (err) {
       showToast('حدث خطأ أثناء نسخ الرابط ❌');
     }
