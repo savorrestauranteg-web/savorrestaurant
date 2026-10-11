@@ -1924,9 +1924,17 @@ document.getElementById('applyCouponBtn').addEventListener('click', () => {
         currentDiscountValue = 0; msgEl.textContent = 'Invalid or expired coupon'; msgEl.className = 'coupon-msg error'; renderCart();
       } else {
         const couponData = snapshot.docs[0].data();
-        let rawDiscount = couponData.value !== undefined ? couponData.value : couponData.discount;
-        currentDiscountValue = parseFloat(rawDiscount);
-        if(isNaN(currentDiscountValue) || currentDiscountValue <= 0) {
+        const rawDiscount = Number(couponData.value !== undefined ? couponData.value : couponData.discount ?? 0);
+        const couponType = couponData.type || 'fixed';
+        const subtotal = cartTotal();
+
+        if (couponType === 'percentage') {
+          currentDiscountValue = Math.min(subtotal * (rawDiscount / 100), subtotal);
+        } else {
+          currentDiscountValue = Math.min(rawDiscount, subtotal);
+        }
+
+        if(isNaN(currentDiscountValue) || currentDiscountValue <= 0 || rawDiscount < 0 || (couponType === 'percentage' && rawDiscount > 100)) {
             currentDiscountValue = 0; msgEl.textContent = 'Invalid coupon value'; msgEl.className = 'coupon-msg error';
         } else {
             msgEl.textContent = '✓ Coupon Applied'; msgEl.className = 'coupon-msg success';
