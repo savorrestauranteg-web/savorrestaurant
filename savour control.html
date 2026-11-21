@@ -73,7 +73,9 @@
 
         <div class="glass-panel p-6 rounded-2xl shadow-sm">
           <h3 class="font-bold text-lg mb-4 text-slate-700">مبيعات آخر 7 أيام</h3>
-          <canvas id="salesChart" height="80"></canvas>
+          <div class="relative w-full h-64">
+            <canvas id="salesChart"></canvas>
+          </div>
         </div>
       </section>
 
@@ -370,19 +372,19 @@ function sendWhatsApp(phone, name, orderNum, status) {
       document.getElementById('statMonthSales').innerText = monthSales + ' ج.م';
     }
 
-    function scheduleMonthlyStatsReset() {
-      clearTimeout(monthlyStatsResetTimer);
-      const now = new Date();
-      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-      monthlyStatsResetTimer = setTimeout(() => {
-        updateMonthlySalesStat();
-        scheduleMonthlyStatsReset();
-      }, nextMonth.getTime() - now.getTime());
-    }
+function scheduleMonthlyStatsReset() {
+  clearTimeout(monthlyStatsResetTimer);
+  const now = new Date();
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const delay = Math.min(nextMonth.getTime() - now.getTime(), 2147483647);
+  monthlyStatsResetTimer = setTimeout(() => {
+    updateMonthlySalesStat();
+    scheduleMonthlyStatsReset();
+  }, delay);
+}
 /* ================== نظام الطلبات والإحصائيات ================== */
   function fetchOrders() {
-      db.collection("orders").orderBy("timestamp", "desc").onSnapshot({ includeMetadataChanges: true }, snapshot => {
-        // تجاهل التحديثات المحلية المؤقتة قبل تثبيتها على السيرفر
+db.collection("orders").orderBy("timestamp", "desc").limit(200).onSnapshot({ includeMetadataChanges: true }, snapshot => {        // تجاهل التحديثات المحلية المؤقتة قبل تثبيتها على السيرفر
         if (snapshot.metadata.hasPendingWrites) return;
 
         if (!isFirstOrdersLoad) {
@@ -482,6 +484,8 @@ function updateChart(labels, data) {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: 1,
           plugins: { legend: { display: false } },
           scales: { y: { beginAtZero: true } }
         }
@@ -801,10 +805,13 @@ function switchMenuSubTab(tabName) {
       });
     }
 
-    // ==========================================
-    // --- إرجاع دوال إدارة الأقسام اللي اتمسحت ---
-    // ==========================================
 
+let appCategories = [];
+const DEFAULT_CATEGORIES = [
+  { id: 'beefburger', nameAr: 'برجر لحمة', nameEn: 'Beef Burger', icon: '🍔', banner: 'assets/beefburger.jpg' },
+  { id: 'chickencrispy', nameAr: 'تشيكن كرسبي', nameEn: 'Chicken Crispy', icon: '🍗', banner: 'assets/beefburger.jpg' },
+  { id: 'drinks', nameAr: 'مشروبات', nameEn: 'Drinks', icon: '🥤', banner: 'assets/beefburger.jpg' }
+];
     function fetchCategories() {
       db.collection("menu").doc("categoriesData").onSnapshot(doc => {
         // لو الأقسام فاضية، هيرجع يحمل الأقسام الافتراضية عشان مفيش حاجة تختفي
