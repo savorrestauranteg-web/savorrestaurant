@@ -1,7 +1,9 @@
 /* ================== Telegram & Firebase Setup ================== */
 const TELEGRAM_BOT_TOKEN = '8775573638:AAH0lL9JerMwWuIZPs2sfTMmpbqf4nRqU4I';
 const TELEGRAM_CHAT_ID = '8540698486';
-
+function makeSlug(name) {
+  return name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+}
 async function notifyTelegram(orderMsg) {
   try {
     await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -485,32 +487,29 @@ function handleSharedLink() {
     let shortId = urlParams.get('p');
 
     if (shortId) {
-      shortId = shortId.replace(/ /g, '+');
-      let sharedItemName = "";
+      let decodedLegacyName = "";
       try {
-        sharedItemName = decodeURIComponent(escape(atob(shortId)));
-      } catch (e) {
-        console.log('Invalid Link Decoding');
-      }
+        decodedLegacyName = decodeURIComponent(escape(atob(shortId.replace(/ /g, '+'))));
+      } catch (e) {}
 
-      if (sharedItemName) {
-        let itemFound = false;
-        for (let c = 0; c < MENU.length; c++) {
-          for (let i = 0; i < MENU[c].items.length; i++) {
-            const dbName = MENU[c].items[i].name ? MENU[c].items[i].name.trim() : "";
-            const dbNameEn = MENU[c].items[i].nameEn ? MENU[c].items[i].nameEn.trim() : "";
-            const targetName = sharedItemName.trim();
-            
-            if (dbName === targetName || dbNameEn === targetName) {
-              setTimeout(() => {
-                openProductModal(c, i);
-              }, 100);
-              itemFound = true;
-              break;
-            }
+      let itemFound = false;
+      for (let c = 0; c < MENU.length; c++) {
+        for (let i = 0; i < MENU[c].items.length; i++) {
+          const item = MENU[c].items[i];
+          const dbName = item.name ? item.name.trim() : "";
+          const dbNameEn = item.nameEn ? item.nameEn.trim() : "";
+          const itemSlug = makeSlug(dbNameEn || dbName);
+
+          // يطابق الرابط الإنجليزي الجديد أو الرابط القديم المشفر
+          if (itemSlug === shortId || (decodedLegacyName && (dbName === decodedLegacyName.trim() || dbNameEn === decodedLegacyName.trim()))) {
+            setTimeout(() => {
+              openProductModal(c, i);
+            }, 100);
+            itemFound = true;
+            break;
           }
-          if (itemFound) break;
         }
+        if (itemFound) break;
       }
     }
     isMenuFirstLoad = false;
@@ -720,11 +719,8 @@ function openProductModal(catIdx, itemIdx) {
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlayBg').classList.add('show');
   
-  const utf8Str = unescape(encodeURIComponent(activePmItem.name));
-  const rawBase64 = btoa(utf8Str);
-  const shortId = encodeURIComponent(rawBase64);
-
-  const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?p=' + shortId;
+  const slugName = makeSlug(activePmItem.nameEn || activePmItem.name);
+  const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?p=' + slugName;
   try {
     window.history.pushState({ path: newUrl }, '', newUrl);
   } catch (e) {}
