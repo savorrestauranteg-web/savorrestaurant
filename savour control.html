@@ -637,7 +637,7 @@ function renderMenuTableHTML(data) {
               <textarea id="descEn_${item.id}" rows="2" class="w-full p-2 border rounded text-xs placeholder-slate-400" placeholder="Ingredients..." dir="ltr">${item.descriptionEn || ''}</textarea>
             </td>
             <td class="p-3 w-48">${priceFieldHTML}</td>
-            <td class="p-3"><input type="file" id="file_${item.id}" class="text-xs w-full" onchange="uploadImageToImgBB('${item.id}')"></td>
+            <td class="p-3"><input type="file" id="file_${item.id}" accept="image/*" class="text-xs w-full" onchange="uploadImageToImgBB('${item.id}')"></td>
             <td class="p-3">
               <select onchange="db.collection('menu').doc('${item.id}').update({status: this.value})" class="border p-1 rounded font-bold text-sm ${item.status === 'out_of_stock' ? 'text-red-600 bg-red-50' : 'text-green-600 bg-green-50'}">
                 <option value="available" ${item.status !== 'out_of_stock' ? 'selected':''}>متاح</option>
@@ -805,12 +805,49 @@ function switchMenuSubTab(tabName) {
       });
     }
 
+async function uploadImageToImgBB(itemId) {
+  const fileInput = document.getElementById(`file_${itemId}`);
+  const file = fileInput.files[0];
+  if (!file) return;
 
+  try {
+    // إظهار مؤشر بسيط إن الصورة بتترفع
+    fileInput.disabled = true;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      const imageUrl = data.data.display_url;
+      await db.collection("menu").doc(itemId).update({ image: imageUrl });
+      alert("✅ تم تغيير صورة المنتج بنجاح!");
+    } else {
+      alert("❌ فشل رفع الصورة على السيرفر، حاول مرة أخرى.");
+    }
+  } catch (err) {
+    alert("❌ حدث خطأ أثناء رفع الصورة: " + err.message);
+  } finally {
+    fileInput.disabled = false;
+    fileInput.value = ''; // تصفير الحقل بعد الرفع
+  }
+}
 let appCategories = [];
 const DEFAULT_CATEGORIES = [
-  { id: 'beefburger', nameAr: 'برجر لحمة', nameEn: 'Beef Burger', icon: '🍔', banner: 'assets/beefburger.jpg' },
-  { id: 'chickencrispy', nameAr: 'تشيكن كرسبي', nameEn: 'Chicken Crispy', icon: '🍗', banner: 'assets/beefburger.jpg' },
-  { id: 'drinks', nameAr: 'مشروبات', nameEn: 'Drinks', icon: '🥤', banner: 'assets/beefburger.jpg' }
+  { id: 'drinks', nameAr: 'مشروبات', nameEn: 'DRINKS', icon: '🥤', banner: 'assets/drinks.jpg' },
+  { id: 'fries', nameAr: 'باكت بطاطس', nameEn: 'FRIES PACKET', icon: '🍟', banner: 'assets/fries.jpg' },
+  { id: 'beefburger', nameAr: 'برجر لحمة', nameEn: 'BEEF BURGER', icon: '🍔', banner: 'assets/beefburger.jpg' },
+  { id: 'tortillapotato', nameAr: 'تورتيلا بطاطس', nameEn: 'TORTILLA POTATO', icon: '🌯', banner: 'assets/tortillapotato.jpg' },
+  { id: 'chickencrispy', nameAr: 'تشيكن كرسبي', nameEn: 'CHICKEN CRISPY', icon: '🍗', banner: 'assets/chickencrispy.jpg' },
+  { id: 'chickenpasta', nameAr: 'مكرونة تشيكن كرسبي', nameEn: 'CHICKEN CRISPY PASTA', icon: '🍝', banner: 'assets/chickenpasta.jpg' },
+  { id: 'tortillachicken', nameAr: 'تورتيلا تشيكن كرسبي', nameEn: 'TORTILLA CHICKEN CRISPY', icon: '🌯', banner: 'assets/tortillachicken.jpg' },
+  { id: 'tortillabeef', nameAr: 'تورتيلا لحمة', nameEn: 'TORTILLA BEEF', icon: '🌯', banner: 'assets/tortillabeef.jpg' },
+  { id: 'additions', nameAr: 'إضافات', nameEn: 'ADDITIONS', icon: '➕', banner: 'assets/additions.jpg' }
 ];
     function fetchCategories() {
       db.collection("menu").doc("categoriesData").onSnapshot(doc => {
@@ -1089,8 +1126,5 @@ function updateExistingItem(itemId, hasSizes) {
     Designed & Developed by Joe Advertise 🚀
   </a>
 </footer>
-
-</body>
-</html>
 </body>
 </html>
